@@ -1,0 +1,6 @@
+﻿cl : 命令行 warning D9025: 正在重写“/sdl”(用“/GS-”)
+cl : 命令行 warning D9025: 正在重写“/sdl”(用“/GS-”)
+cl : 命令行 warning D9025: 正在重写“/sdl”(用“/GS-”)
+  SnippetCamera.cpp
+  SnippetRender.cpp
+  snippet-render.vcxproj -> F:\PhysX4.1-learn\snippet-hello-world\snippet-render\..\bin\debug\snippet-render.lib

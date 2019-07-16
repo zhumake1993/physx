@@ -8,20 +8,20 @@
 
 using namespace physx;
 
-PxDefaultAllocator		gAllocator;
-PxDefaultErrorCallback	gErrorCallback;
+PxDefaultAllocator		gAllocator;			// 默认的内存管理器
+PxDefaultErrorCallback	gErrorCallback;		// 默认的错误管理器
 
-PxFoundation* gFoundation = NULL;
-PxPhysics* gPhysics = NULL;
+PxFoundation* gFoundation = NULL;			// Px基础
+PxPhysics* gPhysics = NULL;					// Px实例
 
-PxDefaultCpuDispatcher* gDispatcher = NULL;
-PxScene* gScene = NULL;
+PxDefaultCpuDispatcher* gDispatcher = NULL;	// cpu分配器
+PxScene* gScene = NULL;						// 场景
 
-PxMaterial* gMaterial = NULL;
+PxMaterial* gMaterial = NULL;				//
 
-PxPvd* gPvd = NULL;
+PxPvd* gPvd = NULL;							//
 
-PxReal stackZ = 10.0f;
+PxReal stackZ = 10.0f;						//
 
 PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
 {
@@ -35,6 +35,7 @@ PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, 
 void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 {
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
+
 	for (PxU32 i = 0; i < size; i++)
 	{
 		for (PxU32 j = 0; j < size - i; j++)
@@ -51,30 +52,37 @@ void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 
 void initPhysics(bool interactive)
 {
+	// 创建Px基础
 	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
 
+	// 链接Pvd
 	gPvd = PxCreatePvd(*gFoundation);
 	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
 	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
+	// 创建Px实例
 	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
 
+	// 创建场景
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	gDispatcher = PxDefaultCpuDispatcherCreate(2);
-	sceneDesc.cpuDispatcher = gDispatcher;
+	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(2);
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
 
+	// 设置传输到Pvd的数据
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)
 	{
-		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
-		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
-		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
+		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);	// 开启约束数据传输到Pvd
+		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);		// 开启链接数据传输到Pvd
+		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);	// 开启场景查询数据传输到Pvd
 	}
+
+	// 创建材质
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
+	// 创建静态物体
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	gScene->addActor(*groundPlane);
 

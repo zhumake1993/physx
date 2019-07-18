@@ -1,6 +1,8 @@
 #pragma once
 
 #include <ctype.h>
+#include <string>
+#include <unordered_map>
 
 #include "PxPhysicsAPI.h"
 
@@ -63,3 +65,52 @@ extern PxDefaultCpuDispatcher* gDispatcher;	// cpu分配器
 extern PxScene* gScene;						// 场景
 
 extern PxPvd* gPvd;							// PVD
+
+//===========================================================
+//===========================================================
+// PhysX几何体
+//===========================================================
+//===========================================================
+
+enum PxGeometryEnum { sphere, box, capsule, plane };
+
+struct PxSphereGeometryDesc {
+	float radius;
+};
+
+struct PxBoxGeometryDesc {
+	float hx;
+	float hy;
+	float hz;
+};
+
+struct PxCapsuleGeometryDesc {
+	float radius;
+	float halfHeight;
+};
+
+struct PxPlaneGeometryDesc {
+	float nx;
+	float ny;
+	float nz;
+	float distance;
+};
+
+struct PxRigidDynamicDesc {
+
+	// transform
+	float px, py, pz;
+	float qx, qy, qz, qw;
+
+	// Material
+	float materialStaticFriction;
+	float materialDynamicFriction;
+	float materialRestitution;
+
+	// Geometry
+	PxGeometryEnum pxGeometry;
+	void* PxGeometryDesc;
+
+	// density
+	float density;
+};

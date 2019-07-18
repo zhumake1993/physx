@@ -32,9 +32,6 @@
 
 #include "GameObject/Sky.h"
 #include "GameObject/Box.h"
-#include "GameObject/WirefenceBox.h"
-#include "GameObject/Hill.h"
-#include "GameObject/Wave.h"
 #include "GameObject/Skull.h"
 #include "GameObject/Globe.h"
 #include "GameObject/Grid.h"

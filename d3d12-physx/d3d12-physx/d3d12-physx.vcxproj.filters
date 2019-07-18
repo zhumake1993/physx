@@ -123,9 +123,6 @@
     <ClCompile Include="GameObject\Grid.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject\Hill.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject\Skull.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
@@ -133,12 +130,6 @@
       <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="GameObject\Sphere.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\Wave.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\WirefenceBox.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Filter\BlurFilter.cpp">
@@ -257,9 +248,6 @@
     <ClInclude Include="GameObject\Grid.h">
       <Filter>GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject\Hill.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject\Skull.h">
       <Filter>GameObject</Filter>
     </ClInclude>
@@ -267,12 +255,6 @@
       <Filter>GameObject</Filter>
     </ClInclude>
     <ClInclude Include="GameObject\Sphere.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Wave.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\WirefenceBox.h">
       <Filter>GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Filter\BlurFilter.h">

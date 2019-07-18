@@ -10,6 +10,55 @@
 
 using namespace DirectX;
 
+//===========================================================
+//===========================================================
+// PhysX几何体
+//===========================================================
+//===========================================================
+
+enum PxGeometryEnum { PxSphere, PxBox, PxCapsule, PxPlane };
+
+struct PxSphereGeometryDesc {
+	float radius;
+};
+
+struct PxBoxGeometryDesc {
+	float hx;
+	float hy;
+	float hz;
+};
+
+struct PxCapsuleGeometryDesc {
+	float radius;
+	float halfHeight;
+};
+
+struct PxPlaneGeometryDesc {
+	float nx;
+	float ny;
+	float nz;
+	float distance;
+};
+
+struct PxRigidDynamicDesc {
+
+	// transform
+	float px, py, pz;
+	float qx, qy, qz, qw;
+
+	// Material
+	float materialStaticFriction;
+	float materialDynamicFriction;
+	float materialRestitution;
+
+	// Geometry
+	PxGeometryEnum pxGeometry;
+	void* pxGeometryDesc;
+
+	// density
+	float density;
+};
+
 class GameObject
 {
 	friend class GameObjectManager;
@@ -23,7 +72,8 @@ protected:
 	bool GetKeyPress(int key);
 	bool GetKeyUp(int key);
 
-private:
+	void AddRigidBody();
+
 	virtual void Update();
 
 	XMFLOAT4X4 GetWorld();
@@ -32,7 +82,7 @@ public:
 	std::string mGameObjectName = "GameObject";
 
 	XMFLOAT3 mTranslation = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	XMFLOAT3 mRotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	XMFLOAT4 mRotationQuat = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT3 mScale = XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 	std::string mMatName;
@@ -43,4 +93,14 @@ public:
 	int mRenderLayer = -1;
 
 	bool mReceiveShadow = true;
+
+protected:
+
+	bool mHasRigidBody = false;
+	XMFLOAT3 mPxLocalPos;			// 相对位置
+	XMFLOAT4 mPxLocalQuat;			// 相对四元数
+	XMFLOAT3 mPxMaterial;
+	PxGeometryEnum mPxGeometry;
+	void* mPxGeometryDesc;
+	float mDensity;
 };

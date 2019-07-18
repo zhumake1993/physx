@@ -9,13 +9,13 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{21ad06be-53bd-48d4-9938-31488b4a6657}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\PhysXUtil.cpp">
       <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="Main\SnippetHelloWorld.cpp">
-      <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="Main\PhysX.cpp">
       <Filter>Main</Filter>

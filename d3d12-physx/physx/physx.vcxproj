@@ -160,7 +160,6 @@
   <ItemGroup>
     <ClCompile Include="Common\PhysXUtil.cpp" />
     <ClCompile Include="Main\PhysX.cpp" />
-    <ClCompile Include="Main\SnippetHelloWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\PhysXUtil.h" />

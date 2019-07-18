@@ -6,6 +6,9 @@
 
 #define MAX_NUM_ACTOR_SHAPES 128
 
+// 硬编码，测试用
+std::unordered_map<std::string, PxRigidDynamic*> gPxRigidDynamicMap;
+
 PhysX::PhysX()
 {
 }
@@ -26,7 +29,10 @@ void PhysX::InitPhysics()
 
 	// 创建Px实例
 	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
+}
 
+void PhysX::CreateScene()
+{
 	// 创建场景
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
@@ -44,7 +50,7 @@ void PhysX::InitPhysics()
 	}
 }
 
-void PhysX::CreateObject()
+void PhysX::CreatePxRigidStatic()
 {
 	// 创建材质
 	PxMaterial* material = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
@@ -52,14 +58,52 @@ void PhysX::CreateObject()
 	// 创建静态平面
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *material);
 	gScene->addActor(*groundPlane);
+}
 
-	// 创建动态立方体
-	PxShape* shape = gPhysics->createShape(PxBoxGeometry(0.5f, 0.5f, 0.5f), *material);
-	PxRigidDynamic* body = gPhysics->createRigidDynamic(PxTransform(PxVec3(0.0f, 10.0f, 0.0f)));
-	body->attachShape(*shape);
-	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-	gScene->addActor(*body);
+void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
+{
+	auto desc = *static_cast<PxRigidDynamicDesc*>(pdesc);
+
+	// 创建transform
+	auto transform = PxTransform(PxVec3(desc.px, desc.py, desc.pz), PxQuat(desc.qx, desc.qy, desc.qz, desc.qw));
+
+	// 创建actor
+	PxRigidDynamic* actor = gPhysics->createRigidDynamic(transform);
+
+	// 创建材质
+	PxMaterial* material = gPhysics->createMaterial(desc.materialStaticFriction, desc.materialDynamicFriction, desc.materialRestitution);
+
+	// 创建shape
+	PxShape* shape = nullptr;
+	switch (desc.pxGeometry) {
+		case sphere: {
+			auto p = static_cast<PxSphereGeometryDesc*>(desc.PxGeometryDesc);
+			shape = gPhysics->createShape(PxSphereGeometry(p->radius), *material); break;
+		}
+		case box: {
+			auto p = static_cast<PxBoxGeometryDesc*>(desc.PxGeometryDesc);
+			shape = gPhysics->createShape(PxBoxGeometry(p->hx, p->hy, p->hz), *material); break;
+		}
+		case capsule: {
+			auto p = static_cast<PxCapsuleGeometryDesc*>(desc.PxGeometryDesc);
+			shape = gPhysics->createShape(PxCapsuleGeometry(p->radius, p->halfHeight), *material); break;
+		}
+		default: {
+			assert(shape);
+		}
+	}
+
+	// 添加shape
+	actor->attachShape(*shape);
 	shape->release();
+
+	// 设置密度
+	PxRigidBodyExt::updateMassAndInertia(*actor, desc.density);
+
+	// 添加actor
+	gScene->addActor(*actor);
+
+	gPxRigidDynamicMap[name] = actor;
 }
 
 void PhysX::Update(float delta)
@@ -70,65 +114,84 @@ void PhysX::Update(float delta)
 
 void PhysX::Get(float& x, float& y, float& z, float& a, float& b, float& c, float& d)
 {
-	PxScene* scene;
-	PxGetPhysics().getScenes(&scene, 1);
-	PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
-	if (nbActors)
-	{
-		std::vector<PxRigidActor*> actors(nbActors);
-		scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor * *>(&actors[0]), nbActors);
-		//Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
+	auto pg = gPxRigidDynamicMap["boxPx"];
+	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
+	pg->getShapes(shapes, 1);
 
-		PxU32 numActors = static_cast<PxU32>(actors.size());
-		
-		PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
+	//获取transform
+	auto t = PxShapeExt::getGlobalPose(*shapes[0], *pg);
 
-		for (PxU32 i = 0; i < numActors; i++)
-		{
-			// 获取添加到actor的shape的数量
-			const PxU32 nbShapes = actors[i]->getNbShapes();
-			PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
+	x = t.p.x;
+	y = t.p.y;
+	z = t.p.z;
+	a = t.q.x;
+	b = t.q.y;
+	c = t.q.z;
+	d = t.q.w;
 
-			// 获取添加到actor的shape
-			actors[i]->getShapes(shapes, nbShapes);
+	//PxScene* scene;
+	//PxGetPhysics().getScenes(&scene, 1);
+	//PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
+	//if (nbActors)
+	//{
+	//	std::vector<PxRigidActor*> actors(nbActors);
+	//	scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor * *>(&actors[0]), nbActors);
+	//	//Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
 
-			// 获取actor的sleep状态
-			const bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false;
+	//	PxU32 numActors = static_cast<PxU32>(actors.size());
+	//	
+	//	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
 
-			for (PxU32 j = 0; j < nbShapes; j++)
-			{
-				// 获取transform
-				auto t = PxShapeExt::getGlobalPose(*shapes[j], *actors[i]);
+	//	for (PxU32 i = 0; i < numActors; i++)
+	//	{
+	//		auto pg = static_cast<PxRigidActor*>(gg);
 
-				x = t.p.x;
-				y = t.p.y;
-				z = t.p.z;
-				a = t.q.x;
-				b = t.q.y;
-				c = t.q.z;
-				d = t.q.w;
+	//		// 获取添加到actor的shape的数量
+	//		const PxU32 nbShapes = actors[i]->getNbShapes();
+	//		PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
 
-				// 获取几何体
-				const PxGeometryHolder h = shapes[j]->getGeometry();
+	//		// 获取添加到actor的shape
+	//		//actors[i]->getShapes(shapes, nbShapes);
+	//		pg->getShapes(shapes, nbShapes);
 
-				if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE) {
-					//
-				}
+	//		// 获取actor的sleep状态
+	//		const bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false;
 
-				if (sleeping)
-				{
-					//
-				}
-				else
-				{
-					//
-				}
-			}
-		}
-	}
+	//		for (PxU32 j = 0; j < nbShapes; j++)
+	//		{
+	//			// 获取transform
+	//			auto t = PxShapeExt::getGlobalPose(*shapes[j], *actors[i]);
+
+	//			x = t.p.x;
+	//			y = t.p.y;
+	//			z = t.p.z;
+	//			a = t.q.x;
+	//			b = t.q.y;
+	//			c = t.q.z;
+	//			d = t.q.w;
+
+	//			// 获取几何体
+	//			const PxGeometryHolder h = shapes[j]->getGeometry();
+
+	//			if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE) {
+	//				//
+	//			}
+
+	//			if (sleeping)
+	//			{
+	//				//
+	//			}
+	//			else
+	//			{
+	//				//
+	//			}
+	//		}
+	//	}
+	//}
 }
 
-void PhysX::cleanupPhysics()
+
+void PhysX::CleanupPhysics()
 {
 	PX_RELEASE(gScene);
 	PX_RELEASE(gDispatcher);

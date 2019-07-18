@@ -73,5 +73,5 @@ Skull::~Skull()
 void Skull::Update()
 {
 	mTranslation = XMFLOAT3(3.0f * cos(gTimer.TotalTime()*0.5f), 2.0f, 3.0f * sin(gTimer.TotalTime()*0.5f));
-	mRotation = XMFLOAT3(0.0f, gTimer.TotalTime(), 0.0f);
+	XMStoreFloat4(&mRotationQuat, XMQuaternionRotationAxis(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), gTimer.TotalTime()));
 }

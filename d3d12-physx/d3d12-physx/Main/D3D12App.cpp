@@ -22,6 +22,10 @@ bool D3D12App::Initialize()
 
 	gCamera->SetPosition(0.0f, 2.0f, -15.0f);
 
+	gPhysX.InitPhysics();
+	gPhysX.CreateScene();
+	gPhysX.CreatePxRigidStatic();
+
 	BuildManagers();
 	BuildRenders();
 	BuildFilters();
@@ -29,9 +33,6 @@ bool D3D12App::Initialize()
 	BuildMaterials();
 	BuildMeshes();
 	BuildGameObjects();
-
-	gPhysX.InitPhysics();
-	gPhysX.CreateObject();
 
 	// 执行初始化指令
 	ThrowIfFailed(gCommandList->Close());
@@ -56,40 +57,6 @@ void D3D12App::Update()
 	OnKeyboardInput();
 
 	gPhysX.Update(gTimer.DeltaTime());
-	float x, y, z, a, b, c, d;
-	gPhysX.Get(x, y, z, a, b, c, d);
-	gGameObjectManager->GetGameObject("boxPx")->mTranslation = XMFLOAT3(x, y, z);
-
-	XMFLOAT3 euler;
-	{
-		XMFLOAT4 q(a, b, c, d);
-
-		const double Epsilon = 0.0009765625f;
-		const double Threshold = 0.5f - Epsilon;
-
-		double TEST = q.w * q.y - q.x * q.z;
-
-		if (TEST < -Threshold || TEST > Threshold) // 奇异姿态,俯仰角为±90°
-		{
-			//int sign = Sign(TEST);
-			int sign = TEST > 0 ? 1 : -1;
-
-			euler.z = -2 * sign * (double)atan2(q.x, q.w); // yaw
-
-			euler.y = sign * (3.1416 / 2.0); // pitch
-
-			euler.x = 0; // roll
-
-		}
-		else
-		{
-			euler.x = atan2(2 * (q.y * q.z + q.w * q.x), q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z);
-			euler.y = asin(-2 * (q.x * q.z - q.w * q.y));
-			euler.x = atan2(2 * (q.x * q.y + q.w * q.z), q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z);
-		}
-	}
-
-	gGameObjectManager->GetGameObject("boxPx")->mRotation = euler;
 
 	// 扫描帧资源环形数组
 	gCurrFrameResourceIndex = (gCurrFrameResourceIndex + 1) % gNumFrameResources;
@@ -576,16 +543,6 @@ void D3D12App::BuildGameObjects()
 		rightSphere->mTranslation = XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f);
 		gGameObjectManager->AddGameObject(std::move(rightSphere));
 	}
-
-	auto hill = std::make_unique<Hill>();
-	gGameObjectManager->AddGameObject(std::move(hill));
-
-	auto wave = std::make_unique<Wave>();
-	wave->SetWavesVB(gD3D12Device.Get());
-	gGameObjectManager->AddGameObject(std::move(wave));
-
-	auto wirefenceBox = std::make_unique<WirefenceBox>();
-	gGameObjectManager->AddGameObject(std::move(wirefenceBox));
 
 	auto skull = std::make_unique<Skull>();
 	gGameObjectManager->AddGameObject(std::move(skull));

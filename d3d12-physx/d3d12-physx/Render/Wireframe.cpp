@@ -1,5 +1,35 @@
 #include "Wireframe.h"
 
+using Microsoft::WRL::ComPtr;
+using namespace DirectX;
+
+#include "Manager/InstanceManager.h"
+#include "Manager/TextureManager.h"
+#include "Manager/MaterialManager.h"
+extern std::unique_ptr<InstanceManager> gInstanceManager;
+extern std::unique_ptr<TextureManager> gTextureManager;
+extern std::unique_ptr<MaterialManager> gMaterialManager;
+
+extern DXGI_FORMAT gBackBufferFormat;
+extern DXGI_FORMAT gDepthStencilFormat;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
+extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
+extern bool g4xMsaaState;
+extern UINT g4xMsaaQuality;
+
+extern D3D12_VIEWPORT gScreenViewport;
+extern D3D12_RECT gScissorRect;
+
+#include "Common/FrameResource.h"
+extern std::unique_ptr<FrameResource<PassConstants>> gPassCB;
+
+extern std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> gRootSignatures;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> gShaders;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
+
 Wireframe::Wireframe()
 {
 	BuildRootSignature();
@@ -24,7 +54,7 @@ void Wireframe::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_D
 	gCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
 	// 绑定常量缓冲
-	auto passCB = gPassCB->GetCurrResource()->Resource();
+	auto passCB = gPassCB->GetCurrResource();
 	gCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
 
 	// 绑定所有材质。对于结构化缓冲，我们可以绕过堆，使用根描述符
@@ -77,6 +107,7 @@ void Wireframe::BuildPSO()
 	};
 	opaqueWireframePsoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	opaqueWireframePsoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	opaqueWireframePsoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
 	opaqueWireframePsoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	opaqueWireframePsoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	opaqueWireframePsoDesc.SampleMask = UINT_MAX;

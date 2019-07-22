@@ -1,6 +1,12 @@
 #include "TextureManager.h"
 
-std::unique_ptr<TextureManager> gTextureManager = std::make_unique<TextureManager>();
+using namespace DirectX;
+using Microsoft::WRL::ComPtr;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
+extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
+extern UINT gCbvSrvUavDescriptorSize;
 
 TextureManager::TextureManager()
 {
@@ -16,6 +22,10 @@ void TextureManager::Initialize()
 
 UINT TextureManager::GetIndex(std::string name)
 {
+	if (!HasTexture(name)) {
+		ThrowMyEx("Texture does not exist!")
+	}
+
 	return mTextures[name]->Index;
 }
 
@@ -32,6 +42,11 @@ ID3D12DescriptorHeap* TextureManager::GetSrvDescriptorHeapPtr()
 UINT TextureManager::GetMaxNumTextures()
 {
 	return mMaxNumTextures;
+}
+
+bool TextureManager::HasTexture(std::string name)
+{
+	return mTextures.find(name) != mTextures.end();
 }
 
 void TextureManager::AddTextureTex(std::wstring FileName)
@@ -115,10 +130,8 @@ void TextureManager::CreateTexture(std::unique_ptr<Texture> &tex)
 	auto end = fileNameString.find_last_of('.');
 	tex->Name = fileNameString.substr(begin + 1, end - begin - 1);
 
-	if (mTextures.find(tex->Name) != mTextures.end()) {
-		OutputMessageBox("Texture already exists!");
-		tex->Name = "";
-		return;
+	if (HasTexture(tex->Name)) {
+		ThrowMyEx("Texture already exists!")
 	}
 
 	ThrowIfFailed(DirectX::CreateDDSTextureFromFile12(gD3D12Device.Get(),

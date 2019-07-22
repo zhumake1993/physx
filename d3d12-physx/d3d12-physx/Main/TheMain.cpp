@@ -20,4 +20,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 		MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
 		return 0;
 	}
+	catch (MyException& e)
+	{
+		MessageBox(nullptr, e.ToString().c_str(), L"Error", MB_OK);
+		return 0;
+	}
 }

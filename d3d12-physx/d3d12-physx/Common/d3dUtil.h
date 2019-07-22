@@ -19,52 +19,21 @@
 
 #include "d3dx12.h"
 #include "MathHelper.h"
-#include "GameTimer.h"
 #include "DDSTextureLoader.h"
-#include "../physx/Main/PhysX.h"
-
-using Microsoft::WRL::ComPtr;
 
 //===========================================================
 //===========================================================
-// 全局变量
+// 结构体
 //===========================================================
 //===========================================================
 
-extern std::wstring gMainWndCaption;					// 标题
-extern D3D_DRIVER_TYPE gd3dDriverType;					// 硬件类型
-extern DXGI_FORMAT gBackBufferFormat;					// 后缓冲格式
-extern DXGI_FORMAT gDepthStencilFormat;					// 深度模板缓冲格式
-extern int gClientWidth;								// 屏幕宽
-extern int gClientHeight;								// 屏幕高
+struct Transform
+{
+	DirectX::XMFLOAT3 Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+	DirectX::XMFLOAT4 Quaternion = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	DirectX::XMFLOAT3 Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+};
 
-extern GameTimer gTimer;								// 计时器
-
-extern ComPtr<ID3D12Device> gD3D12Device;				// D3D12设备
-extern ComPtr<ID3D12GraphicsCommandList> gCommandList;	// 指令列表
-
-extern bool g4xMsaaState;								// 多重采样是否开启
-extern UINT g4xMsaaQuality;								// 多重采样质量
-
-extern D3D12_VIEWPORT gScreenViewport;					// 视口
-extern D3D12_RECT gScissorRect;							// 剪裁矩形
-
-extern UINT gRtvDescriptorSize;							// 渲染目标描述符的大小
-extern UINT gDsvDescriptorSize;							// 深度模板描述符的大小
-extern UINT gCbvSrvUavDescriptorSize;					// 常量缓冲描述符，着色器资源描述符，无序存取描述符的大小
-
-const int gNumFrameResources = 3;						// 帧资源数量
-extern int gCurrFrameResourceIndex;						// 当前帧资源索引
-
-extern PhysX gPhysX;									// PhysX物理引擎
-
-//===========================================================
-//===========================================================
-// 顶点、输入布局、根签名、着色器、渲染状态对象
-//===========================================================
-//===========================================================
-
-// 顶点
 struct Vertex
 {
 	DirectX::XMFLOAT3 Pos;
@@ -73,23 +42,16 @@ struct Vertex
 	DirectX::XMFLOAT3 TangentU;
 };
 
-// 输入布局
-extern std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout;
-
-// 根签名
-extern std::unordered_map<std::string, ComPtr<ID3D12RootSignature>> gRootSignatures;
-
-// 着色器
-extern std::unordered_map<std::string, ComPtr<ID3DBlob>> gShaders;
-
-// 渲染状态对象
-extern std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> gPSOs;
-
-//===========================================================
-//===========================================================
-// 光
-//===========================================================
-//===========================================================
+struct MeshRender
+{
+	std::string Name = "";
+	DirectX::XMFLOAT4X4 World = MathHelper::Identity4x4();
+	std::string MatName = "";
+	DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
+	std::string MeshName = "";
+	int RenderLayer = -1;
+	bool ReceiveShadow = true;
+};
 
 #define MaxLights 16
 struct Light
@@ -100,6 +62,38 @@ struct Light
 	float FalloffEnd = 10.0f;                           // 点光/聚光
 	DirectX::XMFLOAT3 Position = { 0.0f, 0.0f, 0.0f };  // 点光/聚光
 	float SpotPower = 64.0f;                            // 聚光
+};
+
+struct PassConstants
+{
+	DirectX::XMFLOAT4X4 View = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 InvView = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 Proj = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 InvProj = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 ViewProj = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 InvViewProj = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 ViewProjTex = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 ShadowTransform = MathHelper::Identity4x4();
+	DirectX::XMFLOAT3 EyePosW = { 0.0f, 0.0f, 0.0f };
+	float cbPerObjectPad1 = 0.0f;
+	DirectX::XMFLOAT2 RenderTargetSize = { 0.0f, 0.0f };
+	DirectX::XMFLOAT2 InvRenderTargetSize = { 0.0f, 0.0f };
+	float NearZ = 0.0f;
+	float FarZ = 0.0f;
+	float TotalTime = 0.0f;
+	float DeltaTime = 0.0f;
+
+	DirectX::XMFLOAT4 AmbientLight = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	DirectX::XMFLOAT4 FogColor = { 0.7f, 0.7f, 0.7f, 1.0f };
+	float gFogStart = 5.0f;
+	float gFogRange = 150.0f;
+	DirectX::XMFLOAT2 cbPerObjectPad2;
+
+	// 索引 [0, NUM_DIR_LIGHTS) 是平行光
+	// 索引 [NUM_DIR_LIGHTS, NUM_DIR_LIGHTS+NUM_POINT_LIGHTS) 是点光
+	// 索引 [NUM_DIR_LIGHTS+NUM_POINT_LIGHTS, NUM_DIR_LIGHTS+NUM_POINT_LIGHT+NUM_SPOT_LIGHTS) 是聚光
+	Light Lights[MaxLights];
 };
 
 //===========================================================
@@ -116,6 +110,7 @@ enum class RenderLayer : int
 	Sky,
 	OpaqueDynamicReflectors,
 	UI,
+	Wireframe,
 
 	Count
 };
@@ -169,30 +164,6 @@ public:
 //===========================================================
 //===========================================================
 
-class DxException
-{
-public:
-	DxException() = default;
-	DxException(HRESULT hr, const std::wstring& functionName, const std::wstring& filename, int lineNumber) :
-		ErrorCode(hr),
-		FunctionName(functionName),
-		Filename(filename),
-		LineNumber(lineNumber)
-	{
-	}
-
-	std::wstring ToString()const {
-		_com_error err(ErrorCode);
-		std::wstring msg = err.ErrorMessage();
-		return FunctionName + L" failed in " + Filename + L"; line " + std::to_wstring(LineNumber) + L"; error: " + msg;
-	}
-
-	HRESULT ErrorCode = S_OK;
-	std::wstring FunctionName;
-	std::wstring Filename;
-	int LineNumber = -1;
-};
-
 inline std::wstring AnsiToWString(const std::string& str)
 {
 	WCHAR buffer[512];
@@ -221,6 +192,50 @@ inline std::string WStringToString(const std::wstring& wstr)
 	}
 	return str;
 }
+
+class DxException
+{
+public:
+	DxException() = default;
+	DxException(HRESULT hr, const std::wstring& functionName, const std::wstring& filename, int lineNumber) :
+		ErrorCode(hr),
+		FunctionName(functionName),
+		Filename(filename),
+		LineNumber(lineNumber)
+	{
+	}
+
+	std::wstring ToString()const {
+		_com_error err(ErrorCode);
+		std::wstring msg = err.ErrorMessage();
+		return FunctionName + L" failed in " + Filename + L"; line " + std::to_wstring(LineNumber) + L"; error: " + msg;
+	}
+
+	HRESULT ErrorCode = S_OK;
+	std::wstring FunctionName;
+	std::wstring Filename;
+	int LineNumber = -1;
+};
+
+class MyException
+{
+public:
+	MyException() = default;
+	MyException(const std::string& err, const std::wstring& filename, int lineNumber) :
+		Err(err) ,
+		Filename(filename),
+		LineNumber(lineNumber)
+	{
+	}
+
+	std::wstring ToString()const { 
+		return StringToWString(Err) + L" failed in " + Filename + L"; line " + std::to_wstring(LineNumber);
+	}
+
+	std::string Err;
+	std::wstring Filename;
+	int LineNumber = -1;
+};
 
 inline void OutputDebug(int i)
 {
@@ -262,6 +277,14 @@ inline void OutputMessageBox(std::string s)
     HRESULT hr__ = (x);                                               \
     std::wstring wfn = AnsiToWString(__FILE__);                       \
     if(FAILED(hr__)) { throw DxException(hr__, L#x, wfn, __LINE__); } \
+}
+#endif
+
+#ifndef ThrowMyEx
+#define ThrowMyEx(x)										          \
+{                                                                     \
+    std::wstring wfn = AnsiToWString(__FILE__);                       \
+    throw MyException(x, wfn, __LINE__);							  \
 }
 #endif
 

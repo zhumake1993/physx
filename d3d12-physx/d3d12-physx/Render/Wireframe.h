@@ -1,9 +1,6 @@
 #pragma once
 
 #include "Common/d3dUtil.h"
-#include "Common/FrameResource.h"
-#include "Manager/InstanceManager.h"
-#include "Manager/TextureManager.h"
 
 class Wireframe
 {
@@ -22,5 +19,5 @@ private:
 	void BuildPSO();
 
 private:
-	ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
 };

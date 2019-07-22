@@ -1,16 +1,18 @@
 #include "Grid.h"
 
+using namespace DirectX;
+
 Grid::Grid()
 	:GameObject()
 {
-	mGameObjectName = "grid";
+	// 基础信息
+	mName = "grid";
 
-	mMatName = "tile";
-	XMStoreFloat4x4(&mTexTransform, XMMatrixScaling(8.0f, 8.0f, 1.0f));
-
-	mMeshName = "grid";
-
-	mRenderLayer = (int)RenderLayer::Opaque;
+	// 添加MeshRender
+	mHasMeshRender = true;
+	mMeshRender.MatName = "tile";
+	XMStoreFloat4x4(&mMeshRender.TexTransform, XMMatrixScaling(8.0f, 8.0f, 1.0f));
+	mMeshRender.MeshName = "grid";
 }
 
 Grid::~Grid()
@@ -19,4 +21,5 @@ Grid::~Grid()
 
 void Grid::Update()
 {
+	GameObject::Update();
 }

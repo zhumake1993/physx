@@ -1,56 +1,69 @@
 #include "d3dUtil.h"
 
+using Microsoft::WRL::ComPtr;
+
 //===========================================================
 //===========================================================
 // 全局变量
 //===========================================================
 //===========================================================
 
-std::wstring gMainWndCaption = L"d3d12app";
-D3D_DRIVER_TYPE gd3dDriverType = D3D_DRIVER_TYPE_HARDWARE;
-DXGI_FORMAT gBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-DXGI_FORMAT gDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-int gClientWidth = 1200;
-int gClientHeight = 900;
+std::wstring gMainWndCaption = L"d3d12app";							// 标题
+D3D_DRIVER_TYPE gd3dDriverType = D3D_DRIVER_TYPE_HARDWARE;			// 硬件类型
+DXGI_FORMAT gBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;			// 后缓冲格式
+DXGI_FORMAT gDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;	// 深度模板缓冲格式
+int gClientWidth = 1200;											// 屏幕宽
+int gClientHeight = 900;											// 屏幕高
 
-GameTimer gTimer;
+ComPtr<ID3D12Device> gD3D12Device = nullptr;						// D3D12设备
+ComPtr<ID3D12GraphicsCommandList> gCommandList = nullptr;			// 指令列表
 
-ComPtr<ID3D12Device> gD3D12Device = nullptr;
-ComPtr<ID3D12GraphicsCommandList> gCommandList = nullptr;
+bool g4xMsaaState = false;											// 多重采样是否开启
+UINT g4xMsaaQuality = 0;											// 多重采样质量
 
-bool g4xMsaaState = false;
-UINT g4xMsaaQuality = 0;
+D3D12_VIEWPORT gScreenViewport;										// 视口
+D3D12_RECT gScissorRect;											// 剪裁矩形
 
-D3D12_VIEWPORT gScreenViewport;
-D3D12_RECT gScissorRect;
+UINT gRtvDescriptorSize = 0;										// 渲染目标描述符的大小
+UINT gDsvDescriptorSize = 0;										// 深度模板描述符的大小
+UINT gCbvSrvUavDescriptorSize = 0;									// 常量缓冲描述符，着色器资源描述符，无序存取描述符的大小
 
-UINT gRtvDescriptorSize = 0;
-UINT gDsvDescriptorSize = 0;
-UINT gCbvSrvUavDescriptorSize = 0;
+extern const int gNumFrameResources = 3;							// 帧资源数量（如果要在多个文件之间共享const对象，必须在变量的定义之前加extern关键字）
+int gCurrFrameResourceIndex = 0;									// 当前帧资源索引
 
-int gCurrFrameResourceIndex = 0;
+#include "GameTimer.h"
+GameTimer gTimer;													// 计时器
 
-PhysX gPhysX;
+#include "FrameResource.h"
+std::unique_ptr<MainFrameResource> gMainFrameResource = std::make_unique<MainFrameResource>();;				// Main帧资源
+std::unique_ptr<FrameResource<PassConstants>> gPassCB = std::make_unique<FrameResource<PassConstants>>();	// 渲染帧资源
 
-//===========================================================
-//===========================================================
-// 顶点、输入布局、根签名、着色器、渲染状态对象
-//===========================================================
-//===========================================================
+#include "Camera.h"
+std::unique_ptr<Camera> gCamera = std::make_unique<Camera>();
 
-std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout =
+#include "Manager/GameObjectManager.h"
+#include "Manager/InstanceManager.h"
+#include "Manager/TextureManager.h"
+#include "Manager/MaterialManager.h"
+#include "Manager/MeshManager.h"
+#include "Manager/InputManager.h"
+std::unique_ptr<GameObjectManager> gGameObjectManager = std::make_unique<GameObjectManager>();				// 游戏物体管理器
+std::unique_ptr<InstanceManager> gInstanceManager = std::make_unique<InstanceManager>();					// 渲染实例管理器
+std::unique_ptr<TextureManager> gTextureManager = std::make_unique<TextureManager>();						// 纹理管理器
+std::unique_ptr<MaterialManager> gMaterialManager = std::make_unique<MaterialManager>();					// 材质管理器
+std::unique_ptr<MeshManager> gMeshManager = std::make_unique<MeshManager>();								// 网格管理器
+std::unique_ptr<InputManager> gInputManager = std::make_unique<InputManager>();								// 输入管理器
+
+std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout =														// 输入布局
 {
 	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 };
-
-std::unordered_map<std::string, ComPtr<ID3D12RootSignature>> gRootSignatures;
-
-std::unordered_map<std::string, ComPtr<ID3DBlob>> gShaders;
-
-std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> gPSOs;
+std::unordered_map<std::string, ComPtr<ID3D12RootSignature>> gRootSignatures;								// 根签名
+std::unordered_map<std::string, ComPtr<ID3DBlob>> gShaders;													// 着色器
+std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> gPSOs;											// 渲染状态对象
 
 //===========================================================
 //===========================================================

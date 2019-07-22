@@ -1,18 +1,6 @@
 #pragma once
 
 #include "Common/D3DApp.h"
-#include "Common/MathHelper.h"
-#include "Common/UploadBuffer.h"
-#include "Common/FrameResource.h"
-#include "Common/GeometryGenerator.h"
-#include "Common/Camera.h"
-
-#include "Manager/GameObjectManager.h"
-#include "Manager/InstanceManager.h"
-#include "Manager/TextureManager.h"
-#include "Manager/MaterialManager.h"
-#include "Manager/MeshManager.h"
-#include "Manager/InputManager.h"
 
 #include "Render/MainRender.h"
 #include "Render/Wireframe.h"
@@ -30,20 +18,10 @@
 #include "Filter/InverseFilter.h"
 #include "Filter/MultiplyFilter.h"
 
-#include "GameObject/Sky.h"
-#include "GameObject/Box.h"
-#include "GameObject/Skull.h"
-#include "GameObject/Globe.h"
-#include "GameObject/Grid.h"
-#include "GameObject/Cylinder.h"
-#include "GameObject/Sphere.h"
-#include "GameObject/BoxPx.h"
-
-using Microsoft::WRL::ComPtr;
-using namespace DirectX;
-
 class D3D12App : public D3DApp
 {
+	
+
 public:
 	D3D12App(HINSTANCE hInstance);
 	D3D12App(const D3D12App& rhs) = delete;
@@ -82,16 +60,14 @@ private:
 
 private:
 
-	std::unique_ptr<MainFrameResource> mMainFrameResource; // MainÖ¡×ÊÔ´
-
 	POINT mLastMousePos;
 
-	XMFLOAT3 mRotatedLightDirections[3];
+	DirectX::XMFLOAT3 mRotatedLightDirections[3];
 	float mLightRotationAngle = 0.0f;
-	XMFLOAT3 mBaseLightDirections[3] = {
-		XMFLOAT3(0.57735f, -0.57735f, 0.57735f),
-		XMFLOAT3(-0.57735f, -0.57735f, 0.57735f),
-		XMFLOAT3(0.0f, -0.707f, -0.707f)
+	DirectX::XMFLOAT3 mBaseLightDirections[3] = {
+		DirectX::XMFLOAT3(0.57735f, -0.57735f, 0.57735f),
+		DirectX::XMFLOAT3(-0.57735f, -0.57735f, 0.57735f),
+		DirectX::XMFLOAT3(0.0f, -0.707f, -0.707f)
 	};
 
 	//

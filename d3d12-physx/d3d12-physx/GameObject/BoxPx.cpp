@@ -1,33 +1,29 @@
 #include "BoxPx.h"
 
+using namespace DirectX;
+
 BoxPx::BoxPx()
 	:GameObject()
 {
-	mGameObjectName = "boxPx";
+	// 基础信息
+	mName = "boxPx";
 
-	mTranslation = XMFLOAT3(0.0f, 10.0f, -10.0f);
+	// MeshRender
+	mHasMeshRender = true;
+	mTransform.Translation = XMFLOAT3(0.0f, 10.0f, -10.0f);
+	mMeshRender.MatName = "bricks2";
+	XMStoreFloat4x4(&mMeshRender.TexTransform, XMMatrixScaling(1.0f, 0.5f, 1.0f));
+	mMeshRender.MeshName = "box";
 
-	mMatName = "bricks2";
-	XMStoreFloat4x4(&mTexTransform, XMMatrixScaling(1.0f, 0.5f, 1.0f));
-
-	mMeshName = "box";
-
-	mRenderLayer = (int)RenderLayer::Opaque;
-
-	//======
-	// PhysX
-	//======
-	mPxLocalPos = XMFLOAT3(0.0f, 1.0f, 0.0f);;
-	mPxLocalQuat = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	// 刚体
+	mHasRigidBody = true;
+	mRigidBodyLocalTransform.Translation = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	mRigidBodyLocalTransform.Quaternion = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mRigidBodyLocalTransform.Scale = XMFLOAT3(0.5f, 0.5f, 0.5f);
 	mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
 	mPxGeometry = PxBox;
-	PxBoxGeometryDesc boxDesc;
-	boxDesc.hx = 0.5f;
-	boxDesc.hy = 0.5f;
-	boxDesc.hz = 0.5f;
-	mPxGeometryDesc = &boxDesc;
 	mDensity = 10.0f;
-	AddRigidBody();
+	mRigidBodyMeshRender.MeshName = "rigidBox";
 }
 
 BoxPx::~BoxPx()

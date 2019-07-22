@@ -1,6 +1,11 @@
 #include "InstanceManager.h"
 
-std::unique_ptr<InstanceManager> gInstanceManager = std::make_unique<InstanceManager>();
+using namespace DirectX;
+
+#include "MaterialManager.h"
+#include "Manager/MeshManager.h"
+extern std::unique_ptr<MaterialManager> gMaterialManager;
+extern std::unique_ptr<MeshManager> gMeshManager;
 
 InstanceManager::InstanceManager()
 {
@@ -14,43 +19,45 @@ void InstanceManager::Initialize()
 {
 }
 
-void InstanceManager::AddInstance(const std::string& gameObjectName, const XMFLOAT4X4& world,
-	const std::string& matName, const XMFLOAT4X4& texTransform,
-	const std::string& meshName, const int randerLayer,
-	const bool receiveShadow)
+void InstanceManager::AddInstance(const MeshRender& meshRender)
 {
+	auto name = meshRender.Name;
+	auto world = meshRender.World;
+	auto matName = meshRender.MatName;
+	auto texTransform = meshRender.TexTransform;
+	auto meshName = meshRender.MeshName;
+	auto randerLayer = meshRender.RenderLayer;
+	auto receiveShadow = meshRender.ReceiveShadow;
+
 	auto& instanceMap = mInstanceLayers[randerLayer];
 
 	if (instanceMap.find(meshName) != instanceMap.end()) {
-		// 该meshName已存在
-
-		instanceMap[meshName]->AddInstanceData(gameObjectName, world, gMaterialManager->GetIndex(matName), texTransform, receiveShadow);
-	} else {
-		// 该meshName不存在
-
-		if (gMeshManager->mMeshes.find(meshName) == gMeshManager->mMeshes.end()) {
-			OutputMessageBox("Can not find the mesh!");
-			return;
-		}
-
+		instanceMap[meshName]->AddInstanceData(name, world, gMaterialManager->GetIndex(matName), texTransform, receiveShadow);
+	}
+	else {
 		auto instance = std::make_unique<Instance>();
 		instance->mMeshName = meshName;
-		instance->mMesh = gMeshManager->mMeshes[meshName];
+		instance->mMesh = gMeshManager->GetMesh(meshName);
 		instance->CalculateBoundingBox();
 
-		instance->AddInstanceData(gameObjectName, world, gMaterialManager->GetIndex(matName), texTransform, receiveShadow);
+		instance->AddInstanceData(name, world, gMaterialManager->GetIndex(matName), texTransform, receiveShadow);
 
 		instanceMap[meshName] = std::move(instance);
 	}
 }
 
-void InstanceManager::UpdateInstance(const std::string& gameObjectName, const XMFLOAT4X4& world, 
-	const std::string& matName, const XMFLOAT4X4& texTransform, 
-	const std::string& meshName, const int randerLayer,
-	const bool receiveShadow)
+void InstanceManager::UpdateInstance(const MeshRender& meshRender)
 {
+	auto name = meshRender.Name;
+	auto world = meshRender.World;
+	auto matName = meshRender.MatName;
+	auto texTransform = meshRender.TexTransform;
+	auto meshName = meshRender.MeshName;
+	auto randerLayer = meshRender.RenderLayer;
+	auto receiveShadow = meshRender.ReceiveShadow;
+
 	auto& instanceMap = mInstanceLayers[randerLayer];
-	instanceMap[meshName]->UpdateInstanceData(gameObjectName, world, gMaterialManager->GetIndex(matName), texTransform, receiveShadow);
+	instanceMap[meshName]->UpdateInstanceData(name, world, gMaterialManager->GetIndex(matName), texTransform, receiveShadow);
 }
 
 void InstanceManager::UploadInstanceData()

@@ -1,13 +1,17 @@
 #include "Sphere.h"
 
+using namespace DirectX;
+
 Sphere::Sphere()
 	:GameObject()
 {
-	mMatName = "mirror";
+	// 基础信息
+	mName = "Sphere";
 
-	mMeshName = "sphere";
-
-	mRenderLayer = (int)RenderLayer::Opaque;
+	// 添加MeshRender
+	mHasMeshRender = true;
+	mMeshRender.MatName = "mirror";
+	mMeshRender.MeshName = "sphere";
 }
 
 Sphere::~Sphere()
@@ -16,4 +20,5 @@ Sphere::~Sphere()
 
 void Sphere::Update()
 {
+	GameObject::Update();
 }

@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 #include "PxPhysicsAPI.h"
@@ -47,54 +48,13 @@ void OutputDebugPrint(const char*, ...);
 
 #include "../snippet-utils/SnippetUtils.h"
 
-using namespace physx;
-
-//===========================================================
-//===========================================================
-// 全局变量
-//===========================================================
-//===========================================================
-
-extern PxDefaultAllocator		gAllocator;			// 默认的内存管理器
-extern PxDefaultErrorCallback	gErrorCallback;		// 默认的错误管理器
-
-extern PxFoundation* gFoundation;					// Px基础
-extern PxPhysics* gPhysics;							// Px实例
-
-extern PxDefaultCpuDispatcher* gDispatcher;	// cpu分配器
-extern PxScene* gScene;						// 场景
-
-extern PxPvd* gPvd;							// PVD
-
 //===========================================================
 //===========================================================
 // PhysX几何体
 //===========================================================
 //===========================================================
 
-enum PxGeometryEnum { sphere, box, capsule, plane };
-
-struct PxSphereGeometryDesc {
-	float radius;
-};
-
-struct PxBoxGeometryDesc {
-	float hx;
-	float hy;
-	float hz;
-};
-
-struct PxCapsuleGeometryDesc {
-	float radius;
-	float halfHeight;
-};
-
-struct PxPlaneGeometryDesc {
-	float nx;
-	float ny;
-	float nz;
-	float distance;
-};
+enum PxGeometryEnum { PxSphere, PxBox, PxCapsule };
 
 struct PxRigidDynamicDesc {
 
@@ -109,7 +69,9 @@ struct PxRigidDynamicDesc {
 
 	// Geometry
 	PxGeometryEnum pxGeometry;
-	void* PxGeometryDesc;
+	float gx;
+	float gy;
+	float gz;
 
 	// density
 	float density;

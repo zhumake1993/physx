@@ -26,9 +26,9 @@ private:
 
 private:
 
-	ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
 
-	ComPtr<ID3D12DescriptorHeap> mCbvSrvUavDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCbvSrvUavDescriptorHeap = nullptr;
 
 	UINT mWidth = 0;
 	UINT mHeight = 0;

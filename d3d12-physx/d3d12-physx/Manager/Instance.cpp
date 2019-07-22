@@ -1,10 +1,17 @@
 #include "Instance.h"
 
+using namespace DirectX;
+using Microsoft::WRL::ComPtr;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
+extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
+#include "Common/Camera.h"
+extern std::unique_ptr<Camera> gCamera;
+
 Instance::Instance()
 {
-	for (int i = 0; i < gNumFrameResources; ++i) {
-		mFrameResources.push_back(std::make_unique<UploadBuffer<InstanceData>>(gD3D12Device.Get(), mInstanceDataCapacity, false));
-	}
+	mFrameResource = std::make_unique<FrameResource<InstanceData>>(gD3D12Device.Get(), mInstanceDataCapacity, false);
 }
 
 Instance::~Instance()
@@ -23,14 +30,20 @@ void Instance::CalculateBoundingBox()
 	BoundingBox::CreateFromPoints(mBounds, size, &vertices[0].Pos, sizeof(Vertex));
 }
 
+bool Instance::HasInstanceData(const std::string& gameObjectName)
+{
+	return mInstances.find(gameObjectName) != mInstances.end();
+}
+
 void Instance::AddInstanceData(const std::string& gameObjectName, const XMFLOAT4X4& world, const UINT& matIndex, const XMFLOAT4X4& texTransform,
 	const bool receiveShadow)
 {
 	if (mInstanceCount == mInstanceDataCapacity) {
-		// 应该进行扩容操作
-		// 暂时不实现
-		OutputMessageBox("Can not add new instance data!");
-		return;
+		ThrowMyEx("Can not add new instance data!")
+	}
+
+	if (HasInstanceData(gameObjectName)) {
+		ThrowMyEx("InstanceData already exists!")
 	}
 
 	InstanceData instance;
@@ -50,6 +63,10 @@ void Instance::AddInstanceData(const std::string& gameObjectName, const XMFLOAT4
 void Instance::UpdateInstanceData(const std::string& gameObjectName, const XMFLOAT4X4& world, const UINT& matIndex, const XMFLOAT4X4& texTransform,
 	const bool receiveShadow)
 {
+	if (!HasInstanceData(gameObjectName)) {
+		ThrowMyEx("InstanceData does not exist!")
+	}
+
 	mInstances[gameObjectName].World = world;
 	XMMATRIX worldMatrix = XMLoadFloat4x4(&world);
 	XMMATRIX inverseTransposeWorldMatrix = MathHelper::InverseTranspose(worldMatrix);
@@ -61,8 +78,6 @@ void Instance::UpdateInstanceData(const std::string& gameObjectName, const XMFLO
 
 void Instance::UploadInstanceData()
 {
-	auto& uploadBuffer = mFrameResources[gCurrFrameResourceIndex];
-
 	XMMATRIX view = gCamera->GetView();
 	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
 
@@ -101,7 +116,7 @@ void Instance::UploadInstanceData()
 			instanceData.MaterialIndex = p.second.MaterialIndex;
 			instanceData.ReceiveShadow = p.second.ReceiveShadow;
 
-			uploadBuffer->CopyData(mVisibleCount++, instanceData);
+			mFrameResource->Copy(mVisibleCount++, instanceData);
 		}
 	}
 }
@@ -112,8 +127,8 @@ void Instance::Draw()
 	gCommandList->IASetIndexBuffer(&mMesh->IndexBufferView);
 	gCommandList->IASetPrimitiveTopology(mMesh->PrimitiveType);
 
-	auto instanceBuffer = mFrameResources[gCurrFrameResourceIndex]->Resource();
-	gCommandList->SetGraphicsRootShaderResourceView(0, instanceBuffer->GetGPUVirtualAddress());
+	auto passCB = mFrameResource->GetCurrResource();
+	gCommandList->SetGraphicsRootShaderResourceView(0, passCB->GetGPUVirtualAddress());
 
 	gCommandList->DrawIndexedInstanced(mMesh->IndexCount, mVisibleCount, 0, 0, 0);
 }

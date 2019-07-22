@@ -1,10 +1,33 @@
 #include "ShadowMap.h"
 
+using Microsoft::WRL::ComPtr;
+using namespace DirectX;
+
+#include "Manager/InstanceManager.h"
+#include "Manager/TextureManager.h"
+#include "Manager/MaterialManager.h"
+extern std::unique_ptr<InstanceManager> gInstanceManager;
+extern std::unique_ptr<TextureManager> gTextureManager;
+extern std::unique_ptr<MaterialManager> gMaterialManager;
+
+extern DXGI_FORMAT gDepthStencilFormat;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
+extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
+extern bool g4xMsaaState;
+extern UINT g4xMsaaQuality;
+
+extern UINT gDsvDescriptorSize;
+
+extern std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> gRootSignatures;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> gShaders;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
+
 ShadowMap::ShadowMap(UINT width, UINT height)
 {
-	for (int i = 0; i < gNumFrameResources; ++i) {
-		mFrameResources.push_back(std::make_unique<UploadBuffer<PassConstants>>(gD3D12Device.Get(), 1, true));
-	}
+	mFrameResource = std::make_unique<FrameResource<PassConstants>>(gD3D12Device.Get(), 1, true);
 
 	mWidth = width;
 	mHeight = height;
@@ -73,7 +96,6 @@ void ShadowMap::Update(XMFLOAT3 mRotatedLightDirection)
 	XMStoreFloat4x4(&mShadowTransform, S);
 
 	// 更新PCB
-	auto& uploadBuffer = mFrameResources[gCurrFrameResourceIndex];
 	PassConstants mShadowPassCB;
 
 	XMMATRIX view = lightView;
@@ -100,7 +122,7 @@ void ShadowMap::Update(XMFLOAT3 mRotatedLightDirection)
 	mShadowPassCB.NearZ = n;
 	mShadowPassCB.FarZ = f;
 
-	uploadBuffer->CopyData(0, mShadowPassCB);
+	mFrameResource->Copy(0, mShadowPassCB);
 }
 
 void ShadowMap::DrawSceneToShadowMap()
@@ -126,8 +148,8 @@ void ShadowMap::DrawSceneToShadowMap()
 	gCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
 	// 绑定常量缓冲
-	auto uploadBuffer = mFrameResources[gCurrFrameResourceIndex]->Resource();
-	gCommandList->SetGraphicsRootConstantBufferView(1, uploadBuffer->GetGPUVirtualAddress());
+	auto passCB = mFrameResource->GetCurrResource();
+	gCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
 
 	// 绑定所有材质。对于结构化缓冲，我们可以绕过堆，使用根描述符
 	auto matBuffer = gMaterialManager->CurrResource();

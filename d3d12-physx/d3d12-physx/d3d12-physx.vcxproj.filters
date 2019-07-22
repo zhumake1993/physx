@@ -81,9 +81,6 @@
     <ClCompile Include="Render\Wireframe.cpp">
       <Filter>Render</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\GameObject.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\GameObjectManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -147,6 +144,12 @@
     <ClCompile Include="GameObject\BoxPx.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="Manager\GameObject.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\PhysXUtil.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h">
@@ -209,9 +212,6 @@
     <ClInclude Include="Render\Wireframe.h">
       <Filter>Render</Filter>
     </ClInclude>
-    <ClInclude Include="Manager\GameObject.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
     <ClInclude Include="Manager\GameObjectManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
@@ -271,6 +271,12 @@
     </ClInclude>
     <ClInclude Include="GameObject\BoxPx.h">
       <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\GameObject.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\PhysXUtil.h">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,13 +1,47 @@
 #include "Ssao.h"
 #include <DirectXPackedVector.h>
 
+using Microsoft::WRL::ComPtr;
+using namespace DirectX;
 using namespace DirectX::PackedVector;
+
+#include "Common/Camera.h"
+extern std::unique_ptr<Camera> gCamera;
+
+#include "Manager/InstanceManager.h"
+#include "Manager/TextureManager.h"
+#include "Manager/MaterialManager.h"
+extern std::unique_ptr<InstanceManager> gInstanceManager;
+extern std::unique_ptr<TextureManager> gTextureManager;
+extern std::unique_ptr<MaterialManager> gMaterialManager;
+
+extern DXGI_FORMAT gBackBufferFormat;
+extern DXGI_FORMAT gDepthStencilFormat;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
+extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
+extern bool g4xMsaaState;
+extern UINT g4xMsaaQuality;
+
+extern D3D12_VIEWPORT gScreenViewport;
+extern D3D12_RECT gScissorRect;
+
+extern UINT gRtvDescriptorSize;
+extern UINT gDsvDescriptorSize;
+extern UINT gCbvSrvUavDescriptorSize;
+
+#include "Common/FrameResource.h"
+extern std::unique_ptr<FrameResource<PassConstants>> gPassCB;
+
+extern std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> gRootSignatures;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> gShaders;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
 
 Ssao::Ssao(UINT width, UINT height)
 {
-	for (int i = 0; i < gNumFrameResources; ++i) {
-		mFrameResources.push_back(std::make_unique<UploadBuffer<SsaoConstants>>(gD3D12Device.Get(), 1, true));
-	}
+	mFrameResource = std::make_unique<FrameResource<SsaoConstants>>(gD3D12Device.Get(), 1, true);
 
 	mWidth = width;
 	mHeight = height;
@@ -78,7 +112,7 @@ void Ssao::DrawNormalsAndDepth()
 	gCommandList->SetGraphicsRootSignature(gRootSignatures["main"].Get());
 
 	// 绑定常量缓冲
-	auto passCB = gPassCB->GetCurrResource()->Resource();
+	auto passCB = gPassCB->GetCurrResource();
 	gCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
 
 	// 绑定所有材质。对于结构化缓冲，我们可以绕过堆，使用根描述符
@@ -138,7 +172,7 @@ void Ssao::UpdateSsaoConstantData(PassConstants& mainPassCB)
 	ssaoCB.OcclusionFadeEnd = 1.0f;
 	ssaoCB.SurfaceEpsilon = 0.05f;
 
-	mFrameResources[gCurrFrameResourceIndex]->CopyData(0, ssaoCB);
+	mFrameResource->Copy(0, ssaoCB);
 }
 
 void Ssao::ComputeSsao(int blurCount)
@@ -167,8 +201,8 @@ void Ssao::ComputeSsao(int blurCount)
 	gCommandList->SetGraphicsRootSignature(mRootSignature.Get());
 
 	// 绑定常量缓冲
-	auto uploadBuffer = mFrameResources[gCurrFrameResourceIndex]->Resource();
-	gCommandList->SetGraphicsRootConstantBufferView(0, uploadBuffer->GetGPUVirtualAddress());
+	auto passCB = mFrameResource->GetCurrResource();
+	gCommandList->SetGraphicsRootConstantBufferView(0, passCB->GetGPUVirtualAddress());
 	gCommandList->SetGraphicsRoot32BitConstant(1, 0, 0);
 
 	// 绑定描述符堆
@@ -203,8 +237,8 @@ void Ssao::BlurAmbientMap(int blurCount)
 {
 	gCommandList->SetPipelineState(gPSOs["SsaoBlur"].Get());
 
-	auto uploadBuffer = mFrameResources[gCurrFrameResourceIndex]->Resource();
-	gCommandList->SetGraphicsRootConstantBufferView(0, uploadBuffer->GetGPUVirtualAddress());
+	auto passCB = mFrameResource->GetCurrResource();
+	gCommandList->SetGraphicsRootConstantBufferView(0, passCB->GetGPUVirtualAddress());
 
 	for (int i = 0; i < blurCount; ++i) {
 		BlurAmbientMap(true);

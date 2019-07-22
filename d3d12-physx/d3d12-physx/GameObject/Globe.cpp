@@ -1,18 +1,20 @@
 #include "Globe.h"
 
+using namespace DirectX;
+
 Globe::Globe()
 	:GameObject()
 {
-	mGameObjectName = "globe";
+	// 基础信息
+	mName = "globe";
+	mTransform.Translation = XMFLOAT3(0.0f, 2.0f, 0.0f);
+	mTransform.Scale = XMFLOAT3(2.0f, 2.0f, 2.0f);
 
-	mTranslation = XMFLOAT3(0.0f, 2.0f, 0.0f);
-	mScale = XMFLOAT3(2.0f, 2.0f, 2.0f);
-
-	mMatName = "mirror";
-
-	mMeshName = "sphere";
-
-	mRenderLayer = (int)RenderLayer::OpaqueDynamicReflectors;
+	// 添加MeshRender
+	mHasMeshRender = true;
+	mMeshRender.MatName = "mirror";
+	mMeshRender.MeshName = "sphere";
+	mMeshRender.RenderLayer = (int)RenderLayer::OpaqueDynamicReflectors;
 }
 
 Globe::~Globe()
@@ -21,4 +23,5 @@ Globe::~Globe()
 
 void Globe::Update()
 {
+	GameObject::Update();
 }

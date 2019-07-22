@@ -1,17 +1,14 @@
 #pragma once
 
 #include "Common/d3dUtil.h"
-#include "Common/Camera.h"
-#include "Common/UploadBuffer.h"
+#include "Common/FrameResource.h"
 #include "MeshManager.h"
-
-using namespace DirectX;
 
 struct InstanceData
 {
-	XMFLOAT4X4 World = MathHelper::Identity4x4();
-	XMFLOAT4X4 InverseTransposeWorld = MathHelper::Identity4x4();
-	XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 World = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 InverseTransposeWorld = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
 	UINT MaterialIndex;
 	UINT ReceiveShadow;
 	UINT InstancePad1;
@@ -30,19 +27,21 @@ public:
 
 	void CalculateBoundingBox();
 
-	void AddInstanceData(const std::string& gameObjectName, const XMFLOAT4X4& world,
-		const UINT& matIndex, const XMFLOAT4X4& texTransform,
+	bool HasInstanceData(const std::string& gameObjectName);
+
+	void AddInstanceData(const std::string& gameObjectName, const DirectX::XMFLOAT4X4& world,
+		const UINT& matIndex, const DirectX::XMFLOAT4X4& texTransform,
 		const bool receiveShadow);
 
-	void UpdateInstanceData(const std::string& gameObjectName, const XMFLOAT4X4& world,
-		const UINT& matIndex, const XMFLOAT4X4& texTransform,
+	void UpdateInstanceData(const std::string& gameObjectName, const DirectX::XMFLOAT4X4& world,
+		const UINT& matIndex, const DirectX::XMFLOAT4X4& texTransform,
 		const bool receiveShadow);
 
 	void UploadInstanceData();
 
 	void Draw();
 
-	bool Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW, std::string& name, float& tmin, XMVECTOR& point);
+	bool Pick(DirectX::FXMVECTOR rayOriginW, DirectX::FXMVECTOR rayDirW, std::string& name, float& tmin, DirectX::XMVECTOR& point);
 
 private:
 	//
@@ -58,11 +57,11 @@ private:
 
 	UINT mInstanceDataCapacity = 100;
 	UINT mInstanceCount = 0;
-	std::vector<std::unique_ptr<UploadBuffer<InstanceData>>> mFrameResources; // 帧资源vector
+	std::unique_ptr<FrameResource<InstanceData>> mFrameResource; // 帧资源
 
 	UINT mVisibleCount = 0;
 
-	BoundingBox mBounds;
+	DirectX::BoundingBox mBounds;
 
 	std::unordered_map<std::string, InstanceData> mInstances;
 };

@@ -1,5 +1,35 @@
 #include "MainRender.h"
 
+using namespace DirectX;
+using Microsoft::WRL::ComPtr;
+
+#include "Manager/InstanceManager.h"
+#include "Manager/TextureManager.h"
+#include "Manager/MaterialManager.h"
+extern std::unique_ptr<InstanceManager> gInstanceManager;
+extern std::unique_ptr<TextureManager> gTextureManager;
+extern std::unique_ptr<MaterialManager> gMaterialManager;
+
+extern DXGI_FORMAT gBackBufferFormat;
+extern DXGI_FORMAT gDepthStencilFormat;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
+extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
+extern bool g4xMsaaState;
+extern UINT g4xMsaaQuality;
+
+extern D3D12_VIEWPORT gScreenViewport;
+extern D3D12_RECT gScissorRect;
+
+#include "Common/FrameResource.h"
+extern std::unique_ptr<FrameResource<PassConstants>> gPassCB;
+
+extern std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> gRootSignatures;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> gShaders;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
+
 MainRender::MainRender()
 {
 	BuildRootSignature();
@@ -42,7 +72,7 @@ void MainRender::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_
 	gCommandList->SetGraphicsRootSignature(gRootSignatures["main"].Get());
 
 	// 绑定常量缓冲
-	auto passCB = gPassCB->GetCurrResource()->Resource();
+	auto passCB = gPassCB->GetCurrResource();
 	gCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
 
 	// 绑定所有材质。对于结构化缓冲，我们可以绕过堆，使用根描述符
@@ -89,6 +119,10 @@ void MainRender::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_
 
 	gCommandList->SetPipelineState(gPSOs["opaque"].Get());
 	gInstanceManager->Draw((int)RenderLayer::OpaqueDynamicReflectors);
+
+	// 绘制线框物体
+	gCommandList->SetPipelineState(gPSOs["Wireframe"].Get());
+	gInstanceManager->Draw((int)RenderLayer::Wireframe);
 }
 
 void MainRender::BuildRootSignature()
@@ -159,6 +193,9 @@ void MainRender::BuildShader()
 
 	gShaders["UIVS"] = d3dUtil::CompileShader(L"Shaders\\UI.hlsl", nullptr, "VS", "vs_5_1");
 	gShaders["UIPS"] = d3dUtil::CompileShader(L"Shaders\\UI.hlsl", nullptr, "PS", "ps_5_1");
+
+	gShaders["skyVS"] = d3dUtil::CompileShader(L"Shaders\\Sky.hlsl", nullptr, "VS", "vs_5_1");
+	gShaders["skyPS"] = d3dUtil::CompileShader(L"Shaders\\Sky.hlsl", nullptr, "PS", "ps_5_1");
 
 	gShaders["skyVS"] = d3dUtil::CompileShader(L"Shaders\\Sky.hlsl", nullptr, "VS", "vs_5_1");
 	gShaders["skyPS"] = d3dUtil::CompileShader(L"Shaders\\Sky.hlsl", nullptr, "PS", "ps_5_1");

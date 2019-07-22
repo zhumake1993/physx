@@ -1,10 +1,21 @@
 #include "PhysX.h"
 
-#include <vector>
-
 #include "Common/PhysXUtil.h"
 
+using namespace physx;
+
 #define MAX_NUM_ACTOR_SHAPES 128
+
+extern PxDefaultAllocator		gAllocator;
+extern PxDefaultErrorCallback	gErrorCallback;
+
+extern PxFoundation* gFoundation;
+extern PxPhysics* gPhysics;
+
+extern PxDefaultCpuDispatcher* gDispatcher;
+extern PxScene* gScene;
+
+extern PxPvd* gPvd;
 
 // ”≤±‡¬Î£¨≤‚ ‘”√
 std::unordered_map<std::string, PxRigidDynamic*> gPxRigidDynamicMap;
@@ -76,17 +87,14 @@ void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
 	// ¥¥Ω®shape
 	PxShape* shape = nullptr;
 	switch (desc.pxGeometry) {
-		case sphere: {
-			auto p = static_cast<PxSphereGeometryDesc*>(desc.PxGeometryDesc);
-			shape = gPhysics->createShape(PxSphereGeometry(p->radius), *material); break;
+		case PxSphere: {
+			shape = gPhysics->createShape(PxSphereGeometry(desc.gx), *material); break;
 		}
-		case box: {
-			auto p = static_cast<PxBoxGeometryDesc*>(desc.PxGeometryDesc);
-			shape = gPhysics->createShape(PxBoxGeometry(p->hx, p->hy, p->hz), *material); break;
+		case PxBox: {
+			shape = gPhysics->createShape(PxBoxGeometry(desc.gx, desc.gy, desc.gz), *material); break;
 		}
-		case capsule: {
-			auto p = static_cast<PxCapsuleGeometryDesc*>(desc.PxGeometryDesc);
-			shape = gPhysics->createShape(PxCapsuleGeometry(p->radius, p->halfHeight), *material); break;
+		case PxCapsule: {
+			shape = gPhysics->createShape(PxCapsuleGeometry(desc.gx, desc.gy), *material); break;
 		}
 		default: {
 			assert(shape);

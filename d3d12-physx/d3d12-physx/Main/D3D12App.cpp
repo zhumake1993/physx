@@ -1,5 +1,58 @@
 #include "D3D12App.h"
 
+#include "GameObject/Sky.h"
+#include "GameObject/Box.h"
+#include "GameObject/Skull.h"
+#include "GameObject/Globe.h"
+#include "GameObject/Grid.h"
+#include "GameObject/Cylinder.h"
+#include "GameObject/Sphere.h"
+#include "GameObject/BoxPx.h"
+
+using Microsoft::WRL::ComPtr;
+using namespace DirectX;
+
+extern std::wstring gMainWndCaption;
+extern D3D_DRIVER_TYPE gd3dDriverType;
+extern DXGI_FORMAT gBackBufferFormat;
+extern DXGI_FORMAT gDepthStencilFormat;
+extern int gClientWidth;
+extern int gClientHeight;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
+extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
+extern const int gNumFrameResources;
+extern int gCurrFrameResourceIndex;
+
+#include "Common/GameTimer.h"
+extern GameTimer gTimer;
+
+#include "Common/FrameResource.h"
+extern std::unique_ptr<MainFrameResource> gMainFrameResource;
+extern std::unique_ptr<FrameResource<PassConstants>> gPassCB;
+
+#include "Common/Camera.h"
+extern std::unique_ptr<Camera> gCamera;
+
+#include "Manager/GameObjectManager.h"
+#include "Manager/InstanceManager.h"
+#include "Manager/TextureManager.h"
+#include "Manager/MaterialManager.h"
+#include "Manager/MeshManager.h"
+#include "Manager/InputManager.h"
+extern std::unique_ptr<GameObjectManager> gGameObjectManager;
+extern std::unique_ptr<InstanceManager> gInstanceManager;
+extern std::unique_ptr<TextureManager> gTextureManager;
+extern std::unique_ptr<MaterialManager> gMaterialManager;
+extern std::unique_ptr<MeshManager> gMeshManager;
+extern std::unique_ptr<InputManager> gInputManager;
+
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
+
+#include "../physx/Main/PhysX.h"
+extern PhysX gPhysX;
+
 D3D12App::D3D12App(HINSTANCE hInstance)
 	: D3DApp(hInstance)
 {
@@ -17,7 +70,8 @@ bool D3D12App::Initialize()
 	// 重置指令列表，为初始化指令做准备
 	ThrowIfFailed(gCommandList->Reset(mDirectCmdListAlloc.Get(), nullptr));
 
-	mMainFrameResource = std::make_unique<MainFrameResource>(gD3D12Device.Get());
+	gMainFrameResource->Initialize(gD3D12Device.Get());
+
 	gPassCB->Initialize(gD3D12Device.Get(), 1, false);
 
 	gCamera->SetPosition(0.0f, 2.0f, -15.0f);
@@ -63,10 +117,10 @@ void D3D12App::Update()
 
 	// 判断GPU是否完成处理引用当前帧资源的指令
 	// 如果没有，需等待GPU
-	if (mMainFrameResource->GetCurrFence() != 0 && mFence->GetCompletedValue() < mMainFrameResource->GetCurrFence())
+	if (gMainFrameResource->GetCurrFence() != 0 && mFence->GetCompletedValue() < gMainFrameResource->GetCurrFence())
 	{
 		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
-		ThrowIfFailed(mFence->SetEventOnCompletion(mMainFrameResource->GetCurrFence(), eventHandle));
+		ThrowIfFailed(mFence->SetEventOnCompletion(gMainFrameResource->GetCurrFence(), eventHandle));
 		WaitForSingleObject(eventHandle, INFINITE);
 		CloseHandle(eventHandle);
 	}
@@ -94,7 +148,7 @@ void D3D12App::Update()
 void D3D12App::Draw()
 {
 	// 获取当前的指令分配器
-	auto cmdListAlloc = mMainFrameResource->GetCurrCmdListAlloc();
+	auto cmdListAlloc = gMainFrameResource->GetCurrCmdListAlloc();
 
 	//重置指令分配器以重用相关联的内存
 	//必须在GPU执行完关联的指令列表后才能进行该操作
@@ -107,6 +161,7 @@ void D3D12App::Draw()
 	//
 	// 主绘制
 	//
+
 
 	if (mIsWireframe) {
 		mWireframe->Draw(mRenderTarget->Rtv(), DepthStencilView());
@@ -181,7 +236,7 @@ void D3D12App::Draw()
 	mCurrBackBuffer = (mCurrBackBuffer + 1) % SwapChainBufferCount;
 
 	// 标记指令到达该fence点
-	mMainFrameResource->GetCurrFence() = ++mCurrentFence;
+	gMainFrameResource->GetCurrFence() = ++mCurrentFence;
 
 	// 指令同步
 	mCommandQueue->Signal(mFence.Get(), mCurrentFence);
@@ -409,92 +464,92 @@ void D3D12App::BuildTextures()
 
 void D3D12App::BuildMaterials()
 {
-	MaterialData bricks;
-	bricks.DiffuseMapIndex = gTextureManager->GetIndex("bricks");
-	bricks.NormalMapIndex = gTextureManager->GetIndex("bricks_nmap");
-	bricks.DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	bricks.FresnelR0 = XMFLOAT3(0.02f, 0.02f, 0.02f);
-	bricks.Roughness = 0.3f;
+	auto bricks = std::make_shared<MaterialData>();
+	bricks->DiffuseMapIndex = gTextureManager->GetIndex("bricks");
+	bricks->NormalMapIndex = gTextureManager->GetIndex("bricks_nmap");
+	bricks->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	bricks->FresnelR0 = XMFLOAT3(0.02f, 0.02f, 0.02f);
+	bricks->Roughness = 0.3f;
 	gMaterialManager->AddMaterial("bricks", bricks);
 
-	MaterialData bricks2;
-	bricks2.DiffuseMapIndex = gTextureManager->GetIndex("bricks2");
-	bricks2.NormalMapIndex = gTextureManager->GetIndex("bricks2_nmap");
-	bricks2.DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	bricks2.FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
-	bricks2.Roughness = 0.3f;
+	auto bricks2 = std::make_shared<MaterialData>();
+	bricks2->DiffuseMapIndex = gTextureManager->GetIndex("bricks2");
+	bricks2->NormalMapIndex = gTextureManager->GetIndex("bricks2_nmap");
+	bricks2->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	bricks2->FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
+	bricks2->Roughness = 0.3f;
 	gMaterialManager->AddMaterial("bricks2", bricks2);
 
-	MaterialData stone;
-	stone.DiffuseMapIndex = gTextureManager->GetIndex("stone");
-	stone.NormalMapIndex = -1;
-	stone.DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	stone.FresnelR0 = XMFLOAT3(0.02f, 0.02f, 0.02f);
-	stone.Roughness = 0.1f;
+	auto stone = std::make_shared<MaterialData>();
+	stone->DiffuseMapIndex = gTextureManager->GetIndex("stone");
+	stone->NormalMapIndex = -1;
+	stone->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	stone->FresnelR0 = XMFLOAT3(0.02f, 0.02f, 0.02f);
+	stone->Roughness = 0.1f;
 	gMaterialManager->AddMaterial("stone", stone);
 
-	MaterialData tile;
-	tile.DiffuseMapIndex = gTextureManager->GetIndex("tile");
-	tile.NormalMapIndex = gTextureManager->GetIndex("tile_nmap");
-	tile.DiffuseAlbedo = XMFLOAT4(0.9f, 0.9f, 0.9f, 1.0f);
-	tile.FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
-	tile.Roughness = 0.1f;
+	auto tile = std::make_shared<MaterialData>();
+	tile->DiffuseMapIndex = gTextureManager->GetIndex("tile");
+	tile->NormalMapIndex = gTextureManager->GetIndex("tile_nmap");
+	tile->DiffuseAlbedo = XMFLOAT4(0.9f, 0.9f, 0.9f, 1.0f);
+	tile->FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
+	tile->Roughness = 0.1f;
 	gMaterialManager->AddMaterial("tile", tile);
 
-	MaterialData mirror0;
-	mirror0.DiffuseMapIndex = gTextureManager->GetIndex("white1x1");
-	mirror0.NormalMapIndex = gTextureManager->GetIndex("default_nmap");
-	mirror0.DiffuseAlbedo = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mirror0.FresnelR0 = XMFLOAT3(0.98f, 0.97f, 0.95f);
-	mirror0.Roughness = 0.1f;
+	auto mirror0 = std::make_shared<MaterialData>();
+	mirror0->DiffuseMapIndex = gTextureManager->GetIndex("white1x1");
+	mirror0->NormalMapIndex = gTextureManager->GetIndex("default_nmap");
+	mirror0->DiffuseAlbedo = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mirror0->FresnelR0 = XMFLOAT3(0.98f, 0.97f, 0.95f);
+	mirror0->Roughness = 0.1f;
 	gMaterialManager->AddMaterial("mirror", mirror0);
 
-	MaterialData sky;
-	sky.DiffuseMapIndex = gTextureManager->GetCubeIndex();
-	sky.NormalMapIndex = -1;
-	sky.DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	sky.FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
-	sky.Roughness = 1.0f;
+	auto sky = std::make_shared<MaterialData>();
+	sky->DiffuseMapIndex = gTextureManager->GetCubeIndex();
+	sky->NormalMapIndex = -1;
+	sky->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	sky->FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
+	sky->Roughness = 1.0f;
 	gMaterialManager->AddMaterial("sky", sky);
 
-	MaterialData grass;
-	grass.DiffuseMapIndex = gTextureManager->GetIndex("grass");
-	grass.NormalMapIndex = -1;
-	grass.DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	grass.FresnelR0 = XMFLOAT3(0.01f, 0.01f, 0.01f);
-	grass.Roughness = 0.925f;
+	auto grass = std::make_shared<MaterialData>();
+	grass->DiffuseMapIndex = gTextureManager->GetIndex("grass");
+	grass->NormalMapIndex = -1;
+	grass->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	grass->FresnelR0 = XMFLOAT3(0.01f, 0.01f, 0.01f);
+	grass->Roughness = 0.925f;
 	gMaterialManager->AddMaterial("grass", grass);
 
-	MaterialData water;
-	water.DiffuseMapIndex = gTextureManager->GetIndex("water1");
-	water.NormalMapIndex = -1;
-	water.DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.5f);
-	water.FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
-	water.Roughness = 0.0f;
+	auto water = std::make_shared<MaterialData>();
+	water->DiffuseMapIndex = gTextureManager->GetIndex("water1");
+	water->NormalMapIndex = -1;
+	water->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 0.5f);
+	water->FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
+	water->Roughness = 0.0f;
 	gMaterialManager->AddMaterial("water", water);
 
-	MaterialData wirefence;
-	wirefence.DiffuseMapIndex = gTextureManager->GetIndex("WireFence");
-	wirefence.NormalMapIndex = -1;
-	wirefence.DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	wirefence.FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
-	wirefence.Roughness = 0.25f;
+	auto wirefence = std::make_shared<MaterialData>();
+	wirefence->DiffuseMapIndex = gTextureManager->GetIndex("WireFence");
+	wirefence->NormalMapIndex = -1;
+	wirefence->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	wirefence->FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
+	wirefence->Roughness = 0.25f;
 	gMaterialManager->AddMaterial("wirefence", wirefence);
 
-	MaterialData ice;
-	ice.DiffuseMapIndex = gTextureManager->GetIndex("ice");
-	ice.NormalMapIndex = -1;
-	ice.DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	ice.FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
-	ice.Roughness = 0.0f;
+	auto ice = std::make_shared<MaterialData>();
+	ice->DiffuseMapIndex = gTextureManager->GetIndex("ice");
+	ice->NormalMapIndex = -1;
+	ice->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	ice->FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
+	ice->Roughness = 0.0f;
 	gMaterialManager->AddMaterial("ice", ice);
 
-	MaterialData skullMat;
-	skullMat.DiffuseMapIndex = gTextureManager->GetIndex("white1x1");
-	skullMat.NormalMapIndex = -1;
-	skullMat.DiffuseAlbedo = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
-	skullMat.FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
-	skullMat.Roughness = 0.2f;
+	auto skullMat = std::make_shared<MaterialData>();
+	skullMat->DiffuseMapIndex = gTextureManager->GetIndex("white1x1");
+	skullMat->NormalMapIndex = -1;
+	skullMat->DiffuseAlbedo = XMFLOAT4(0.8f, 0.8f, 0.8f, 1.0f);
+	skullMat->FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
+	skullMat->Roughness = 0.2f;
 	gMaterialManager->AddMaterial("skullMat", skullMat);
 }
 
@@ -506,49 +561,50 @@ void D3D12App::BuildMeshes()
 	gMeshManager->AddMesh("sphere", geoGen.CreateSphere(0.5f, 20, 20));
 	gMeshManager->AddMesh("cylinder", geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20));
 	gMeshManager->AddMesh("box2", geoGen.CreateBox(8.0f, 8.0f, 8.0f, 3));
+	gMeshManager->AddMesh("rigidBox", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 0));
 }
 
 void D3D12App::BuildGameObjects()
 {
-	auto sky = std::make_unique<Sky>();
-	gGameObjectManager->AddGameObject(std::move(sky));
+	auto sky = std::make_shared<Sky>();
+	gGameObjectManager->AddGameObject(sky);
 
-	auto box = std::make_unique<Box>();
-	gGameObjectManager->AddGameObject(std::move(box));
+	auto box = std::make_shared<Box>();
+	gGameObjectManager->AddGameObject(box);
 
-	auto globe = std::make_unique<Globe>();
-	gGameObjectManager->AddGameObject(std::move(globe));
+	auto globe = std::make_shared<Globe>();
+	gGameObjectManager->AddGameObject(globe);
 
-	auto grid = std::make_unique<Grid>();
-	gGameObjectManager->AddGameObject(std::move(grid));
+	auto grid = std::make_shared<Grid>();
+	gGameObjectManager->AddGameObject(grid);
 
 	for (int i = 0; i < 5; ++i) {
-		auto leftCyl = std::make_unique<Cylinder>();
-		leftCyl->mGameObjectName = "leftCyl" + std::to_string(i);
-		leftCyl->mTranslation = XMFLOAT3(-5.0f, 1.5f, -10.0f + i * 5.0f);
-		gGameObjectManager->AddGameObject(std::move(leftCyl));
+		auto leftCyl = std::make_shared<Cylinder>();
+		leftCyl->mName = "leftCyl" + std::to_string(i);
+		leftCyl->mTransform.Translation = XMFLOAT3(-5.0f, 1.5f, -10.0f + i * 5.0f);
+		gGameObjectManager->AddGameObject(leftCyl);
 
-		auto rightCyl = std::make_unique<Cylinder>();
-		rightCyl->mGameObjectName = "rightCyl" + std::to_string(i);
-		rightCyl->mTranslation = XMFLOAT3(+5.0f, 1.5f, -10.0f + i * 5.0f);
-		gGameObjectManager->AddGameObject(std::move(rightCyl));
+		auto rightCyl = std::make_shared<Cylinder>();
+		rightCyl->mName = "rightCyl" + std::to_string(i);
+		rightCyl->mTransform.Translation = XMFLOAT3(+5.0f, 1.5f, -10.0f + i * 5.0f);
+		gGameObjectManager->AddGameObject(rightCyl);
 
-		auto leftSphere = std::make_unique<Sphere>();
-		leftSphere->mGameObjectName = "leftSphere" + std::to_string(i);
-		leftSphere->mTranslation = XMFLOAT3(-5.0f, 3.5f, -10.0f + i * 5.0f);
-		gGameObjectManager->AddGameObject(std::move(leftSphere));
+		auto leftSphere = std::make_shared<Sphere>();
+		leftSphere->mName = "leftSphere" + std::to_string(i);
+		leftSphere->mTransform.Translation = XMFLOAT3(-5.0f, 3.5f, -10.0f + i * 5.0f);
+		gGameObjectManager->AddGameObject(leftSphere);
 
-		auto rightSphere = std::make_unique<Sphere>();
-		rightSphere->mGameObjectName = "rightSphere" + std::to_string(i);
-		rightSphere->mTranslation = XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f);
-		gGameObjectManager->AddGameObject(std::move(rightSphere));
+		auto rightSphere = std::make_shared<Sphere>();
+		rightSphere->mName = "rightSphere" + std::to_string(i);
+		rightSphere->mTransform.Translation = XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f);
+		gGameObjectManager->AddGameObject(rightSphere);
 	}
 
-	auto skull = std::make_unique<Skull>();
-	gGameObjectManager->AddGameObject(std::move(skull));
+	auto skull = std::make_shared<Skull>();
+	gGameObjectManager->AddGameObject(skull);
 
-	auto boxPx = std::make_unique<BoxPx>();
-	gGameObjectManager->AddGameObject(std::move(boxPx));
+	auto boxPx = std::make_shared<BoxPx>();
+	gGameObjectManager->AddGameObject(boxPx);
 }
 
 void D3D12App::Pick(int sx, int sy)

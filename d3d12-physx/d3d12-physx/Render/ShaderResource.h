@@ -21,7 +21,7 @@ private:
 	UINT mHeight = 0;
 	DXGI_FORMAT mFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-	ComPtr<ID3D12Resource> mShaderResource = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mShaderResource = nullptr;
 };
 
  

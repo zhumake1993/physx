@@ -1,9 +1,33 @@
 #include "D3DApp.h"
+
 #include <WindowsX.h>
 
 using Microsoft::WRL::ComPtr;
 using namespace std;
 using namespace DirectX;
+
+extern std::wstring gMainWndCaption;
+extern D3D_DRIVER_TYPE gd3dDriverType;
+extern DXGI_FORMAT gBackBufferFormat;
+extern DXGI_FORMAT gDepthStencilFormat;
+extern int gClientWidth;
+extern int gClientHeight;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
+extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
+extern bool g4xMsaaState;
+extern UINT g4xMsaaQuality;
+
+extern D3D12_VIEWPORT gScreenViewport;
+extern D3D12_RECT gScissorRect;
+
+extern UINT gRtvDescriptorSize;
+extern UINT gDsvDescriptorSize;
+extern UINT gCbvSrvUavDescriptorSize;
+
+#include "Common/GameTimer.h"
+extern GameTimer gTimer;
 
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

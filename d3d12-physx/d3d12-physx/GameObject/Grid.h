@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Manager/GameObjectManager.h"
+#include "Manager/GameObject.h"
 
 class Grid :
 	public GameObject

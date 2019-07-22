@@ -2,8 +2,6 @@
 
 #include "Common/d3dUtil.h"
 #include "Common/FrameResource.h"
-#include "Manager/InstanceManager.h"
-#include "Manager/TextureManager.h"
 
 struct SsaoConstants
 {
@@ -62,14 +60,14 @@ private:
 
 private:
 
-	ComPtr<ID3D12RootSignature> mRootSignature;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature;
 
 	D3D12_VIEWPORT mViewport;
 	D3D12_RECT mScissorRect;
 
-	ComPtr<ID3D12DescriptorHeap> mCbvSrvUavDescriptorHeap = nullptr;
-	ComPtr<ID3D12DescriptorHeap> mRtvHeap = nullptr;
-	ComPtr<ID3D12DescriptorHeap> mDsvHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCbvSrvUavDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mRtvHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mDsvHeap = nullptr;
 
 	UINT mWidth = 0;
 	UINT mHeight = 0;
@@ -77,34 +75,34 @@ private:
 	const DXGI_FORMAT mNormalMapFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 	const int mMaxBlurRadius = 5;
 	
-	ComPtr<ID3D12Resource> mNormalMap;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mNormalMap;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhNormalMapCpuSrv;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE mhNormalMapGpuSrv;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhNormalMapCpuRtv;
 
-	ComPtr<ID3D12Resource> mDepthMap;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mDepthMap;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhDepthMapCpuSrv;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE mhDepthMapGpuSrv;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhDepthMapCpuDsv;
 
-	ComPtr<ID3D12Resource> mRandomVectorMap;
-	ComPtr<ID3D12Resource> mRandomVectorMapUploadBuffer;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mRandomVectorMap;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mRandomVectorMapUploadBuffer;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhRandomVectorMapCpuSrv;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE mhRandomVectorMapGpuSrv;
 
 	// 模糊
-	ComPtr<ID3D12Resource> mAmbientMap0;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mAmbientMap0;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhAmbientMap0CpuSrv;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE mhAmbientMap0GpuSrv;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhAmbientMap0CpuRtv;
 
-	ComPtr<ID3D12Resource> mAmbientMap1;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mAmbientMap1;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhAmbientMap1CpuSrv;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE mhAmbientMap1GpuSrv;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhAmbientMap1CpuRtv;
 
-	XMFLOAT4 mOffsets[14];
+	DirectX::XMFLOAT4 mOffsets[14];
 
-	std::vector<std::unique_ptr<UploadBuffer<SsaoConstants>>> mFrameResources; // 帧资源vector
+	std::unique_ptr<FrameResource<SsaoConstants>> mFrameResource; // 帧资源
 };
 

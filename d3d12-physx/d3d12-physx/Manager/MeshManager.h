@@ -37,17 +37,17 @@ public:
 
 	void Initialize();
 
+	bool HasMesh(std::string name);
+	std::shared_ptr<Mesh> GetMesh(const std::string name);
 	void AddMesh(std::string Name,  GeometryGenerator::MeshData mesh);
 	void AddMesh(std::string Name, std::vector<Vertex> &vertices, std::vector<std::uint16_t> &indices);
-	void DeleteMesh(std::string Name);
-
-private:
-
-public:
-	std::unordered_map<std::string, std::shared_ptr<Mesh>> mMeshes;
 
 private:
 	//
-};
 
-extern std::unique_ptr<MeshManager> gMeshManager;
+public:
+	//
+
+private:
+	std::unordered_map<std::string, std::shared_ptr<Mesh>> mMeshes;
+};

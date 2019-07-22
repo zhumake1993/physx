@@ -1,4 +1,8 @@
 #include "RenderTarget.h"
+
+using Microsoft::WRL::ComPtr;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
  
 RenderTarget::RenderTarget(UINT width, UINT height, DXGI_FORMAT format)
 {

@@ -2,8 +2,6 @@
 
 #include "Common/d3dUtil.h"
 
-using Microsoft::WRL::ComPtr;
-
 struct Texture
 {
 	std::string Name;
@@ -29,8 +27,10 @@ public:
 	ID3D12DescriptorHeap* GetSrvDescriptorHeapPtr();
 	UINT GetMaxNumTextures();
 
+	bool HasTexture(std::string name);
 	void AddTextureTex(std::wstring FileName);
 	void AddTextureCube(std::wstring FileName);
+
 	void BuildDescriptorHeaps();
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuSrvTex();
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuSrvCube();
@@ -43,11 +43,9 @@ public:
 
 private:
 
-	ComPtr<ID3D12DescriptorHeap> mSrvDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mSrvDescriptorHeap = nullptr;
 
 	const UINT mMaxNumTextures = 100;
 	std::unordered_map<std::string, std::unique_ptr<Texture>> mTextures;
 	std::unique_ptr<Texture> mCubeMap;
 };
-
-extern std::unique_ptr<TextureManager> gTextureManager;

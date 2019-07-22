@@ -1,7 +1,5 @@
 #include "GameObjectManager.h"
 
-std::unique_ptr<GameObjectManager> gGameObjectManager = std::make_unique<GameObjectManager>();
-
 GameObjectManager::GameObjectManager()
 {
 }
@@ -14,31 +12,63 @@ void GameObjectManager::Initialize()
 {
 }
 
-void GameObjectManager::AddGameObject(std::unique_ptr<GameObject> gameObject)
+bool GameObjectManager::HasGameObject(std::string name)
 {
-	if (mGameObjects.find(gameObject->mGameObjectName) != mGameObjects.end()) {
-		OutputMessageBox("GameObject already exists!");
-		return;
-	}
-
-	gInstanceManager->AddInstance(gameObject->mGameObjectName, gameObject->GetWorld(),
-		gameObject->mMatName, gameObject->mTexTransform, gameObject->mMeshName, gameObject->mRenderLayer,
-		gameObject->mReceiveShadow);
-
-	mGameObjects[gameObject->mGameObjectName] = std::move(gameObject);
+	return mGameObjects.find(name) != mGameObjects.end();
 }
 
-std::unique_ptr<GameObject>& GameObjectManager::GetGameObject(std::string name)
+bool GameObjectManager::HasGameObject(std::shared_ptr<GameObject> gameObject)
 {
+	return mGameObjects.find(gameObject->mName) != mGameObjects.end();
+}
+
+std::shared_ptr<GameObject> GameObjectManager::GetGameObject(std::string name)
+{
+	if (!HasGameObject(name)) {
+		ThrowMyEx("GameObject does not exist!")
+	}
+
 	return mGameObjects[name];
+}
+
+void GameObjectManager::AddGameObject(std::shared_ptr<GameObject> gameObject)
+{
+	if (HasGameObject(gameObject)) {
+		ThrowMyEx("GameObject already exists!")
+	}
+
+	if (gameObject->mHasMeshRender) {
+		gameObject->AddMeshRender();
+	}
+
+	if (gameObject->mHasRigidBody) {
+		gameObject->AddRigidBody();
+	}
+
+	mGameObjects[gameObject->mName] = gameObject;
+}
+
+void GameObjectManager::DeleteGameObject(std::string name)
+{
+	if (!HasGameObject(name)) {
+		ThrowMyEx("GameObject does not exist!")
+	}
+
+	mGameObjects.erase(name);
+}
+
+void GameObjectManager::DeleteGameObject(std::shared_ptr<GameObject> gameObject)
+{
+	if (!HasGameObject(gameObject->mName)) {
+		ThrowMyEx("GameObject does not exist!")
+	}
+
+	mGameObjects.erase(gameObject->mName);
 }
 
 void GameObjectManager::Update()
 {
-	for (auto &p : mGameObjects) {
+	for (auto p : mGameObjects) {
 		p.second->Update();
-
-		gInstanceManager->UpdateInstance(p.second->mGameObjectName, p.second->GetWorld(),
-			p.second->mMatName, p.second->mTexTransform, p.second->mMeshName, p.second->mRenderLayer, p.second->mReceiveShadow);
 	}
 }

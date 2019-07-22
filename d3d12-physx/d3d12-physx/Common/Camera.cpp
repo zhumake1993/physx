@@ -2,8 +2,6 @@
 
 using namespace DirectX;
 
-std::unique_ptr<Camera> gCamera = std::make_unique<Camera>();
-
 Camera::Camera()
 {
 	SetLens(0.25f*MathHelper::Pi, 1.0f, 1.0f, 1000.0f);

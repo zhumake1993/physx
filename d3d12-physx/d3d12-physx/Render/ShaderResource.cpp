@@ -1,4 +1,8 @@
 #include "ShaderResource.h"
+
+using Microsoft::WRL::ComPtr;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
  
 ShaderResource::ShaderResource(UINT width, UINT height, DXGI_FORMAT format)
 {

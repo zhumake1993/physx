@@ -1,5 +1,24 @@
 #include "DrawQuad.h"
 
+using namespace DirectX;
+using Microsoft::WRL::ComPtr;
+
+extern DXGI_FORMAT gBackBufferFormat;
+extern DXGI_FORMAT gDepthStencilFormat;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
+extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
+extern bool g4xMsaaState;
+extern UINT g4xMsaaQuality;
+
+extern D3D12_VIEWPORT gScreenViewport;
+extern D3D12_RECT gScissorRect;
+
+extern std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> gShaders;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
+
 DrawQuad::DrawQuad(UINT width, UINT height, DXGI_FORMAT format)
 {
 	mWidth = width;

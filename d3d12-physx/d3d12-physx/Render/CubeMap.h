@@ -1,9 +1,8 @@
 #pragma once
 
 #include "Common/d3dUtil.h"
+#include "Common/Camera.h"
 #include "Common/FrameResource.h"
-#include "Manager/InstanceManager.h"
-#include "Manager/TextureManager.h"
 
 enum class CubeMapFace : int
 {
@@ -46,26 +45,26 @@ private:
 	D3D12_VIEWPORT mViewport;
 	D3D12_RECT mScissorRect;
 
-	ComPtr<ID3D12DescriptorHeap> mCbvSrvUavDescriptorHeap = nullptr;
-	ComPtr<ID3D12DescriptorHeap> mRtvHeap = nullptr;
-	ComPtr<ID3D12DescriptorHeap> mDsvHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCbvSrvUavDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mRtvHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mDsvHeap = nullptr;
 
 	UINT mWidth = 0;
 	UINT mHeight = 0;
 	DXGI_FORMAT mFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	DXGI_FORMAT mDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
-	ComPtr<ID3D12Resource> mCubeMap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mCubeMap = nullptr;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhCpuSrv;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE mhGpuSrv;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhCpuRtv[6];
 
-	ComPtr<ID3D12Resource> mCubeDepthStencilBuffer = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mCubeDepthStencilBuffer = nullptr;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mhCubeDSV;
 
 	Camera mCubeMapCamera[6];
 
-	std::vector<std::unique_ptr<UploadBuffer<PassConstants>>> mFrameResources; // 帧资源vector
+	std::unique_ptr<FrameResource<PassConstants>> mFrameResource; // 帧资源
 
 	ID3D12DescriptorHeap* mShadowSrvDescriptorHeapPtr;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE mShadowSrv;

@@ -2,8 +2,6 @@
 
 #include "Common/d3dUtil.h"
 
-const int size = 256;
-
 class InputManager
 {
 public:
@@ -28,9 +26,8 @@ public:
 	//
 
 private:
+	static const int size = 256;
 	bool mKeyDown[size];
 	bool mKeyPress[size];
 	bool mKeyUp[size];
 };
-
-extern std::unique_ptr<InputManager> gInputManager;

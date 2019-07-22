@@ -1,7 +1,5 @@
 #include "InputManager.h"
 
-std::unique_ptr<InputManager> gInputManager = std::make_unique<InputManager>();
-
 InputManager::InputManager()
 {
 }

@@ -1,10 +1,27 @@
 #include "CubeMap.h"
 
+using namespace DirectX;
+using Microsoft::WRL::ComPtr;
+
+#include "Manager/InstanceManager.h"
+#include "Manager/TextureManager.h"
+#include "Manager/MaterialManager.h"
+extern std::unique_ptr<InstanceManager> gInstanceManager;
+extern std::unique_ptr<TextureManager> gTextureManager;
+extern std::unique_ptr<MaterialManager> gMaterialManager;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
+extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
+extern UINT gRtvDescriptorSize;
+extern UINT gDsvDescriptorSize;
+
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> gRootSignatures;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
+
 CubeMap::CubeMap(DXGI_FORMAT format, DXGI_FORMAT depthStencilFormat)
 {
-	for (int i = 0; i < gNumFrameResources; ++i) {
-		mFrameResources.push_back(std::make_unique<UploadBuffer<PassConstants>>(gD3D12Device.Get(), 6, true));
-	}
+	mFrameResource = std::make_unique<FrameResource<PassConstants>>(gD3D12Device.Get(), 6, true);
 
 	mWidth = mCubeMapSize;
 	mHeight = mCubeMapSize;
@@ -76,8 +93,6 @@ void CubeMap::BuildCubeFaceCamera(float x, float y, float z)
 
 void CubeMap::UpdatePassConstantsData(PassConstants& mainPassCB)
 {
-	auto& uploadBuffer = mFrameResources[gCurrFrameResourceIndex];
-
 	for (int i = 0; i < 6; ++i) {
 		PassConstants cubeFacePassCB = mainPassCB;
 
@@ -99,7 +114,7 @@ void CubeMap::UpdatePassConstantsData(PassConstants& mainPassCB)
 		cubeFacePassCB.RenderTargetSize = XMFLOAT2((float)mCubeMapSize, (float)mCubeMapSize);
 		cubeFacePassCB.InvRenderTargetSize = XMFLOAT2(1.0f / mCubeMapSize, 1.0f / mCubeMapSize);
 
-		uploadBuffer->CopyData(i, cubeFacePassCB);
+		mFrameResource->Copy(i, cubeFacePassCB);
 	}
 }
 
@@ -126,8 +141,8 @@ void CubeMap::DrawSceneToCubeMap()
 		gCommandList->SetGraphicsRootSignature(gRootSignatures["main"].Get());
 
 		// 绑定常量缓冲
-		auto uploadBuffer = mFrameResources[gCurrFrameResourceIndex]->Resource();
-		gCommandList->SetGraphicsRootConstantBufferView(1, uploadBuffer->GetGPUVirtualAddress() + i * passCBByteSize);
+		auto passCB = mFrameResource->GetCurrResource();
+		gCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress() + i * passCBByteSize);
 
 		// 绑定所有材质。对于结构化缓冲，我们可以绕过堆，使用根描述符
 		auto matBuffer = gMaterialManager->CurrResource();

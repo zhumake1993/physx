@@ -1,5 +1,15 @@
 #include "BlurFilter.h"
 
+using Microsoft::WRL::ComPtr;
+
+extern ComPtr<ID3D12Device> gD3D12Device;
+extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
+
+extern UINT gCbvSrvUavDescriptorSize;
+
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> gShaders;
+extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
+
 BlurFilter::BlurFilter(UINT width, UINT height, DXGI_FORMAT format)
 {
 	mWidth = width;

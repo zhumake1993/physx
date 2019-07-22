@@ -1,4 +1,5 @@
 #include "GeometryGenerator.h"
+
 #include <algorithm>
 
 using namespace DirectX;

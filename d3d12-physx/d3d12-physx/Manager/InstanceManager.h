@@ -1,9 +1,6 @@
 #pragma once
 
 #include "Instance.h"
-#include "MaterialManager.h"
-
-using namespace DirectX;
 
 class InstanceManager
 {
@@ -13,21 +10,14 @@ public:
 
 	void Initialize();
 
-	void AddInstance(const std::string& gameObjectName, const XMFLOAT4X4& world,
-		const std::string& matName, const XMFLOAT4X4& texTransform,
-		const std::string& meshName, const int randerLayer,
-		const bool receiveShadow);
-
-	void UpdateInstance(const std::string& gameObjectName, const XMFLOAT4X4& world,
-		const std::string& matName, const XMFLOAT4X4& texTransform,
-		const std::string& meshName, const int randerLayer,
-		const bool receiveShadow);
+	void AddInstance(const MeshRender& meshRender);
+	void UpdateInstance(const MeshRender& meshRender);
 
 	void UploadInstanceData();
 
 	void Draw(int randerLayer);
 
-	bool Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW);
+	bool Pick(DirectX::FXMVECTOR rayOriginW, DirectX::FXMVECTOR rayDirW);
 
 private:
 	//
@@ -38,5 +28,3 @@ public:
 private:
 	//
 };
-
-extern std::unique_ptr<InstanceManager> gInstanceManager;

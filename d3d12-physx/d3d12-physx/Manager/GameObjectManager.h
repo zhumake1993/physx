@@ -2,8 +2,6 @@
 
 #include "GameObject.h"
 
-using namespace DirectX;
-
 class GameObjectManager
 {
 public:
@@ -12,9 +10,12 @@ public:
 
 	void Initialize();
 
-	void AddGameObject(std::unique_ptr<GameObject> gameObject);
-
-	std::unique_ptr<GameObject>& GetGameObject(std::string name);
+	bool HasGameObject(std::string name);
+	bool HasGameObject(std::shared_ptr<GameObject> gameObject);
+	std::shared_ptr<GameObject> GetGameObject(std::string name);
+	void AddGameObject(std::shared_ptr<GameObject> gameObject);
+	void DeleteGameObject(std::string name);
+	void DeleteGameObject(std::shared_ptr<GameObject> gameObject);
 
 	void Update();
 
@@ -25,7 +26,5 @@ public:
 	//
 
 private:
-	std::unordered_map<std::string, std::unique_ptr<GameObject>> mGameObjects;
+	std::unordered_map<std::string, std::shared_ptr<GameObject>> mGameObjects;
 };
-
-extern std::unique_ptr<GameObjectManager> gGameObjectManager;

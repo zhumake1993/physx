@@ -25,15 +25,15 @@ private:
 	void BuildPSO();
 
 private:
-	ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> mRootSignature = nullptr;
 
-	ComPtr<ID3D12DescriptorHeap> mCbvSrvUavDescriptorHeap = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mCbvSrvUavDescriptorHeap = nullptr;
 
 	UINT mWidth = 0;
 	UINT mHeight = 0;
 	DXGI_FORMAT mFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-	ComPtr<ID3D12Resource> mTex = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Resource> mTex = nullptr;
 	CD3DX12_CPU_DESCRIPTOR_HANDLE mTexCpuSrv;
 	CD3DX12_GPU_DESCRIPTOR_HANDLE mTexGpuSrv;
 };

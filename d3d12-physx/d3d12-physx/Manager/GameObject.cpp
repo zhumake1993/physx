@@ -2,10 +2,8 @@
 
 using namespace DirectX;
 
-#include "InputManager.h"
-#include "InstanceManager.h"
-extern std::unique_ptr<InstanceManager> gInstanceManager;
-extern std::unique_ptr<InputManager> gInputManager;
+#include "Manager/SceneManager.h"
+extern std::unique_ptr<SceneManager> gSceneManager;
 
 #include "../physx/Main/PhysX.h"
 extern PhysX gPhysX;
@@ -60,13 +58,14 @@ GameObject::~GameObject()
 void GameObject::Update()
 {
 	if (mHasRigidBody) {
-		float x, y, z, a, b, c, d;
-		gPhysX.Get(x, y, z, a, b, c, d);
+		PxFloat3 pos;
+		PxFloat4 quat;
+		gPhysX.GetPxRigidDynamicTransform(mName, pos, quat);
 
 		// 刚体的世界坐标
 		Transform rigidBodyWorld;
-		rigidBodyWorld.Translation = XMFLOAT3(x, y, z);
-		rigidBodyWorld.Quaternion = XMFLOAT4(a, b, c, d);
+		rigidBodyWorld.Translation = XMFLOAT3(pos.x, pos.y, pos.z);
+		rigidBodyWorld.Quaternion = XMFLOAT4(quat.x, quat.y, quat.z, quat.w);
 		rigidBodyWorld.Scale = XMFLOAT3(1.0f, 1.0f, 1.0f); // 此项不用
 
 		// 主体相对于刚体的局部坐标
@@ -95,36 +94,36 @@ void GameObject::Update()
 
 		// 更新刚体的世界坐标
 		XMStoreFloat4x4(&mRigidBodyMeshRender.World, GetMatrix(rigidBodyWorld));
-		gInstanceManager->UpdateInstance(mRigidBodyMeshRender);
+		gSceneManager->GetCurrInstanceManager()->UpdateInstance(mRigidBodyMeshRender);
 	}
 
 	if (mHasMeshRender) {
 		// 有问题，暂缓
 		XMStoreFloat4x4(&mMeshRender.World, GetMatrix(mTransform));
-		gInstanceManager->UpdateInstance(mMeshRender);
+		gSceneManager->GetCurrInstanceManager()->UpdateInstance(mMeshRender);
 	}
 }
 
 bool GameObject::GetKeyDown(int key)
 {
-	return gInputManager->GetKeyDown(key);
+	return gSceneManager->GetCurrInputManager()->GetKeyDown(key);
 }
 
 bool GameObject::GetKeyPress(int key)
 {
-	return gInputManager->GetKeyPress(key);
+	return gSceneManager->GetCurrInputManager()->GetKeyPress(key);
 }
 
 bool GameObject::GetKeyUp(int key)
 {
-	return gInputManager->GetKeyUp(key);
+	return gSceneManager->GetCurrInputManager()->GetKeyUp(key);
 }
 
 void GameObject::AddMeshRender()
 {
 	mMeshRender.Name = mName;
 	XMStoreFloat4x4(&mMeshRender.World, GetMatrix(mTransform));
-	gInstanceManager->AddInstance(mMeshRender);
+	gSceneManager->GetCurrInstanceManager()->AddInstance(mMeshRender);
 }
 
 void GameObject::AddRigidBody()
@@ -141,25 +140,25 @@ void GameObject::AddRigidBody()
 
 	XMFLOAT3 worldPos;
 	XMStoreFloat3(&worldPos, worldPosV);
-	desc.px = worldPos.x;
-	desc.py = worldPos.y;
-	desc.pz = worldPos.z;
+	desc.pos.x = worldPos.x;
+	desc.pos.y = worldPos.y;
+	desc.pos.z = worldPos.z;
 
 	XMFLOAT4 worldQuat;
 	XMStoreFloat4(&worldQuat, worldQuatV);
-	desc.qx = worldQuat.x;
-	desc.qy = worldQuat.y;
-	desc.qz = worldQuat.z;
-	desc.qw = worldQuat.w;
+	desc.quat.x = worldQuat.x;
+	desc.quat.y = worldQuat.y;
+	desc.quat.z = worldQuat.z;
+	desc.quat.w = worldQuat.w;
 
-	desc.materialStaticFriction = mPxMaterial.x;
-	desc.materialDynamicFriction = mPxMaterial.y;
-	desc.materialRestitution = mPxMaterial.z;
+	desc.material.x = mPxMaterial.x;
+	desc.material.y = mPxMaterial.y;
+	desc.material.z = mPxMaterial.z;
 
 	desc.pxGeometry = mPxGeometry;
-	desc.gx = mRigidBodyLocalTransform.Scale.x;
-	desc.gy = mRigidBodyLocalTransform.Scale.y;
-	desc.gz = mRigidBodyLocalTransform.Scale.z;
+	desc.scale.x = mRigidBodyLocalTransform.Scale.x;
+	desc.scale.y = mRigidBodyLocalTransform.Scale.y;
+	desc.scale.z = mRigidBodyLocalTransform.Scale.z;
 
 	desc.density = mDensity;
 
@@ -168,5 +167,5 @@ void GameObject::AddRigidBody()
 	// 添加刚体的MeshRender
 	mRigidBodyMeshRender.Name = mName + "RigidBody";
 	XMStoreFloat4x4(&mRigidBodyMeshRender.World, world);
-	gInstanceManager->AddInstance(mRigidBodyMeshRender);
+	gSceneManager->GetCurrInstanceManager()->AddInstance(mRigidBodyMeshRender);
 }

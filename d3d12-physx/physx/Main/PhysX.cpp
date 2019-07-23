@@ -76,25 +76,25 @@ void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
 	auto desc = *static_cast<PxRigidDynamicDesc*>(pdesc);
 
 	// 创建transform
-	auto transform = PxTransform(PxVec3(desc.px, desc.py, desc.pz), PxQuat(desc.qx, desc.qy, desc.qz, desc.qw));
+	auto transform = PxTransform(PxVec3(desc.pos.x, desc.pos.y, desc.pos.z), PxQuat(desc.quat.x, desc.quat.y, desc.quat.z, desc.quat.w));
 
 	// 创建actor
 	PxRigidDynamic* actor = gPhysics->createRigidDynamic(transform);
 
 	// 创建材质
-	PxMaterial* material = gPhysics->createMaterial(desc.materialStaticFriction, desc.materialDynamicFriction, desc.materialRestitution);
+	PxMaterial* material = gPhysics->createMaterial(desc.material.x, desc.material.y, desc.material.z);
 
 	// 创建shape
 	PxShape* shape = nullptr;
 	switch (desc.pxGeometry) {
 		case PxSphere: {
-			shape = gPhysics->createShape(PxSphereGeometry(desc.gx), *material); break;
+			shape = gPhysics->createShape(PxSphereGeometry(desc.scale.x), *material); break;
 		}
 		case PxBox: {
-			shape = gPhysics->createShape(PxBoxGeometry(desc.gx, desc.gy, desc.gz), *material); break;
+			shape = gPhysics->createShape(PxBoxGeometry(desc.scale.x, desc.scale.y, desc.scale.z), *material); break;
 		}
 		case PxCapsule: {
-			shape = gPhysics->createShape(PxCapsuleGeometry(desc.gx, desc.gy), *material); break;
+			shape = gPhysics->createShape(PxCapsuleGeometry(desc.scale.x, desc.scale.y), *material); break;
 		}
 		default: {
 			assert(shape);
@@ -116,88 +116,36 @@ void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
 
 void PhysX::Update(float delta)
 {
-	gScene->simulate(delta);
+	/*gScene->simulate(delta);
+	gScene->fetchResults(true);*/
+
+	mAccumulator += delta;
+	if (mAccumulator < mStepSize)
+		return;
+
+	mAccumulator -= mStepSize;
+
+	gScene->simulate(mStepSize);
 	gScene->fetchResults(true);
 }
 
-void PhysX::Get(float& x, float& y, float& z, float& a, float& b, float& c, float& d)
+void PhysX::GetPxRigidDynamicTransform(std::string name, PxFloat3& pos, PxFloat4& quat)
 {
-	auto pg = gPxRigidDynamicMap["boxPx"];
+	auto pg = gPxRigidDynamicMap[name];
 	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
 	pg->getShapes(shapes, 1);
 
 	//获取transform
 	auto t = PxShapeExt::getGlobalPose(*shapes[0], *pg);
 
-	x = t.p.x;
-	y = t.p.y;
-	z = t.p.z;
-	a = t.q.x;
-	b = t.q.y;
-	c = t.q.z;
-	d = t.q.w;
-
-	//PxScene* scene;
-	//PxGetPhysics().getScenes(&scene, 1);
-	//PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
-	//if (nbActors)
-	//{
-	//	std::vector<PxRigidActor*> actors(nbActors);
-	//	scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor * *>(&actors[0]), nbActors);
-	//	//Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
-
-	//	PxU32 numActors = static_cast<PxU32>(actors.size());
-	//	
-	//	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
-
-	//	for (PxU32 i = 0; i < numActors; i++)
-	//	{
-	//		auto pg = static_cast<PxRigidActor*>(gg);
-
-	//		// 获取添加到actor的shape的数量
-	//		const PxU32 nbShapes = actors[i]->getNbShapes();
-	//		PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
-
-	//		// 获取添加到actor的shape
-	//		//actors[i]->getShapes(shapes, nbShapes);
-	//		pg->getShapes(shapes, nbShapes);
-
-	//		// 获取actor的sleep状态
-	//		const bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false;
-
-	//		for (PxU32 j = 0; j < nbShapes; j++)
-	//		{
-	//			// 获取transform
-	//			auto t = PxShapeExt::getGlobalPose(*shapes[j], *actors[i]);
-
-	//			x = t.p.x;
-	//			y = t.p.y;
-	//			z = t.p.z;
-	//			a = t.q.x;
-	//			b = t.q.y;
-	//			c = t.q.z;
-	//			d = t.q.w;
-
-	//			// 获取几何体
-	//			const PxGeometryHolder h = shapes[j]->getGeometry();
-
-	//			if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE) {
-	//				//
-	//			}
-
-	//			if (sleeping)
-	//			{
-	//				//
-	//			}
-	//			else
-	//			{
-	//				//
-	//			}
-	//		}
-	//	}
-	//}
+	pos.x = t.p.x;
+	pos.y = t.p.y;
+	pos.z = t.p.z;
+	quat.x = t.q.x;
+	quat.y = t.q.y;
+	quat.z = t.q.z;
+	quat.w = t.q.w;
 }
-
 
 void PhysX::CleanupPhysics()
 {

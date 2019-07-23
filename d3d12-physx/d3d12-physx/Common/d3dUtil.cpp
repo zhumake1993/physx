@@ -41,18 +41,8 @@ std::unique_ptr<FrameResource<PassConstants>> gPassCB = std::make_unique<FrameRe
 #include "Camera.h"
 std::unique_ptr<Camera> gCamera = std::make_unique<Camera>();
 
-#include "Manager/GameObjectManager.h"
-#include "Manager/InstanceManager.h"
-#include "Manager/TextureManager.h"
-#include "Manager/MaterialManager.h"
-#include "Manager/MeshManager.h"
-#include "Manager/InputManager.h"
-std::unique_ptr<GameObjectManager> gGameObjectManager = std::make_unique<GameObjectManager>();				// 游戏物体管理器
-std::unique_ptr<InstanceManager> gInstanceManager = std::make_unique<InstanceManager>();					// 渲染实例管理器
-std::unique_ptr<TextureManager> gTextureManager = std::make_unique<TextureManager>();						// 纹理管理器
-std::unique_ptr<MaterialManager> gMaterialManager = std::make_unique<MaterialManager>();					// 材质管理器
-std::unique_ptr<MeshManager> gMeshManager = std::make_unique<MeshManager>();								// 网格管理器
-std::unique_ptr<InputManager> gInputManager = std::make_unique<InputManager>();								// 输入管理器
+#include "Manager/SceneManager.h"
+std::unique_ptr<SceneManager> gSceneManager = std::make_unique<SceneManager>();								// 场景管理器
 
 std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout =														// 输入布局
 {
@@ -64,6 +54,9 @@ std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout =														// 输入布局
 std::unordered_map<std::string, ComPtr<ID3D12RootSignature>> gRootSignatures;								// 根签名
 std::unordered_map<std::string, ComPtr<ID3DBlob>> gShaders;													// 着色器
 std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> gPSOs;											// 渲染状态对象
+
+#include "../physx/Main/PhysX.h"
+PhysX gPhysX;																								// PhysX物理引擎
 
 //===========================================================
 //===========================================================

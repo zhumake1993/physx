@@ -2,10 +2,8 @@
 
 using namespace DirectX;
 
-#include "MaterialManager.h"
-#include "Manager/MeshManager.h"
-extern std::unique_ptr<MaterialManager> gMaterialManager;
-extern std::unique_ptr<MeshManager> gMeshManager;
+#include "Manager/SceneManager.h"
+extern std::unique_ptr<SceneManager> gSceneManager;
 
 InstanceManager::InstanceManager()
 {
@@ -32,15 +30,15 @@ void InstanceManager::AddInstance(const MeshRender& meshRender)
 	auto& instanceMap = mInstanceLayers[randerLayer];
 
 	if (instanceMap.find(meshName) != instanceMap.end()) {
-		instanceMap[meshName]->AddInstanceData(name, world, gMaterialManager->GetIndex(matName), texTransform, receiveShadow);
+		instanceMap[meshName]->AddInstanceData(name, world, gSceneManager->GetCurrMaterialManager()->GetIndex(matName), texTransform, receiveShadow);
 	}
 	else {
 		auto instance = std::make_unique<Instance>();
 		instance->mMeshName = meshName;
-		instance->mMesh = gMeshManager->GetMesh(meshName);
+		instance->mMesh = gSceneManager->GetCurrMeshManager()->GetMesh(meshName);
 		instance->CalculateBoundingBox();
 
-		instance->AddInstanceData(name, world, gMaterialManager->GetIndex(matName), texTransform, receiveShadow);
+		instance->AddInstanceData(name, world, gSceneManager->GetCurrMaterialManager()->GetIndex(matName), texTransform, receiveShadow);
 
 		instanceMap[meshName] = std::move(instance);
 	}
@@ -57,7 +55,7 @@ void InstanceManager::UpdateInstance(const MeshRender& meshRender)
 	auto receiveShadow = meshRender.ReceiveShadow;
 
 	auto& instanceMap = mInstanceLayers[randerLayer];
-	instanceMap[meshName]->UpdateInstanceData(name, world, gMaterialManager->GetIndex(matName), texTransform, receiveShadow);
+	instanceMap[meshName]->UpdateInstanceData(name, world, gSceneManager->GetCurrMaterialManager()->GetIndex(matName), texTransform, receiveShadow);
 }
 
 void InstanceManager::UploadInstanceData()

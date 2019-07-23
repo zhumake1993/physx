@@ -3,12 +3,8 @@
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 
-#include "Manager/InstanceManager.h"
-#include "Manager/TextureManager.h"
-#include "Manager/MaterialManager.h"
-extern std::unique_ptr<InstanceManager> gInstanceManager;
-extern std::unique_ptr<TextureManager> gTextureManager;
-extern std::unique_ptr<MaterialManager> gMaterialManager;
+#include "Manager/SceneManager.h"
+extern std::unique_ptr<SceneManager> gSceneManager;
 
 extern DXGI_FORMAT gBackBufferFormat;
 extern DXGI_FORMAT gDepthStencilFormat;
@@ -58,24 +54,24 @@ void Wireframe::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_D
 	gCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
 
 	// 绑定所有材质。对于结构化缓冲，我们可以绕过堆，使用根描述符
-	auto matBuffer = gMaterialManager->CurrResource();
+	auto matBuffer = gSceneManager->GetCurrMaterialManager()->CurrResource();
 	gCommandList->SetGraphicsRootShaderResourceView(2, matBuffer->GetGPUVirtualAddress());
 
 	// 绑定描述符堆
-	ID3D12DescriptorHeap* descriptorHeaps[] = { gTextureManager->GetSrvDescriptorHeapPtr() };
+	ID3D12DescriptorHeap* descriptorHeaps[] = { gSceneManager->GetCurrTextureManager()->GetSrvDescriptorHeapPtr() };
 	gCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	// 绑定所有的纹理
-	gCommandList->SetGraphicsRootDescriptorTable(3, gTextureManager->GetGpuSrvTex());
+	gCommandList->SetGraphicsRootDescriptorTable(3, gSceneManager->GetCurrTextureManager()->GetGpuSrvTex());
 
 	// 绑定天空球立方体贴图
-	gCommandList->SetGraphicsRootDescriptorTable(4, gTextureManager->GetGpuSrvCube());
+	gCommandList->SetGraphicsRootDescriptorTable(4, gSceneManager->GetCurrTextureManager()->GetGpuSrvCube());
 
 	gCommandList->SetPipelineState(gPSOs["Wireframe"].Get());
-	gInstanceManager->Draw((int)RenderLayer::Opaque);
-	gInstanceManager->Draw((int)RenderLayer::OpaqueDynamicReflectors);
-	gInstanceManager->Draw((int)RenderLayer::AlphaTested);
-	gInstanceManager->Draw((int)RenderLayer::Transparent);
+	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Opaque);
+	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
+	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::AlphaTested);
+	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Transparent);
 }
 
 void Wireframe::BuildRootSignature()

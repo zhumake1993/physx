@@ -148,7 +148,6 @@
     <ClCompile Include="Common\GameTimer.cpp" />
     <ClCompile Include="Common\GeometryGenerator.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
-    <ClCompile Include="Common\PhysXUtil.cpp" />
     <ClCompile Include="Filter\BlurFilter.cpp" />
     <ClCompile Include="Filter\InverseFilter.cpp" />
     <ClCompile Include="Filter\MultiplyFilter.cpp" />
@@ -170,6 +169,8 @@
     <ClCompile Include="Manager\InstanceManager.cpp" />
     <ClCompile Include="Manager\MaterialManager.cpp" />
     <ClCompile Include="Manager\MeshManager.cpp" />
+    <ClCompile Include="Manager\Scene.cpp" />
+    <ClCompile Include="Manager\SceneManager.cpp" />
     <ClCompile Include="Manager\TextureManager.cpp" />
     <ClCompile Include="Render\CubeMap.cpp" />
     <ClCompile Include="Render\DepthComplexityUseBlend.cpp" />
@@ -181,6 +182,7 @@
     <ClCompile Include="Render\ShadowMap.cpp" />
     <ClCompile Include="Render\Ssao.cpp" />
     <ClCompile Include="Render\Wireframe.cpp" />
+    <ClCompile Include="Scenes\MainScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h" />
@@ -192,7 +194,6 @@
     <ClInclude Include="Common\GameTimer.h" />
     <ClInclude Include="Common\GeometryGenerator.h" />
     <ClInclude Include="Common\MathHelper.h" />
-    <ClInclude Include="Common\PhysXUtil.h" />
     <ClInclude Include="Common\UploadBuffer.h" />
     <ClInclude Include="Filter\BlurFilter.h" />
     <ClInclude Include="Filter\InverseFilter.h" />
@@ -214,6 +215,8 @@
     <ClInclude Include="Manager\InstanceManager.h" />
     <ClInclude Include="Manager\MaterialManager.h" />
     <ClInclude Include="Manager\MeshManager.h" />
+    <ClInclude Include="Manager\Scene.h" />
+    <ClInclude Include="Manager\SceneManager.h" />
     <ClInclude Include="Manager\TextureManager.h" />
     <ClInclude Include="Render\CubeMap.h" />
     <ClInclude Include="Render\DepthComplexityUseBlend.h" />
@@ -225,6 +228,7 @@
     <ClInclude Include="Render\ShadowMap.h" />
     <ClInclude Include="Render\Ssao.h" />
     <ClInclude Include="Render\Wireframe.h" />
+    <ClInclude Include="Scenes\MainScene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Blur.hlsl">

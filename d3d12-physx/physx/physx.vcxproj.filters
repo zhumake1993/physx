@@ -20,6 +20,9 @@
     <ClCompile Include="Main\PhysX.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="Common\PhysXCommon.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\PhysXUtil.h">
@@ -27,6 +30,9 @@
     </ClInclude>
     <ClInclude Include="Main\PhysX.h">
       <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\PhysXCommon.h">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -48,13 +48,8 @@ private:
 
 	void UpdateFrameResource();
 
-	void BuildManagers();
 	void BuildRenders();
 	void BuildFilters();
-	void BuildTextures();
-	void BuildMaterials();
-	void BuildMeshes();
-	void BuildGameObjects();
 
 	void Pick(int sx, int sy);
 

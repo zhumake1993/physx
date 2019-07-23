@@ -25,6 +25,9 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{d4c9585e-aaf1-4cbb-8a18-ccbd893edce7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{022308a2-771b-451e-9094-a09a5a1a67ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\Camera.cpp">
@@ -147,8 +150,14 @@
     <ClCompile Include="Manager\GameObject.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Common\PhysXUtil.cpp">
-      <Filter>Common</Filter>
+    <ClCompile Include="Manager\Scene.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\SceneManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Scenes\MainScene.cpp">
+      <Filter>Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -275,8 +284,14 @@
     <ClInclude Include="Manager\GameObject.h">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Common\PhysXUtil.h">
-      <Filter>Common</Filter>
+    <ClInclude Include="Manager\Scene.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\SceneManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenes\MainScene.h">
+      <Filter>Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

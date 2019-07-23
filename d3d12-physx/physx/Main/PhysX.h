@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "../physx/Common/PhysXCommon.h"
+
 class PhysX
 {
 public:
@@ -16,6 +18,7 @@ public:
 
 	void Update(float delta);
 
+	void GetPxRigidDynamicTransform(std::string name, PxFloat3& pos, PxFloat4& quat);
 	void Get(float& x, float& y, float& z, float& a, float& b, float& c, float& d);
 
 	void CleanupPhysics();
@@ -27,5 +30,7 @@ public:
 	//
 
 private:
-	//
+	
+	float mAccumulator = 0.0f;
+	float mStepSize = 1.0f / 60.0f;
 };

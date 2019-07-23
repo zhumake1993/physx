@@ -83,7 +83,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.;..\PhysXSDK\include;..\PhysXSDK\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\physx;..\PhysXSDK\include;..\PhysXSDK\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DiagnosticsFormat>Classic</DiagnosticsFormat>
@@ -108,7 +108,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.;..\PhysXSDK\include;..\PhysXSDK\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\physx;..\PhysXSDK\include;..\PhysXSDK\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DiagnosticsFormat>Classic</DiagnosticsFormat>
@@ -158,10 +158,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Common\PhysXCommon.cpp" />
     <ClCompile Include="Common\PhysXUtil.cpp" />
     <ClCompile Include="Main\PhysX.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common\PhysXCommon.h" />
     <ClInclude Include="Common\PhysXUtil.h" />
     <ClInclude Include="Main\PhysX.h" />
   </ItemGroup>

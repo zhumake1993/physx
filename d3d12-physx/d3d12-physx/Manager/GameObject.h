@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Common/d3dUtil.h"
-#include "Common/PhysXUtil.h"
+#include "../physx/Common/PhysXCommon.h"
 
 class GameObject
 {

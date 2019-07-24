@@ -12,6 +12,12 @@
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 
+#include "Common/GameTimer.h"
+extern GameTimer gTimer;
+
+#include "Common/Camera.h"
+extern std::unique_ptr<Camera> gCamera;
+
 MainScene::MainScene()
 	:Scene()
 {
@@ -21,9 +27,18 @@ MainScene::~MainScene()
 {
 }
 
+void MainScene::Initialize()
+{
+	Scene::Initialize();
+
+	gCamera->SetPosition(0.0f, 2.0f, -15.0f);
+}
+
 void MainScene::Update()
 {
 	Scene::Update();
+
+	MoveCamera();
 }
 
 void MainScene::BuildManagers()
@@ -209,4 +224,57 @@ void MainScene::BuildGameObjects()
 
 	auto boxPx = std::make_shared<BoxPx>();
 	mGameObjectManager->AddGameObject(boxPx);
+}
+
+void MainScene::MoveCamera()
+{
+	const float dt = gTimer.DeltaTime();
+
+	if (GetAsyncKeyState('W') & 0x8000)
+		gCamera->Walk(10.0f * dt);
+
+	if (GetAsyncKeyState('S') & 0x8000)
+		gCamera->Walk(-10.0f * dt);
+
+	if (GetAsyncKeyState('A') & 0x8000)
+		gCamera->Strafe(-10.0f * dt);
+
+	if (GetAsyncKeyState('D') & 0x8000)
+		gCamera->Strafe(10.0f * dt);
+
+	if (GetAsyncKeyState('Q') & 0x8000)
+		gCamera->FlyUp(10.0f * dt);
+
+	if (GetAsyncKeyState('E') & 0x8000)
+		gCamera->FlyDown(10.0f * dt);
+}
+
+void MainScene::OnMouseDown(WPARAM btnState, int x, int y)
+{
+	if ((btnState & MK_RBUTTON) != 0) {
+		mLastMousePos.x = x;
+		mLastMousePos.y = y;
+	}
+	else if ((btnState & MK_LBUTTON) != 0) {
+		Pick(x, y);
+	}
+}
+
+void MainScene::OnMouseUp(WPARAM btnState, int x, int y)
+{
+}
+
+void MainScene::OnMouseMove(WPARAM btnState, int x, int y)
+{
+	if ((btnState & MK_RBUTTON) != 0) {
+		// 每像素对应0.25度
+		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
+		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
+
+		gCamera->Pitch(dy);
+		gCamera->RotateY(dx);
+	}
+
+	mLastMousePos.x = x;
+	mLastMousePos.y = y;
 }

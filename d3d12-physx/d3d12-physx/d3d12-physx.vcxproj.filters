@@ -28,6 +28,9 @@
     <Filter Include="Scenes">
       <UniqueIdentifier>{022308a2-771b-451e-9094-a09a5a1a67ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\Linkup">
+      <UniqueIdentifier>{76bbb6f3-fafd-400d-9d9e-f03e7c0952c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\Camera.cpp">
@@ -158,6 +161,15 @@
     </ClCompile>
     <ClCompile Include="Scenes\MainScene.cpp">
       <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Scenes\Linkup.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\Linkup\Cube.cpp">
+      <Filter>GameObject\Linkup</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\Linkup\Floor.cpp">
+      <Filter>GameObject\Linkup</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -292,6 +304,15 @@
     </ClInclude>
     <ClInclude Include="Scenes\MainScene.h">
       <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenes\Linkup.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Linkup\Cube.h">
+      <Filter>GameObject\Linkup</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Linkup\Floor.h">
+      <Filter>GameObject\Linkup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

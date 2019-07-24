@@ -1,16 +1,2 @@
-﻿  d3dUtil.cpp
-  D3D12App.cpp
-  GameObject.cpp
-  InstanceManager.cpp
-  Scene.cpp
-  SceneManager.cpp
-  CubeMap.cpp
-  DepthComplexityUseBlend.cpp
-  DepthComplexityUseStencil.cpp
-  MainRender.cpp
-  ShadowMap.cpp
-  Ssao.cpp
-  Wireframe.cpp
-  MainScene.cpp
-  正在生成代码...
+﻿  SceneManager.cpp
   d3d12-physx.vcxproj -> F:\PhysX4.1-learn\d3d12-physx\d3d12-physx\..\bin\debug\d3d12-physx.exe

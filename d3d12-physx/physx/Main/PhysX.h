@@ -11,8 +11,12 @@ public:
 	~PhysX();
 
 	void InitPhysics();
-	void CreateScene();
 
+	// ≥°æ∞
+	void CreateScene();
+	void CleanupScene();
+
+	// ∏’ÃÂ
 	void CreatePxRigidStatic();
 	void CreatePxRigidDynamic(std::string name, void* pdesc);
 

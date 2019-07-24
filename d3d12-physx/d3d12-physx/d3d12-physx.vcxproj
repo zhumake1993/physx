@@ -157,6 +157,8 @@
     <ClCompile Include="GameObject\Cylinder.cpp" />
     <ClCompile Include="GameObject\Globe.cpp" />
     <ClCompile Include="GameObject\Grid.cpp" />
+    <ClCompile Include="GameObject\Linkup\Cube.cpp" />
+    <ClCompile Include="GameObject\Linkup\Floor.cpp" />
     <ClCompile Include="GameObject\Skull.cpp" />
     <ClCompile Include="GameObject\Sky.cpp" />
     <ClCompile Include="GameObject\Sphere.cpp" />
@@ -182,6 +184,7 @@
     <ClCompile Include="Render\ShadowMap.cpp" />
     <ClCompile Include="Render\Ssao.cpp" />
     <ClCompile Include="Render\Wireframe.cpp" />
+    <ClCompile Include="Scenes\Linkup.cpp" />
     <ClCompile Include="Scenes\MainScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -204,6 +207,8 @@
     <ClInclude Include="GameObject\Cylinder.h" />
     <ClInclude Include="GameObject\Globe.h" />
     <ClInclude Include="GameObject\Grid.h" />
+    <ClInclude Include="GameObject\Linkup\Cube.h" />
+    <ClInclude Include="GameObject\Linkup\Floor.h" />
     <ClInclude Include="GameObject\Skull.h" />
     <ClInclude Include="GameObject\Sky.h" />
     <ClInclude Include="GameObject\Sphere.h" />
@@ -228,6 +233,7 @@
     <ClInclude Include="Render\ShadowMap.h" />
     <ClInclude Include="Render\Ssao.h" />
     <ClInclude Include="Render\Wireframe.h" />
+    <ClInclude Include="Scenes\Linkup.h" />
     <ClInclude Include="Scenes\MainScene.h" />
   </ItemGroup>
   <ItemGroup>

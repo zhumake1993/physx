@@ -38,8 +38,6 @@ extern std::unique_ptr<Camera> gCamera;
 #include "Manager/SceneManager.h"
 extern std::unique_ptr<SceneManager> gSceneManager;
 
-extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
-
 #include "../physx/Main/PhysX.h"
 extern PhysX gPhysX;
 
@@ -63,11 +61,7 @@ bool D3D12App::Initialize()
 	gMainFrameResource->Initialize(gD3D12Device.Get());
 	gPassCB->Initialize(gD3D12Device.Get(), 1, false);
 
-	gCamera->SetPosition(0.0f, 2.0f, -15.0f);
-
 	gPhysX.InitPhysics();
-	gPhysX.CreateScene();
-	gPhysX.CreatePxRigidStatic();
 
 	gSceneManager->Initialize();
 
@@ -94,10 +88,6 @@ void D3D12App::OnResize()
 
 void D3D12App::Update()
 {
-	OnKeyboardInput();
-
-	gPhysX.Update(gTimer.DeltaTime());
-
 	// 扫描帧资源环形数组
 	gCurrFrameResourceIndex = (gCurrFrameResourceIndex + 1) % gNumFrameResources;
 
@@ -122,6 +112,37 @@ void D3D12App::Update()
 
 	gSceneManager->Update();
 
+	if (gSceneManager->ChangingScene()) {
+
+		// 等待指令完成
+		// 因为指令队列中可能残留有引用上一个场景资源的指令
+		// 因此必须先清空指令队列
+		FlushCommandQueue();
+
+		// 获取当前的指令分配器
+		auto cmdListAlloc = gMainFrameResource->GetCurrCmdListAlloc();
+
+		//重置指令分配器以重用相关联的内存
+		//必须在GPU执行完关联的指令列表后才能进行该操作
+		ThrowIfFailed(cmdListAlloc->Reset());
+
+		//重置指令列表以重用内存
+		//必须在使用ExecuteCommandList将指令列表添加进指令队列后才能执行该操作
+		ThrowIfFailed(gCommandList->Reset(cmdListAlloc.Get(), nullptr));
+
+		gSceneManager->ChangeScene();
+
+		//关闭指令列表
+		ThrowIfFailed(gCommandList->Close());
+
+		//将指令列表添加进指令队列，供GPU执行
+		ID3D12CommandList* cmdsLists[] = { gCommandList.Get() };
+		mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+
+		// 等待指令完成
+		FlushCommandQueue();
+	}
+
 	mShadowMap->Update(mRotatedLightDirections[0]);
 
 	UpdateFrameResource();
@@ -138,7 +159,7 @@ void D3D12App::Draw()
 
 	//重置指令列表以重用内存
 	//必须在使用ExecuteCommandList将指令列表添加进指令队列后才能执行该操作
-	ThrowIfFailed(gCommandList->Reset(cmdListAlloc.Get(), gPSOs["opaque"].Get()));
+	ThrowIfFailed(gCommandList->Reset(cmdListAlloc.Get(), nullptr));
 
 	//
 	// 主绘制
@@ -227,33 +248,22 @@ void D3D12App::Draw()
 void D3D12App::OnMouseDown(WPARAM btnState, int x, int y)
 {
 	if ((btnState & MK_RBUTTON) != 0) {
-		mLastMousePos.x = x;
-		mLastMousePos.y = y;
-
 		SetCapture(mhMainWnd);
-	} else if ((btnState & MK_LBUTTON) != 0) {
-		Pick(x, y);
 	}
+
+	gSceneManager->OnMouseDown(btnState, x, y);
 }
 
 void D3D12App::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	ReleaseCapture();
+
+	gSceneManager->OnMouseUp(btnState, x, y);
 }
 
 void D3D12App::OnMouseMove(WPARAM btnState, int x, int y)
 {
-	if ((btnState & MK_RBUTTON) != 0) {
-		// 每像素对应0.25度
-		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
-
-		gCamera->Pitch(dy);
-		gCamera->RotateY(dx);
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
+	gSceneManager->OnMouseMove(btnState, x, y);
 }
 
 void D3D12App::OnKeyDown(WPARAM vkCode)
@@ -294,29 +304,6 @@ void D3D12App::OnKeyDown(WPARAM vkCode)
 void D3D12App::OnKeyUp(WPARAM vkCode)
 {
 	gSceneManager->GetCurrInputManager()->OnKeyUp(vkCode);
-}
-
-void D3D12App::OnKeyboardInput()
-{
-	const float dt = gTimer.DeltaTime();
-
-	if (GetAsyncKeyState('W') & 0x8000)
-		gCamera->Walk(10.0f * dt);
-
-	if (GetAsyncKeyState('S') & 0x8000)
-		gCamera->Walk(-10.0f * dt);
-
-	if (GetAsyncKeyState('A') & 0x8000)
-		gCamera->Strafe(-10.0f * dt);
-
-	if (GetAsyncKeyState('D') & 0x8000)
-		gCamera->Strafe(10.0f * dt);
-
-	if (GetAsyncKeyState('Q') & 0x8000)
-		gCamera->FlyUp(10.0f * dt);
-
-	if (GetAsyncKeyState('E') & 0x8000)
-		gCamera->FlyDown(10.0f * dt);
 }
 
 void D3D12App::UpdateFrameResource()
@@ -402,26 +389,4 @@ void D3D12App::BuildFilters()
 	mSobelFilter = std::make_unique<SobelFilter>(gClientWidth, gClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 	mInverseFilter = std::make_unique<InverseFilter>(gClientWidth, gClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 	mMultiplyFilter = std::make_unique<MultiplyFilter>(gClientWidth, gClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-}
-
-void D3D12App::Pick(int sx, int sy)
-{
-	XMFLOAT4X4 P = gCamera->GetProj4x4f();
-
-	// 计算视空间的选取射线
-	float vx = (+2.0f * sx / gClientWidth - 1.0f) / P(0, 0);
-	float vy = (-2.0f * sy / gClientHeight + 1.0f) / P(1, 1);
-
-	// 视空间的射线定义
-	XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-	XMVECTOR rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
-
-	// 将射线转换至世界空间
-	XMMATRIX V = gCamera->GetView();
-	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(V), V);
-
-	XMVECTOR rayOriginW = XMVector3TransformCoord(rayOrigin, invView);
-	XMVECTOR rayDirW = XMVector3TransformNormal(rayDir, invView);
-
-	gSceneManager->GetCurrInstanceManager()->Pick(rayOriginW, rayDirW);
 }

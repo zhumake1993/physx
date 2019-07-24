@@ -9,6 +9,8 @@ public:
 	MainScene();
 	~MainScene();
 
+	virtual void Initialize()override;
+
 	virtual void Update()override;
 
 private:
@@ -19,6 +21,12 @@ private:
 	virtual void BuildMeshes()override;
 	virtual void BuildGameObjects()override;
 
+	virtual void MoveCamera()override;
+
+	virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
+	virtual void OnMouseUp(WPARAM btnState, int x, int y)override;
+	virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
+
 private:
-	//
+	POINT mLastMousePos;
 };

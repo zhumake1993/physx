@@ -36,26 +36,21 @@ private:
 
 	virtual void Draw()override;
 
-
+	// 鼠标输入处理
 	virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
 	virtual void OnMouseUp(WPARAM btnState, int x, int y)override;
 	virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
 
+	// 键盘输入处理
 	virtual void OnKeyDown(WPARAM vkCode)override;
 	virtual void OnKeyUp(WPARAM vkCode)override;
-
-	void OnKeyboardInput();
 
 	void UpdateFrameResource();
 
 	void BuildRenders();
 	void BuildFilters();
 
-	void Pick(int sx, int sy);
-
 private:
-
-	POINT mLastMousePos;
 
 	DirectX::XMFLOAT3 mRotatedLightDirections[3];
 	float mLightRotationAngle = 0.0f;

@@ -9,11 +9,12 @@
 
 class Scene
 {
+	friend class SceneManager;
 public:
 	Scene();
 	virtual ~Scene();
 
-	void Initialize();
+	virtual void Initialize();
 
 	std::shared_ptr<GameObjectManager> GetGameObjectManager();
 	std::shared_ptr<InstanceManager> GetInstanceManager();
@@ -31,6 +32,14 @@ protected:
 	virtual void BuildMaterials() = 0;
 	virtual void BuildMeshes() = 0;
 	virtual void BuildGameObjects() = 0;
+
+	virtual void MoveCamera();
+
+	virtual void OnMouseDown(WPARAM btnState, int x, int y);
+	virtual void OnMouseUp(WPARAM btnState, int x, int y);
+	virtual void OnMouseMove(WPARAM btnState, int x, int y);
+
+	void Pick(int sx, int sy);
 
 protected:
 	

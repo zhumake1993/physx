@@ -61,6 +61,11 @@ void PhysX::CreateScene()
 	}
 }
 
+void PhysX::CleanupScene()
+{
+	PX_RELEASE(gScene);
+}
+
 void PhysX::CreatePxRigidStatic()
 {
 	// ´´½¨²ÄÖÊ
@@ -116,9 +121,6 @@ void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
 
 void PhysX::Update(float delta)
 {
-	/*gScene->simulate(delta);
-	gScene->fetchResults(true);*/
-
 	mAccumulator += delta;
 	if (mAccumulator < mStepSize)
 		return;

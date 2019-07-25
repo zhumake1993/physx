@@ -8,17 +8,17 @@ extern GameTimer gTimer;
 #include "Manager/SceneManager.h"
 extern std::unique_ptr<SceneManager> gSceneManager;
 
-Skull::Skull()
-	:GameObject()
+Skull::Skull(const std::string& name, const Transform& transform)
+	:GameObject(name, transform)
 {
-	// 基础信息
-	mName = "skull";
-	mTransform.Scale = XMFLOAT3(0.2f, 0.2f, 0.2f);
-
-	// 添加MeshRender
-	mHasMeshRender = true;
-	mMeshRender.MatName = "skullMat";
-	mMeshRender.MeshName = "skull";
+	// MeshRender
+	mMeshRender = std::make_unique<MeshRender>(name, transform);
+	mMeshRender->mMatName = "skullMat";
+	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
+	mMeshRender->mMeshName = "skull";
+	mMeshRender->mRenderLayer = (int)RenderLayer::Opaque;
+	mMeshRender->mReceiveShadow = true;
+	mMeshRender->AddMeshRender();
 }
 
 Skull::~Skull()

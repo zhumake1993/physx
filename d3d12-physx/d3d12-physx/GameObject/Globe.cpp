@@ -2,19 +2,17 @@
 
 using namespace DirectX;
 
-Globe::Globe()
-	:GameObject()
+Globe::Globe(const std::string& name, const Transform& transform)
+	:GameObject(name, transform)
 {
-	// 基础信息
-	mName = "globe";
-	mTransform.Translation = XMFLOAT3(0.0f, 2.0f, 0.0f);
-	mTransform.Scale = XMFLOAT3(2.0f, 2.0f, 2.0f);
-
-	// 添加MeshRender
-	mHasMeshRender = true;
-	mMeshRender.MatName = "mirror";
-	mMeshRender.MeshName = "sphere";
-	mMeshRender.RenderLayer = (int)RenderLayer::OpaqueDynamicReflectors;
+	// MeshRender
+	mMeshRender = std::make_unique<MeshRender>(name, transform);
+	mMeshRender->mMatName = "mirror";
+	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
+	mMeshRender->mMeshName = "sphere";
+	mMeshRender->mRenderLayer = (int)RenderLayer::OpaqueDynamicReflectors;
+	mMeshRender->mReceiveShadow = true;
+	mMeshRender->AddMeshRender();
 }
 
 Globe::~Globe()

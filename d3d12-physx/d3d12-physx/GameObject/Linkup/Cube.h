@@ -6,7 +6,7 @@ class Cube :
 	public GameObject
 {
 public:
-	Cube();
+	Cube(const std::string& name, const Transform& transform = Transform());
 	~Cube();
 
 private:

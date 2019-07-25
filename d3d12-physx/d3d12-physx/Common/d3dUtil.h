@@ -20,6 +20,7 @@
 #include "d3dx12.h"
 #include "MathHelper.h"
 #include "DDSTextureLoader.h"
+#include "../physx/Common/PhysXCommon.h"
 
 //===========================================================
 //===========================================================
@@ -29,6 +30,12 @@
 
 struct Transform
 {
+	Transform(const DirectX::XMFLOAT3& t = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+		const DirectX::XMFLOAT4& q = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f),
+		const DirectX::XMFLOAT3& s = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f)) :
+		Translation(t),
+		Quaternion(q),
+		Scale(s) {}
 	DirectX::XMFLOAT3 Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 	DirectX::XMFLOAT4 Quaternion = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	DirectX::XMFLOAT3 Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
@@ -40,17 +47,6 @@ struct Vertex
 	DirectX::XMFLOAT3 Normal;
 	DirectX::XMFLOAT2 TexC;
 	DirectX::XMFLOAT3 TangentU;
-};
-
-struct MeshRender
-{
-	std::string Name = "";
-	DirectX::XMFLOAT4X4 World = MathHelper::Identity4x4();
-	std::string MatName = "";
-	DirectX::XMFLOAT4X4 TexTransform = MathHelper::Identity4x4();
-	std::string MeshName = "";
-	int RenderLayer = -1;
-	bool ReceiveShadow = true;
 };
 
 #define MaxLights 16

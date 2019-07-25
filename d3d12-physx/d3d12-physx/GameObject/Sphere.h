@@ -6,7 +6,7 @@ class Sphere :
 	public GameObject
 {
 public:
-	Sphere();
+	Sphere(const std::string& name, const Transform& transform = Transform());
 	~Sphere();
 
 private:

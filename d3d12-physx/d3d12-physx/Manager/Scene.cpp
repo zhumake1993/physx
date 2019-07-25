@@ -32,7 +32,6 @@ Scene::~Scene()
 void Scene::Initialize()
 {
 	gPhysX.CreateScene();
-	gPhysX.CreatePxRigidStatic();
 
 	BuildManagers();
 	BuildTextures();

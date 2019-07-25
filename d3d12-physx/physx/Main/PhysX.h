@@ -17,18 +17,18 @@ public:
 	void CleanupScene();
 
 	// ∏’ÃÂ
-	void CreatePxRigidStatic();
+	void CreatePxRigidStatic(std::string name, void* pdesc);
 	void CreatePxRigidDynamic(std::string name, void* pdesc);
 
 	void Update(float delta);
 
 	void GetPxRigidDynamicTransform(std::string name, PxFloat3& pos, PxFloat4& quat);
-	void Get(float& x, float& y, float& z, float& a, float& b, float& c, float& d);
 
 	void CleanupPhysics();
 
 private:
-	//
+	bool HasPxRigidStatic(const std::string& name);
+	bool HasPxRigidDynamic(const std::string& name);
 
 public:
 	//

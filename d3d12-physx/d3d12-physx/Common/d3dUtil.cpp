@@ -60,6 +60,24 @@ PhysX gPhysX;																								// PhysX物理引擎
 
 //===========================================================
 //===========================================================
+// 辅助函数
+//===========================================================
+//===========================================================
+
+// 将一个Transform转换成矩阵形式
+DirectX::XMMATRIX TransformToMatrix(Transform& transform)
+{
+	DirectX::XMVECTOR S = XMLoadFloat3(&transform.Scale);
+	DirectX::XMVECTOR P = XMLoadFloat3(&transform.Translation);
+	DirectX::XMVECTOR Q = XMLoadFloat4(&transform.Quaternion);
+
+	DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+
+	return DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
+}
+
+//===========================================================
+//===========================================================
 // 辅助类
 //===========================================================
 //===========================================================

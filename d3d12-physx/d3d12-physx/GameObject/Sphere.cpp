@@ -2,16 +2,17 @@
 
 using namespace DirectX;
 
-Sphere::Sphere()
-	:GameObject()
+Sphere::Sphere(const std::string& name, const Transform& transform)
+	:GameObject(name, transform)
 {
-	// 基础信息
-	mName = "Sphere";
-
-	// 添加MeshRender
-	mHasMeshRender = true;
-	mMeshRender.MatName = "mirror";
-	mMeshRender.MeshName = "sphere";
+	// MeshRender
+	mMeshRender = std::make_unique<MeshRender>(name, transform);
+	mMeshRender->mMatName = "mirror";
+	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
+	mMeshRender->mMeshName = "sphere";
+	mMeshRender->mRenderLayer = (int)RenderLayer::Opaque;
+	mMeshRender->mReceiveShadow = true;
+	mMeshRender->AddMeshRender();
 }
 
 Sphere::~Sphere()

@@ -2,19 +2,17 @@
 
 using namespace DirectX;
 
-Box::Box()
-	:GameObject()
+Box::Box(const std::string& name, const Transform& transform)
+	:GameObject(name, transform)
 {
-	// 基础信息
-	mName = "box";
-	mTransform.Translation = XMFLOAT3(0.0f, 0.5f, 0.0f);
-	mTransform.Scale = XMFLOAT3(2.0f, 1.0f, 2.0f);
-
-	// 添加MeshRender
-	mHasMeshRender = true;
-	mMeshRender.MatName = "bricks2";
-	XMStoreFloat4x4(&mMeshRender.TexTransform, XMMatrixScaling(1.0f, 0.5f, 1.0f));
-	mMeshRender.MeshName = "box";
+	// MeshRender
+	mMeshRender = std::make_unique<MeshRender>(name, transform);
+	mMeshRender->mMatName = "bricks2";
+	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 0.5f, 1.0f));
+	mMeshRender->mMeshName = "box";
+	mMeshRender->mRenderLayer = (int)RenderLayer::Opaque;
+	mMeshRender->mReceiveShadow = true;
+	mMeshRender->AddMeshRender();
 }
 
 Box::~Box()

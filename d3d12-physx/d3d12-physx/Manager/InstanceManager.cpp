@@ -17,15 +17,15 @@ void InstanceManager::Initialize()
 {
 }
 
-void InstanceManager::AddInstance(const MeshRender& meshRender)
+void InstanceManager::AddInstance(MeshRender* meshRender)
 {
-	auto name = meshRender.Name;
-	auto world = meshRender.World;
-	auto matName = meshRender.MatName;
-	auto texTransform = meshRender.TexTransform;
-	auto meshName = meshRender.MeshName;
-	auto randerLayer = meshRender.RenderLayer;
-	auto receiveShadow = meshRender.ReceiveShadow;
+	auto name = meshRender->mName;
+	auto world = meshRender->GetWorld();
+	auto matName = meshRender->mMatName;
+	auto texTransform = meshRender->mTexTransform;
+	auto meshName = meshRender->mMeshName;
+	auto randerLayer = meshRender->mRenderLayer;
+	auto receiveShadow = meshRender->mReceiveShadow;
 
 	auto& instanceMap = mInstanceLayers[randerLayer];
 
@@ -44,15 +44,15 @@ void InstanceManager::AddInstance(const MeshRender& meshRender)
 	}
 }
 
-void InstanceManager::UpdateInstance(const MeshRender& meshRender)
+void InstanceManager::UpdateInstance(MeshRender* meshRender)
 {
-	auto name = meshRender.Name;
-	auto world = meshRender.World;
-	auto matName = meshRender.MatName;
-	auto texTransform = meshRender.TexTransform;
-	auto meshName = meshRender.MeshName;
-	auto randerLayer = meshRender.RenderLayer;
-	auto receiveShadow = meshRender.ReceiveShadow;
+	auto name = meshRender->mName;
+	auto world = meshRender->GetWorld();
+	auto matName = meshRender->mMatName;
+	auto texTransform = meshRender->mTexTransform;
+	auto meshName = meshRender->mMeshName;
+	auto randerLayer = meshRender->mRenderLayer;
+	auto receiveShadow = meshRender->mReceiveShadow;
 
 	auto& instanceMap = mInstanceLayers[randerLayer];
 	instanceMap[meshName]->UpdateInstanceData(name, world, gSceneManager->GetCurrMaterialManager()->GetIndex(matName), texTransform, receiveShadow);

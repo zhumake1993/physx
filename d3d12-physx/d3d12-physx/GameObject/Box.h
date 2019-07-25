@@ -6,7 +6,7 @@ class Box :
 	public GameObject
 {
 public:
-	Box();
+	Box(const std::string& name, const Transform& transform = Transform());
 	~Box();
 
 private:

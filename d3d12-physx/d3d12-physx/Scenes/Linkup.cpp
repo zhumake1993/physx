@@ -105,13 +105,13 @@ void Linkup::BuildMeshes()
 
 void Linkup::BuildGameObjects()
 {
-	auto sky = std::make_shared<Sky>();
+	auto sky = std::make_shared<Sky>("Sky", Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)));
 	mGameObjectManager->AddGameObject(sky);
 
-	auto cube = std::make_shared<Cube>();
+	auto cube = std::make_shared<Cube>("Cube", Transform(XMFLOAT3(0.0f, 10.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.99f, 0.99f, 0.99f)));
 	mGameObjectManager->AddGameObject(cube);
 
-	auto floor = std::make_shared<Floor>();
+	auto floor = std::make_shared<Floor>("Floor");
 	mGameObjectManager->AddGameObject(floor);
 }
 

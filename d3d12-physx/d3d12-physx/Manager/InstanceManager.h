@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Instance.h"
+#include "Manager/MeshRender.h"
 
 class InstanceManager
 {
@@ -10,8 +11,8 @@ public:
 
 	void Initialize();
 
-	void AddInstance(const MeshRender& meshRender);
-	void UpdateInstance(const MeshRender& meshRender);
+	void AddInstance(MeshRender* meshRender);
+	void UpdateInstance(MeshRender* meshRender);
 
 	void UploadInstanceData();
 

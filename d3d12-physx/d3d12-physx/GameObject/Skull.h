@@ -6,7 +6,7 @@ class Skull :
 	public GameObject
 {
 public:
-	Skull();
+	Skull(const std::string& name, const Transform& transform = Transform());
 	~Skull();
 
 private:

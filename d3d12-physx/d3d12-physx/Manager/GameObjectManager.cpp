@@ -37,14 +37,6 @@ void GameObjectManager::AddGameObject(std::shared_ptr<GameObject> gameObject)
 		ThrowMyEx("GameObject already exists!")
 	}
 
-	if (gameObject->mHasMeshRender) {
-		gameObject->AddMeshRender();
-	}
-
-	if (gameObject->mHasRigidBody) {
-		gameObject->AddRigidBody();
-	}
-
 	mGameObjects[gameObject->mName] = gameObject;
 }
 

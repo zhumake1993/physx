@@ -6,7 +6,7 @@ class Globe :
 	public GameObject
 {
 public:
-	Globe();
+	Globe(const std::string& name, const Transform& transform = Transform());
 	~Globe();
 
 private:

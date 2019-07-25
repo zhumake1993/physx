@@ -5,29 +5,26 @@ using namespace DirectX;
 #include "Manager/SceneManager.h"
 extern std::unique_ptr<SceneManager> gSceneManager;
 
-Cube::Cube()
-	:GameObject()
+Cube::Cube(const std::string& name, const Transform& transform)
+	:GameObject(name, transform)
 {
-	// 基础信息
-	mName = "Cube";
-
 	// MeshRender
-	mHasMeshRender = true;
-	mTransform.Translation = XMFLOAT3(0.0f, 10.0f, 0.0f);
-	mTransform.Scale = XMFLOAT3(0.99f, 0.99f, 0.99f);
-	mMeshRender.MatName = "bricks";
-	XMStoreFloat4x4(&mMeshRender.TexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	mMeshRender.MeshName = "box";
+	mMeshRender = std::make_unique<MeshRender>(name, transform);
+	mMeshRender->mMatName = "bricks";
+	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
+	mMeshRender->mMeshName = "box";
+	mMeshRender->mRenderLayer = (int)RenderLayer::Opaque;
+	mMeshRender->mReceiveShadow = true;
+	mMeshRender->AddMeshRender();
 
 	// 刚体
-	mHasRigidBody = true;
-	mRigidBodyLocalTransform.Translation = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	mRigidBodyLocalTransform.Quaternion = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	mRigidBodyLocalTransform.Scale = XMFLOAT3(0.5f, 0.5f, 0.5f);
-	mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
-	mPxGeometry = PxBox;
-	mDensity = 10.0f;
-	mRigidBodyMeshRender.MeshName = "rigidBox";
+	Transform rigidDynamicLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	mRigidDynamic = std::make_unique<RigidDynamic>(name, transform, rigidDynamicLocal);
+	mRigidDynamic->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
+	mRigidDynamic->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
+	mRigidDynamic->mPxGeometry = PxBoxEnum;
+	mRigidDynamic->mDensity = 10.0f;
+	mRigidDynamic->AddRigidDynamic();
 }
 
 Cube::~Cube()

@@ -2,19 +2,17 @@
 
 using namespace DirectX;
 
-Sky::Sky()
-	:GameObject()
+Sky::Sky(const std::string& name, const Transform& transform)
+	:GameObject(name, transform)
 {
-	// 基础信息
-	mName = "sky";
-	mTransform.Scale = XMFLOAT3(5000.0f, 5000.0f, 5000.0f);
-
-	// 添加MeshRender
-	mHasMeshRender = true;
-	mMeshRender.MatName = "sky";
-	mMeshRender.MeshName = "sphere";
-	mMeshRender.RenderLayer = (int)RenderLayer::Sky;
-	mMeshRender.ReceiveShadow = false;
+	// MeshRender
+	mMeshRender = std::make_unique<MeshRender>(name, transform);
+	mMeshRender->mMatName = "sky";
+	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
+	mMeshRender->mMeshName = "sphere";
+	mMeshRender->mRenderLayer = (int)RenderLayer::Sky;
+	mMeshRender->mReceiveShadow = false;
+	mMeshRender->AddMeshRender();
 }
 
 Sky::~Sky()

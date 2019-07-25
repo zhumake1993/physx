@@ -171,6 +171,9 @@
     <ClCompile Include="Manager\InstanceManager.cpp" />
     <ClCompile Include="Manager\MaterialManager.cpp" />
     <ClCompile Include="Manager\MeshManager.cpp" />
+    <ClCompile Include="Manager\MeshRender.cpp" />
+    <ClCompile Include="Manager\RigidDynamic.cpp" />
+    <ClCompile Include="Manager\RigidStatic.cpp" />
     <ClCompile Include="Manager\Scene.cpp" />
     <ClCompile Include="Manager\SceneManager.cpp" />
     <ClCompile Include="Manager\TextureManager.cpp" />
@@ -220,6 +223,9 @@
     <ClInclude Include="Manager\InstanceManager.h" />
     <ClInclude Include="Manager\MaterialManager.h" />
     <ClInclude Include="Manager\MeshManager.h" />
+    <ClInclude Include="Manager\MeshRender.h" />
+    <ClInclude Include="Manager\RigidDynamic.h" />
+    <ClInclude Include="Manager\RigidStatic.h" />
     <ClInclude Include="Manager\Scene.h" />
     <ClInclude Include="Manager\SceneManager.h" />
     <ClInclude Include="Manager\TextureManager.h" />

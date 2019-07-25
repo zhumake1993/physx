@@ -2,17 +2,17 @@
 
 using namespace DirectX;
 
-Cylinder::Cylinder()
-	:GameObject()
+Cylinder::Cylinder(const std::string& name, const Transform& transform)
+	:GameObject(name, transform)
 {
-	// 基础信息
-	mName = "Cylinder";
-
-	// 添加MeshRender
-	mHasMeshRender = true;
-	mMeshRender.MatName = "bricks";
-	XMStoreFloat4x4(&mMeshRender.TexTransform, XMMatrixScaling(1.5f, 2.0f, 1.0f));
-	mMeshRender.MeshName = "cylinder";
+	// MeshRender
+	mMeshRender = std::make_unique<MeshRender>(name, transform);
+	mMeshRender->mMatName = "bricks";
+	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.5f, 2.0f, 1.0f));
+	mMeshRender->mMeshName = "cylinder";
+	mMeshRender->mRenderLayer = (int)RenderLayer::Opaque;
+	mMeshRender->mReceiveShadow = true;
+	mMeshRender->AddMeshRender();
 }
 
 Cylinder::~Cylinder()

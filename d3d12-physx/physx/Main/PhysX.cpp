@@ -19,6 +19,7 @@ extern PxPvd* gPvd;
 
 // 硬编码，测试用
 std::unordered_map<std::string, PxRigidDynamic*> gPxRigidDynamicMap;
+std::unordered_map<std::string, PxRigidStatic*> gPxRigidStaticMap;
 
 PhysX::PhysX()
 {
@@ -66,18 +67,63 @@ void PhysX::CleanupScene()
 	PX_RELEASE(gScene);
 }
 
-void PhysX::CreatePxRigidStatic()
+void PhysX::CreatePxRigidStatic(std::string name, void* pdesc)
 {
-	// 创建材质
-	PxMaterial* material = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+	if (HasPxRigidStatic(name)) {
+		ThrowPxEx("RigidStatic already exists!");
+	}
 
-	// 创建静态平面
-	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *material);
-	gScene->addActor(*groundPlane);
+	auto desc = *static_cast<PxRigidStaticDesc*>(pdesc);
+
+	// 创建transform
+	auto transform = PxTransform(PxVec3(desc.pos.x, desc.pos.y, desc.pos.z), PxQuat(desc.quat.x, desc.quat.y, desc.quat.z, desc.quat.w));
+
+	// 创建actor
+	PxRigidStatic* actor = gPhysics->createRigidStatic(transform);
+
+	// 创建材质
+	PxMaterial* material = gPhysics->createMaterial(desc.material.x, desc.material.y, desc.material.z);
+
+	// 创建shape
+	PxShape* shape = nullptr;
+	switch (desc.pxGeometry) {
+		case PxSphereEnum: {
+			shape = gPhysics->createShape(PxSphereGeometry(desc.scale.x), *material); 
+			break;
+		}
+		case PxBoxEnum: {
+			shape = gPhysics->createShape(PxBoxGeometry(desc.scale.x, desc.scale.y, desc.scale.z), *material); 
+			break;
+		}
+		case PxCapsuleEnum: {
+			shape = gPhysics->createShape(PxCapsuleGeometry(desc.scale.x, desc.scale.y), *material); 
+			break;
+		}
+		case PxPlaneEnum: {
+			ThrowPxEx("Plane not implemented!");
+			break;
+		}
+		default: {
+			ThrowPxEx("Wrong Geometry!");
+		}
+	}
+
+	// 添加shape
+	actor->attachShape(*shape);
+	shape->release();
+
+	// 添加actor
+	gScene->addActor(*actor);
+
+	gPxRigidStaticMap[name] = actor;
 }
 
 void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
 {
+	if (HasPxRigidDynamic(name)) {
+		ThrowPxEx("RigidDynamic already exists!");
+	}
+
 	auto desc = *static_cast<PxRigidDynamicDesc*>(pdesc);
 
 	// 创建transform
@@ -92,17 +138,17 @@ void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
 	// 创建shape
 	PxShape* shape = nullptr;
 	switch (desc.pxGeometry) {
-		case PxSphere: {
+		case PxSphereEnum: {
 			shape = gPhysics->createShape(PxSphereGeometry(desc.scale.x), *material); break;
 		}
-		case PxBox: {
+		case PxBoxEnum: {
 			shape = gPhysics->createShape(PxBoxGeometry(desc.scale.x, desc.scale.y, desc.scale.z), *material); break;
 		}
-		case PxCapsule: {
+		case PxCapsuleEnum: {
 			shape = gPhysics->createShape(PxCapsuleGeometry(desc.scale.x, desc.scale.y), *material); break;
 		}
 		default: {
-			assert(shape);
+			ThrowPxEx("Wrong Geometry!");
 		}
 	}
 
@@ -163,4 +209,14 @@ void PhysX::CleanupPhysics()
 	PX_RELEASE(gFoundation);
 
 	printf("SnippetHelloWorld done.\n");
+}
+
+bool PhysX::HasPxRigidStatic(const std::string& name)
+{
+	return gPxRigidStaticMap.find(name) != gPxRigidStaticMap.end();
+}
+
+bool PhysX::HasPxRigidDynamic(const std::string& name)
+{
+	return gPxRigidDynamicMap.find(name) != gPxRigidDynamicMap.end();
 }

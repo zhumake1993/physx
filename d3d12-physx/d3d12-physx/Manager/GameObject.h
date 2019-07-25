@@ -1,13 +1,15 @@
 #pragma once
 
 #include "Common/d3dUtil.h"
-#include "../physx/Common/PhysXCommon.h"
+#include "Manager/MeshRender.h"
+#include "Manager/RigidDynamic.h"
+#include "Manager/RigidStatic.h"
 
 class GameObject
 {
 	friend class GameObjectManager;
 public:
-	GameObject();
+	GameObject(const std::string& name, const Transform& transform);
 	virtual ~GameObject();
 
 	virtual void Update();
@@ -17,20 +19,11 @@ protected:
 	bool GetKeyPress(int key);
 	bool GetKeyUp(int key);
 
-	void AddMeshRender();
-	void AddRigidBody();
-
 public:
-	std::string mName = "";
+	std::string mName;
 	Transform mTransform;
 
-	bool mHasMeshRender = false;
-	MeshRender mMeshRender;
-
-	bool mHasRigidBody = false;
-	Transform mRigidBodyLocalTransform;
-	DirectX::XMFLOAT3 mPxMaterial;
-	PxGeometryEnum mPxGeometry;
-	float mDensity;
-	MeshRender mRigidBodyMeshRender;
+	std::unique_ptr<MeshRender> mMeshRender = nullptr;
+	std::unique_ptr<RigidDynamic> mRigidDynamic = nullptr;
+	std::unique_ptr<RigidStatic> mRigidStatic = nullptr;
 };

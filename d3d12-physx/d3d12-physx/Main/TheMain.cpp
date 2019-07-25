@@ -22,7 +22,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 	}
 	catch (MyException& e)
 	{
-		MessageBox(nullptr, e.ToString().c_str(), L"Error", MB_OK);
+		MessageBox(nullptr, e.ToString().c_str(), L"D3D Error", MB_OK);
+		return 0;
+	}
+	catch (MyPxException& e)
+	{
+		MessageBox(nullptr, StringToWString(e.ToString()).c_str(), L"PhysX Error", MB_OK);
 		return 0;
 	}
 }

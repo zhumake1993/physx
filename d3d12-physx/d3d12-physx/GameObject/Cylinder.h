@@ -6,7 +6,7 @@ class Cylinder :
 	public GameObject
 {
 public:
-	Cylinder();
+	Cylinder(const std::string& name, const Transform& transform = Transform());
 	~Cylinder();
 
 private:

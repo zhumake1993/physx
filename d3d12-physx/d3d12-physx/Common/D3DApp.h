@@ -6,6 +6,7 @@
 #endif
 
 #include "d3dUtil.h"
+#include "GameTimer.h"
 
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib, "D3D12.lib")
@@ -39,8 +40,8 @@ public:
 protected:
 	virtual void CreateRtvAndDsvDescriptorHeaps();//创建渲染目标视图描述符堆，深度模板视图描述符堆
 	virtual void OnResize();
-	virtual void Update() = 0;
-	virtual void Draw() = 0;
+	virtual void Update(const GameTimer& gt) = 0;
+	virtual void Draw(const GameTimer& gt) = 0;
 
 	virtual void OnMouseDown(WPARAM btnState, int x, int y) { }
 	virtual void OnMouseUp(WPARAM btnState, int x, int y) { }
@@ -79,6 +80,8 @@ protected:
 	bool      mMaximized = false;  //应用是否最大化？
 	bool      mResizing = false;   //是否正在拖动resize bars？
 	bool      mFullscreenState = false;//应用是否全屏？
+
+	GameTimer mTimer; // 计时器
 
 	Microsoft::WRL::ComPtr<IDXGIFactory4> mdxgiFactory;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;

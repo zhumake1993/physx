@@ -6,28 +6,10 @@ using Microsoft::WRL::ComPtr;
 using namespace std;
 using namespace DirectX;
 
-extern std::wstring gMainWndCaption;
-extern D3D_DRIVER_TYPE gd3dDriverType;
-extern DXGI_FORMAT gBackBufferFormat;
-extern DXGI_FORMAT gDepthStencilFormat;
-extern int gClientWidth;
-extern int gClientHeight;
+extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
-
-extern bool g4xMsaaState;
-extern UINT g4xMsaaQuality;
-
-extern D3D12_VIEWPORT gScreenViewport;
-extern D3D12_RECT gScissorRect;
-
-extern UINT gRtvDescriptorSize;
-extern UINT gDsvDescriptorSize;
-extern UINT gCbvSrvUavDescriptorSize;
-
-#include "Common/GameTimer.h"
-extern GameTimer gTimer;
 
 LRESULT CALLBACK
 MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -67,19 +49,19 @@ HWND D3DApp::MainWnd()const
 
 float D3DApp::AspectRatio()const
 {
-	return static_cast<float>(gClientWidth) / gClientHeight;
+	return static_cast<float>(gSetting.ClientWidth) / gSetting.ClientHeight;
 }
 
 bool D3DApp::Get4xMsaaState()const
 {
-	return g4xMsaaState;
+	return gSetting.X4MsaaState;
 }
 
 void D3DApp::Set4xMsaaState(bool value)
 {
-	if (g4xMsaaState != value)
+	if (gSetting.X4MsaaState != value)
 	{
-		g4xMsaaState = value;
+		gSetting.X4MsaaState = value;
 
 		//重新创建交换链和缓冲
 		CreateSwapChain();
@@ -91,7 +73,7 @@ int D3DApp::Run()
 {
 	MSG msg = { 0 };
 
-	gTimer.Reset();
+	mTimer.Reset();
 
 	while (msg.message != WM_QUIT)
 	{
@@ -102,13 +84,13 @@ int D3DApp::Run()
 		}
 		else
 		{
-			gTimer.Tick();
+			mTimer.Tick();
 
 			if (!mAppPaused)
 			{
 				CalculateFrameStats();
-				Update();
-				Draw();
+				Update(mTimer);
+				Draw(mTimer);
 			}
 			else
 			{
@@ -170,8 +152,8 @@ void D3DApp::OnResize()
 
 	ThrowIfFailed(mSwapChain->ResizeBuffers(
 		SwapChainBufferCount,
-		gClientWidth, gClientHeight,
-		gBackBufferFormat,
+		gSetting.ClientWidth, gSetting.ClientHeight,
+		gSetting.BackBufferFormat,
 		DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
 
 	mCurrBackBuffer = 0;
@@ -182,25 +164,25 @@ void D3DApp::OnResize()
 	{
 		ThrowIfFailed(mSwapChain->GetBuffer(i, IID_PPV_ARGS(&mSwapChainBuffer[i])));
 		gD3D12Device->CreateRenderTargetView(mSwapChainBuffer[i].Get(), nullptr, rtvHeapHandle);
-		rtvHeapHandle.Offset(1, gRtvDescriptorSize);
+		rtvHeapHandle.Offset(1, gSetting.RtvDescriptorSize);
 	}
 
 	//创建深度模板缓冲和视图
 	D3D12_RESOURCE_DESC depthStencilDesc;
 	depthStencilDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 	depthStencilDesc.Alignment = 0;
-	depthStencilDesc.Width = gClientWidth;
-	depthStencilDesc.Height = gClientHeight;
+	depthStencilDesc.Width = gSetting.ClientWidth;
+	depthStencilDesc.Height = gSetting.ClientHeight;
 	depthStencilDesc.DepthOrArraySize = 1;
 	depthStencilDesc.MipLevels = 1;  
 	depthStencilDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;//创建针对同一资源的不同视图需要指定为typeless
-	depthStencilDesc.SampleDesc.Count = g4xMsaaState ? 4 : 1;
-	depthStencilDesc.SampleDesc.Quality = g4xMsaaState ? (g4xMsaaQuality - 1) : 0;
+	depthStencilDesc.SampleDesc.Count = gSetting.X4MsaaState ? 4 : 1;
+	depthStencilDesc.SampleDesc.Quality = gSetting.X4MsaaState ? (gSetting.X4MsaaQuality - 1) : 0;
 	depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
 	D3D12_CLEAR_VALUE optClear;
-	optClear.Format = gDepthStencilFormat;
+	optClear.Format = gSetting.DepthStencilFormat;
 	optClear.DepthStencil.Depth = 1.0f;
 	optClear.DepthStencil.Stencil = 0;
 	ThrowIfFailed(gD3D12Device->CreateCommittedResource(
@@ -215,7 +197,7 @@ void D3DApp::OnResize()
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 	dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-	dsvDesc.Format = gDepthStencilFormat;
+	dsvDesc.Format = gSetting.DepthStencilFormat;
 	dsvDesc.Texture2D.MipSlice = 0;
 	gD3D12Device->CreateDepthStencilView(mDepthStencilBuffer.Get(), &dsvDesc, DepthStencilView());
 
@@ -232,15 +214,15 @@ void D3DApp::OnResize()
 	FlushCommandQueue();
 
 	//更新视口
-	gScreenViewport.TopLeftX = 0;
-	gScreenViewport.TopLeftY = 0;
-	gScreenViewport.Width = static_cast<float>(gClientWidth);
-	gScreenViewport.Height = static_cast<float>(gClientHeight);
-	gScreenViewport.MinDepth = 0.0f;
-	gScreenViewport.MaxDepth = 1.0f;
+	gSetting.ScreenViewport.TopLeftX = 0;
+	gSetting.ScreenViewport.TopLeftY = 0;
+	gSetting.ScreenViewport.Width = static_cast<float>(gSetting.ClientWidth);
+	gSetting.ScreenViewport.Height = static_cast<float>(gSetting.ClientHeight);
+	gSetting.ScreenViewport.MinDepth = 0.0f;
+	gSetting.ScreenViewport.MaxDepth = 1.0f;
 
 	//更新剪裁矩形
-	gScissorRect = { 0, 0, gClientWidth, gClientHeight };
+	gSetting.ScissorRect = { 0, 0, gSetting.ClientWidth, gSetting.ClientHeight };
 }
 
 LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -254,19 +236,19 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (LOWORD(wParam) == WA_INACTIVE)
 		{
 			mAppPaused = true;
-			gTimer.Stop();
+			mTimer.Stop();
 		}
 		else
 		{
 			mAppPaused = false;
-			gTimer.Start();
+			mTimer.Start();
 		}
 		return 0;
 
 	case WM_SIZE:
 		//保存新客户区域的大小
-		gClientWidth = LOWORD(lParam);
-		gClientHeight = HIWORD(lParam);
+		gSetting.ClientWidth = LOWORD(lParam);
+		gSetting.ClientHeight = HIWORD(lParam);
 		if (gD3D12Device)
 		{
 			if (wParam == SIZE_MINIMIZED)
@@ -312,14 +294,14 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_ENTERSIZEMOVE:
 		mAppPaused = true;
 		mResizing = true;
-		gTimer.Stop();
+		mTimer.Stop();
 		return 0;
 
 		// WM_EXITSIZEMOVE ：用户结束改变窗口大小
 	case WM_EXITSIZEMOVE:
 		mAppPaused = false;
 		mResizing = false;
-		gTimer.Start();
+		mTimer.Start();
 		OnResize();
 		return 0;
 
@@ -338,14 +320,28 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONDOWN:
 		OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
-	case WM_LBUTTONUP:
+
+	/*case WM_LBUTTONUP:
 	case WM_MBUTTONUP:
 	case WM_RBUTTONUP:
 		OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;*/
+
+	// 由于不明原因，接收鼠标弹起的消息时wParam参数恒为0，故修改为以下写法：
+	case WM_LBUTTONUP:
+		OnMouseUp(MK_LBUTTON, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
+	case WM_MBUTTONUP:
+		OnMouseUp(MK_MBUTTON, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+	case WM_RBUTTONUP:
+		OnMouseUp(MK_RBUTTON, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
+
 	case WM_MOUSEMOVE:
 		OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		return 0;
+
 	case WM_KEYDOWN:
 		OnKeyDown(wParam);
 
@@ -354,7 +350,7 @@ LRESULT D3DApp::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (wParam == VK_ESCAPE) {
 			PostQuitMessage(0);
 		} else if ((int)wParam == VK_F2)
-			Set4xMsaaState(!g4xMsaaState);
+			Set4xMsaaState(!gSetting.X4MsaaState);
 		else
 			OnKeyUp(wParam);
 
@@ -384,12 +380,12 @@ bool D3DApp::InitMainWindow()
 		return false;
 	}
 
-	RECT R = { 0, 0, gClientWidth, gClientHeight };
+	RECT R = { 0, 0, gSetting.ClientWidth, gSetting.ClientHeight };
 	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);
 	int width = R.right - R.left;
 	int height = R.bottom - R.top;
 
-	mhMainWnd = CreateWindow(L"MainWnd", gMainWndCaption.c_str(),
+	mhMainWnd = CreateWindow(L"MainWnd", gSetting.MainWndCaption.c_str(),
 		WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, width, height, 0, 0, mhAppInst, 0);
 
 	if (!mhMainWnd)
@@ -439,15 +435,15 @@ bool D3DApp::InitDirect3D()
 		IID_PPV_ARGS(&mFence)));
 
 	//获取描述符的大小
-	gRtvDescriptorSize = gD3D12Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	gDsvDescriptorSize = gD3D12Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
-	gCbvSrvUavDescriptorSize = gD3D12Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	gSetting.RtvDescriptorSize = gD3D12Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	gSetting.DsvDescriptorSize = gD3D12Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	gSetting.CbvSrvUavDescriptorSize = gD3D12Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	//检测支持的4X MSAA的质量，与后备缓冲格式相关
 	//所有支持Direct3D 11的设备都支持4X MSAA，无论后备缓冲格式如何
 	//因此，我们只需检测支持的4X MSAA的质量
 	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS msQualityLevels;
-	msQualityLevels.Format = gBackBufferFormat;
+	msQualityLevels.Format = gSetting.BackBufferFormat;
 	msQualityLevels.SampleCount = 4;
 	msQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
 	msQualityLevels.NumQualityLevels = 0;
@@ -456,8 +452,8 @@ bool D3DApp::InitDirect3D()
 		&msQualityLevels,
 		sizeof(msQualityLevels)));
 
-	g4xMsaaQuality = msQualityLevels.NumQualityLevels;
-	assert(g4xMsaaQuality > 0 && "Unexpected MSAA quality level.");
+	gSetting.X4MsaaQuality = msQualityLevels.NumQualityLevels;
+	assert(gSetting.X4MsaaQuality > 0 && "Unexpected MSAA quality level.");
 
 #ifdef _DEBUG
 	LogAdapters();
@@ -501,15 +497,15 @@ void D3DApp::CreateSwapChain()
 	mSwapChain.Reset();
 
 	DXGI_SWAP_CHAIN_DESC sd;
-	sd.BufferDesc.Width = gClientWidth;
-	sd.BufferDesc.Height = gClientHeight;
+	sd.BufferDesc.Width = gSetting.ClientWidth;
+	sd.BufferDesc.Height = gSetting.ClientHeight;
 	sd.BufferDesc.RefreshRate.Numerator = 60;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
-	sd.BufferDesc.Format = gBackBufferFormat;
+	sd.BufferDesc.Format = gSetting.BackBufferFormat;
 	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	sd.SampleDesc.Count = g4xMsaaState ? 4 : 1;
-	sd.SampleDesc.Quality = g4xMsaaState ? (g4xMsaaQuality - 1) : 0;
+	sd.SampleDesc.Count = gSetting.X4MsaaState ? 4 : 1;
+	sd.SampleDesc.Quality = gSetting.X4MsaaState ? (gSetting.X4MsaaQuality - 1) : 0;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.BufferCount = SwapChainBufferCount;
 	sd.OutputWindow = mhMainWnd;
@@ -552,7 +548,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE D3DApp::CurrentBackBufferView()const
 	return CD3DX12_CPU_DESCRIPTOR_HANDLE(
 		mRtvHeap->GetCPUDescriptorHandleForHeapStart(),
 		mCurrBackBuffer,
-		gRtvDescriptorSize);
+		gSetting.RtvDescriptorSize);
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE D3DApp::DepthStencilView()const
@@ -567,7 +563,7 @@ void D3DApp::CalculateFrameStats()
 
 	frameCnt++;
 
-	if ((gTimer.TotalTime() - timeElapsed) >= 1.0f)
+	if ((mTimer.TotalTime() - timeElapsed) >= 1.0f)
 	{
 		float fps = (float)frameCnt;
 		float mspf = 1000.0f / fps;
@@ -575,7 +571,7 @@ void D3DApp::CalculateFrameStats()
 		wstring fpsStr = to_wstring(fps);
 		wstring mspfStr = to_wstring(mspf);
 
-		wstring windowText = gMainWndCaption +
+		wstring windowText = gSetting.MainWndCaption +
 			L"    fps: " + fpsStr +
 			L"   mspf: " + mspfStr;
 
@@ -628,7 +624,7 @@ void D3DApp::LogAdapterOutputs(IDXGIAdapter * adapter)
 		text += L"\n";
 		OutputDebugString(text.c_str());
 
-		LogOutputDisplayModes(output, gBackBufferFormat);
+		LogOutputDisplayModes(output, gSetting.BackBufferFormat);
 
 		ReleaseCom(output);
 

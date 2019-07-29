@@ -27,7 +27,7 @@ Grid::~Grid()
 {
 }
 
-void Grid::Update()
+void Grid::Update(const GameTimer& gt)
 {
-	GameObject::Update();
+	GameObject::Update(gt);
 }

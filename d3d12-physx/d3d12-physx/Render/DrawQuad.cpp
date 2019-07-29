@@ -3,17 +3,10 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
-extern DXGI_FORMAT gBackBufferFormat;
-extern DXGI_FORMAT gDepthStencilFormat;
+extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
-
-extern bool g4xMsaaState;
-extern UINT g4xMsaaQuality;
-
-extern D3D12_VIEWPORT gScreenViewport;
-extern D3D12_RECT gScissorRect;
 
 extern std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> gShaders;
@@ -63,8 +56,8 @@ void DrawQuad::CopyIn(ID3D12Resource* input)
 void DrawQuad::Draw(const D3D12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_DESCRIPTOR_HANDLE& dsv)
 {
 	//设置视口和剪裁矩形。每次重置指令列表后都要设置视口和剪裁矩形
-	gCommandList->RSSetViewports(1, &gScreenViewport);
-	gCommandList->RSSetScissorRects(1, &gScissorRect);
+	gCommandList->RSSetViewports(1, &gSetting.ScreenViewport);
+	gCommandList->RSSetScissorRects(1, &gSetting.ScissorRect);
 
 	//清空后背缓冲和深度模板缓冲
 	gCommandList->ClearRenderTargetView(rtv, DirectX::Colors::Black, 0, nullptr);
@@ -182,7 +175,7 @@ void DrawQuad::BuildDescriptor()
 	// 创建描述符
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.Format = gBackBufferFormat;
+	srvDesc.Format = gSetting.BackBufferFormat;
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = 1;
@@ -216,10 +209,10 @@ void DrawQuad::BuildPSO()
 	drawQuadPSODesc.SampleMask = UINT_MAX;
 	drawQuadPSODesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	drawQuadPSODesc.NumRenderTargets = 1;
-	drawQuadPSODesc.RTVFormats[0] = gBackBufferFormat;
-	drawQuadPSODesc.SampleDesc.Count = g4xMsaaState ? 4 : 1;
-	drawQuadPSODesc.SampleDesc.Quality = g4xMsaaState ? (g4xMsaaQuality - 1) : 0;
-	drawQuadPSODesc.DSVFormat = gDepthStencilFormat;
+	drawQuadPSODesc.RTVFormats[0] = gSetting.BackBufferFormat;
+	drawQuadPSODesc.SampleDesc.Count = gSetting.X4MsaaState ? 4 : 1;
+	drawQuadPSODesc.SampleDesc.Quality = gSetting.X4MsaaState ? (gSetting.X4MsaaQuality - 1) : 0;
+	drawQuadPSODesc.DSVFormat = gSetting.DepthStencilFormat;
 
 	// 关闭深度测试
 	drawQuadPSODesc.DepthStencilState.DepthEnable = false;

@@ -19,7 +19,7 @@ Globe::~Globe()
 {
 }
 
-void Globe::Update()
+void Globe::Update(const GameTimer& gt)
 {
-	GameObject::Update();
+	GameObject::Update(gt);
 }

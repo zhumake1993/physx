@@ -19,6 +19,7 @@ public:
 	// ∏’ÃÂ
 	void CreatePxRigidStatic(std::string name, void* pdesc);
 	void CreatePxRigidDynamic(std::string name, void* pdesc);
+	void DeletePxRigid(std::string name);
 
 	void Update(float delta);
 

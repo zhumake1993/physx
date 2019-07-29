@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Common/Camera.h"
 #include "Manager/GameObjectManager.h"
 #include "Manager/InstanceManager.h"
 #include "Manager/TextureManager.h"
@@ -23,7 +24,10 @@ public:
 	std::shared_ptr<MeshManager> GetMeshManager();
 	std::shared_ptr<InputManager> GetInputManager();
 
-	virtual void Update();
+	std::shared_ptr<Camera> GetMainCamera();
+
+	virtual void Update(const GameTimer& gt);
+	virtual void PostUpdate(const GameTimer& gt);
 
 protected:
 
@@ -32,12 +36,6 @@ protected:
 	virtual void BuildMaterials() = 0;
 	virtual void BuildMeshes() = 0;
 	virtual void BuildGameObjects() = 0;
-
-	virtual void MoveCamera();
-
-	virtual void OnMouseDown(WPARAM btnState, int x, int y);
-	virtual void OnMouseUp(WPARAM btnState, int x, int y);
-	virtual void OnMouseMove(WPARAM btnState, int x, int y);
 
 	void Pick(int sx, int sy);
 
@@ -49,4 +47,6 @@ protected:
 	std::shared_ptr<MaterialManager> mMaterialManager;					// 材质管理器
 	std::shared_ptr<MeshManager> mMeshManager;							// 网格管理器
 	std::shared_ptr<InputManager> mInputManager;						// 输入管理器
+
+	std::shared_ptr<Camera> mMainCamera;								// 主摄像机
 };

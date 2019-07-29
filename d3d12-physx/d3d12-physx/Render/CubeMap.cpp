@@ -3,14 +3,13 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
+extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 
-extern UINT gRtvDescriptorSize;
-extern UINT gDsvDescriptorSize;
+#include "Manager/SceneManager.h"
+extern std::unique_ptr<SceneManager> gSceneManager;
 
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> gRootSignatures;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
@@ -272,7 +271,7 @@ void CubeMap::BuildDescriptor()
 		&rtvHeapDesc, IID_PPV_ARGS(mRtvHeap.GetAddressOf())));
 
 	for (int i = 0; i < 6; ++i)
-		mhCpuRtv[i] = CD3DX12_CPU_DESCRIPTOR_HANDLE(mRtvHeap->GetCPUDescriptorHandleForHeapStart(), i, gRtvDescriptorSize);
+		mhCpuRtv[i] = CD3DX12_CPU_DESCRIPTOR_HANDLE(mRtvHeap->GetCPUDescriptorHandleForHeapStart(), i, gSetting.RtvDescriptorSize);
 
 	// 创建每个立方体面的RTV
 	for (int i = 0; i < 6; ++i) {
@@ -303,7 +302,7 @@ void CubeMap::BuildDescriptor()
 	ThrowIfFailed(gD3D12Device->CreateDescriptorHeap(
 		&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
 
-	mhCubeDSV = CD3DX12_CPU_DESCRIPTOR_HANDLE(mDsvHeap->GetCPUDescriptorHandleForHeapStart(), 0, gDsvDescriptorSize);
+	mhCubeDSV = CD3DX12_CPU_DESCRIPTOR_HANDLE(mDsvHeap->GetCPUDescriptorHandleForHeapStart(), 0, gSetting.DsvDescriptorSize);
 
 	// 创建深度模板视图
 	gD3D12Device->CreateDepthStencilView(mCubeDepthStencilBuffer.Get(), nullptr, mhCubeDSV);

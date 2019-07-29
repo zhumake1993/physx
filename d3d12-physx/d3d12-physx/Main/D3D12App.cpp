@@ -12,34 +12,23 @@
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 
-extern std::wstring gMainWndCaption;
-extern D3D_DRIVER_TYPE gd3dDriverType;
-extern DXGI_FORMAT gBackBufferFormat;
-extern DXGI_FORMAT gDepthStencilFormat;
-extern int gClientWidth;
-extern int gClientHeight;
+extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 
+#include "Common/FrameResource.h"
 extern const int gNumFrameResources;
 extern int gCurrFrameResourceIndex;
-
-#include "Common/GameTimer.h"
-extern GameTimer gTimer;
-
-#include "Common/FrameResource.h"
 extern std::unique_ptr<MainFrameResource> gMainFrameResource;
 extern std::unique_ptr<FrameResource<PassConstants>> gPassCB;
-
-#include "Common/Camera.h"
-extern std::unique_ptr<Camera> gCamera;
 
 #include "Manager/SceneManager.h"
 extern std::unique_ptr<SceneManager> gSceneManager;
 
 #include "../physx/Main/PhysX.h"
 extern PhysX gPhysX;
+extern bool gDrawWireframe;
 
 D3D12App::D3D12App(HINSTANCE hInstance)
 	: D3DApp(hInstance)
@@ -82,11 +71,9 @@ bool D3D12App::Initialize()
 void D3D12App::OnResize()
 {
 	D3DApp::OnResize();
-
-	gCamera->SetLens(0.25f * MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
 }
 
-void D3D12App::Update()
+void D3D12App::Update(const GameTimer& gt)
 {
 	// 扫描帧资源环形数组
 	gCurrFrameResourceIndex = (gCurrFrameResourceIndex + 1) % gNumFrameResources;
@@ -102,7 +89,7 @@ void D3D12App::Update()
 	}
 
 	// 移动光
-	mLightRotationAngle += 0.1f * gTimer.DeltaTime();
+	mLightRotationAngle += 0.1f * gt.DeltaTime();
 	XMMATRIX R = XMMatrixRotationY(mLightRotationAngle);
 	for (int i = 0; i < 3; ++i) {
 		XMVECTOR lightDir = XMLoadFloat3(&mBaseLightDirections[i]);
@@ -110,7 +97,7 @@ void D3D12App::Update()
 		XMStoreFloat3(&mRotatedLightDirections[i], lightDir);
 	}
 
-	gSceneManager->Update();
+	gSceneManager->Update(gt);
 
 	if (gSceneManager->ChangingScene()) {
 
@@ -131,6 +118,7 @@ void D3D12App::Update()
 		ThrowIfFailed(gCommandList->Reset(cmdListAlloc.Get(), nullptr));
 
 		gSceneManager->ChangeScene();
+		mTimer.Reset();
 
 		//关闭指令列表
 		ThrowIfFailed(gCommandList->Close());
@@ -145,10 +133,10 @@ void D3D12App::Update()
 
 	mShadowMap->Update(mRotatedLightDirections[0]);
 
-	UpdateFrameResource();
+	UpdateFrameResource(gt);
 }
 
-void D3D12App::Draw()
+void D3D12App::Draw(const GameTimer& gt)
 {
 	// 获取当前的指令分配器
 	auto cmdListAlloc = gMainFrameResource->GetCurrCmdListAlloc();
@@ -178,7 +166,7 @@ void D3D12App::Draw()
 	}
 	else {
 		// 关闭平截头剔除
-		gCamera->mFrustumCullingEnabled = false;
+		gSceneManager->GetCurrMainCamera()->mFrustumCullingEnabled = false;
 
 		mShadowMap->DrawSceneToShadowMap();
 
@@ -251,19 +239,19 @@ void D3D12App::OnMouseDown(WPARAM btnState, int x, int y)
 		SetCapture(mhMainWnd);
 	}
 
-	gSceneManager->OnMouseDown(btnState, x, y);
+	gSceneManager->GetCurrInputManager()->OnMouseDown(btnState, x, y);
 }
 
 void D3D12App::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	ReleaseCapture();
 
-	gSceneManager->OnMouseUp(btnState, x, y);
+	gSceneManager->GetCurrInputManager()->OnMouseUp(btnState, x, y);
 }
 
 void D3D12App::OnMouseMove(WPARAM btnState, int x, int y)
 {
-	gSceneManager->OnMouseMove(btnState, x, y);
+	gSceneManager->GetCurrInputManager()->OnMouseMove(btnState, x, y);
 }
 
 void D3D12App::OnKeyDown(WPARAM vkCode)
@@ -295,7 +283,11 @@ void D3D12App::OnKeyDown(WPARAM vkCode)
 	}
 
 	if (vkCode == '6') {
-		gCamera->mFrustumCullingEnabled = !gCamera->mFrustumCullingEnabled;
+		gSceneManager->GetCurrMainCamera()->mFrustumCullingEnabled = !gSceneManager->GetCurrMainCamera()->mFrustumCullingEnabled;
+	}
+
+	if (vkCode == 'M') {
+		gDrawWireframe = !gDrawWireframe;
 	}
 
 	gSceneManager->GetCurrInputManager()->OnKeyDown(vkCode);
@@ -306,12 +298,12 @@ void D3D12App::OnKeyUp(WPARAM vkCode)
 	gSceneManager->GetCurrInputManager()->OnKeyUp(vkCode);
 }
 
-void D3D12App::UpdateFrameResource()
+void D3D12App::UpdateFrameResource(const GameTimer& gt)
 {
 	PassConstants mainPassCB;
 
-	XMMATRIX view = gCamera->GetView();
-	XMMATRIX proj = gCamera->GetProj();
+	XMMATRIX view = gSceneManager->GetCurrMainCamera()->GetView();
+	XMMATRIX proj = gSceneManager->GetCurrMainCamera()->GetProj();
 
 	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
 	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
@@ -336,13 +328,13 @@ void D3D12App::UpdateFrameResource()
 	XMStoreFloat4x4(&mainPassCB.ViewProjTex, XMMatrixTranspose(viewProjTex));
 	XMStoreFloat4x4(&mainPassCB.ShadowTransform, XMMatrixTranspose(shadowTransform));
 
-	mainPassCB.EyePosW = gCamera->GetPosition3f();
-	mainPassCB.RenderTargetSize = XMFLOAT2((float)gClientWidth, (float)gClientHeight);
-	mainPassCB.InvRenderTargetSize = XMFLOAT2(1.0f / gClientWidth, 1.0f / gClientHeight);
+	mainPassCB.EyePosW = gSceneManager->GetCurrMainCamera()->GetPosition3f();
+	mainPassCB.RenderTargetSize = XMFLOAT2((float)gSetting.ClientWidth, (float)gSetting.ClientHeight);
+	mainPassCB.InvRenderTargetSize = XMFLOAT2(1.0f / gSetting.ClientWidth, 1.0f / gSetting.ClientHeight);
 	mainPassCB.NearZ = 1.0f;
 	mainPassCB.FarZ = 1000.0f;
-	mainPassCB.TotalTime = gTimer.TotalTime();
-	mainPassCB.DeltaTime = gTimer.DeltaTime();
+	mainPassCB.TotalTime = gt.TotalTime();
+	mainPassCB.DeltaTime = gt.DeltaTime();
 	mainPassCB.AmbientLight = { 0.25f, 0.25f, 0.35f, 1.0f };
 	mainPassCB.Lights[0].Direction = mRotatedLightDirections[0];
 	mainPassCB.Lights[0].Strength = { 0.9f, 0.8f, 0.7f };
@@ -361,15 +353,15 @@ void D3D12App::BuildRenders()
 {
 	mMainRender = std::make_unique<MainRender>();
 
-	mDrawQuad = std::make_unique<DrawQuad>(gClientWidth, gClientHeight, gBackBufferFormat);
-	mRenderTarget = std::make_unique<RenderTarget>(gClientWidth, gClientHeight, gBackBufferFormat);
-	mShaderResourceTemp = std::make_unique<ShaderResource>(gClientWidth, gClientHeight, gBackBufferFormat);
+	mDrawQuad = std::make_unique<DrawQuad>(gSetting.ClientWidth, gSetting.ClientHeight, gSetting.BackBufferFormat);
+	mRenderTarget = std::make_unique<RenderTarget>(gSetting.ClientWidth, gSetting.ClientHeight, gSetting.BackBufferFormat);
+	mShaderResourceTemp = std::make_unique<ShaderResource>(gSetting.ClientWidth, gSetting.ClientHeight, gSetting.BackBufferFormat);
 
 	mWireframe = std::make_unique<Wireframe>();
 	mDepthComplexityUseStencil = std::make_unique<DepthComplexityUseStencil>();
 	mDepthComplexityUseBlend = std::make_unique<DepthComplexityUseBlend>();
 
-	mCubeMap = std::make_unique<CubeMap>(DXGI_FORMAT_R8G8B8A8_UNORM, gDepthStencilFormat);
+	mCubeMap = std::make_unique<CubeMap>(DXGI_FORMAT_R8G8B8A8_UNORM, gSetting.DepthStencilFormat);
 	mCubeMap->BuildCubeFaceCamera(0.0f, 2.0f, 0.0f);
 
 	mShadowMap = std::make_unique<ShadowMap>(2048, 2048);
@@ -380,13 +372,13 @@ void D3D12App::BuildRenders()
 	sceneBounds.Radius = sqrtf(10.0f * 10.0f + 15.0f * 15.0f);
 	mShadowMap->SetBoundingSphere(sceneBounds);
 
-	mSsao = std::make_unique<Ssao>(gClientWidth, gClientHeight);
+	mSsao = std::make_unique<Ssao>(gSetting.ClientWidth, gSetting.ClientHeight);
 }
 
 void D3D12App::BuildFilters()
 {
-	mBlurFilter = std::make_unique<BlurFilter>(gClientWidth, gClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-	mSobelFilter = std::make_unique<SobelFilter>(gClientWidth, gClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-	mInverseFilter = std::make_unique<InverseFilter>(gClientWidth, gClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
-	mMultiplyFilter = std::make_unique<MultiplyFilter>(gClientWidth, gClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	mBlurFilter = std::make_unique<BlurFilter>(gSetting.ClientWidth, gSetting.ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	mSobelFilter = std::make_unique<SobelFilter>(gSetting.ClientWidth, gSetting.ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	mInverseFilter = std::make_unique<InverseFilter>(gSetting.ClientWidth, gSetting.ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
+	mMultiplyFilter = std::make_unique<MultiplyFilter>(gSetting.ClientWidth, gSetting.ClientHeight, DXGI_FORMAT_R8G8B8A8_UNORM);
 }

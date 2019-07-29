@@ -3,20 +3,13 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
-
-extern DXGI_FORMAT gBackBufferFormat;
-extern DXGI_FORMAT gDepthStencilFormat;
+extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 
-extern bool g4xMsaaState;
-extern UINT g4xMsaaQuality;
-
-extern D3D12_VIEWPORT gScreenViewport;
-extern D3D12_RECT gScissorRect;
+#include "Manager/SceneManager.h"
+extern std::unique_ptr<SceneManager> gSceneManager;
 
 #include "Common/FrameResource.h"
 extern std::unique_ptr<FrameResource<PassConstants>> gPassCB;
@@ -36,8 +29,8 @@ DepthComplexityUseStencil::DepthComplexityUseStencil()
 void DepthComplexityUseStencil::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_DESCRIPTOR_HANDLE& dsv)
 {
 	//设置视口和剪裁矩形。每次重置指令列表后都要设置视口和剪裁矩形
-	gCommandList->RSSetViewports(1, &gScreenViewport);
-	gCommandList->RSSetScissorRects(1, &gScissorRect);
+	gCommandList->RSSetViewports(1, &gSetting.ScreenViewport);
+	gCommandList->RSSetScissorRects(1, &gSetting.ScissorRect);
 
 	//清空后背缓冲和深度模板缓冲
 	gCommandList->ClearRenderTargetView(rtv, DirectX::Colors::Black, 0, nullptr);
@@ -203,10 +196,10 @@ void DepthComplexityUseStencil::BuildPSO()
 	countDepthComplexityPsoDesc.SampleMask = UINT_MAX;
 	countDepthComplexityPsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	countDepthComplexityPsoDesc.NumRenderTargets = 1;
-	countDepthComplexityPsoDesc.RTVFormats[0] = gBackBufferFormat;
-	countDepthComplexityPsoDesc.SampleDesc.Count = g4xMsaaState ? 4 : 1;
-	countDepthComplexityPsoDesc.SampleDesc.Quality = g4xMsaaState ? (g4xMsaaQuality - 1) : 0;
-	countDepthComplexityPsoDesc.DSVFormat = gDepthStencilFormat;
+	countDepthComplexityPsoDesc.RTVFormats[0] = gSetting.BackBufferFormat;
+	countDepthComplexityPsoDesc.SampleDesc.Count = gSetting.X4MsaaState ? 4 : 1;
+	countDepthComplexityPsoDesc.SampleDesc.Quality = gSetting.X4MsaaState ? (gSetting.X4MsaaQuality - 1) : 0;
+	countDepthComplexityPsoDesc.DSVFormat = gSetting.DepthStencilFormat;
 	ThrowIfFailed(gD3D12Device->CreateGraphicsPipelineState(&countDepthComplexityPsoDesc, IID_PPV_ARGS(&gPSOs["CountDepthComplexityUseStencil"])));
 
 	//
@@ -251,9 +244,9 @@ void DepthComplexityUseStencil::BuildPSO()
 	showDepthComplexityPsoDesc.SampleMask = UINT_MAX;
 	showDepthComplexityPsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	showDepthComplexityPsoDesc.NumRenderTargets = 1;
-	showDepthComplexityPsoDesc.RTVFormats[0] = gBackBufferFormat;
-	showDepthComplexityPsoDesc.SampleDesc.Count = g4xMsaaState ? 4 : 1;
-	showDepthComplexityPsoDesc.SampleDesc.Quality = g4xMsaaState ? (g4xMsaaQuality - 1) : 0;
-	showDepthComplexityPsoDesc.DSVFormat = gDepthStencilFormat;
+	showDepthComplexityPsoDesc.RTVFormats[0] = gSetting.BackBufferFormat;
+	showDepthComplexityPsoDesc.SampleDesc.Count = gSetting.X4MsaaState ? 4 : 1;
+	showDepthComplexityPsoDesc.SampleDesc.Quality = gSetting.X4MsaaState ? (gSetting.X4MsaaQuality - 1) : 0;
+	showDepthComplexityPsoDesc.DSVFormat = gSetting.DepthStencilFormat;
 	ThrowIfFailed(gD3D12Device->CreateGraphicsPipelineState(&showDepthComplexityPsoDesc, IID_PPV_ARGS(&gPSOs["ShowDepthComplexityUseStencil"])));
 }

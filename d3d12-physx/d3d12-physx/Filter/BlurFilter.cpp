@@ -2,10 +2,10 @@
 
 using Microsoft::WRL::ComPtr;
 
+extern Setting gSetting;
+
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
-
-extern UINT gCbvSrvUavDescriptorSize;
 
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> gShaders;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
@@ -211,14 +211,14 @@ void BlurFilter::BuildDescriptor()
 
 	// 保留描述符的引用
 	mBlur0CpuSrv = hCpuDescriptor;
-	mBlur0CpuUav = hCpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mBlur1CpuSrv = hCpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mBlur1CpuUav = hCpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
+	mBlur0CpuUav = hCpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mBlur1CpuSrv = hCpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mBlur1CpuUav = hCpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
 
 	mBlur0GpuSrv = hGpuDescriptor;
-	mBlur0GpuUav = hGpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mBlur1GpuSrv = hGpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mBlur1GpuUav = hGpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
+	mBlur0GpuUav = hGpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mBlur1GpuSrv = hGpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mBlur1GpuUav = hGpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
 
 	// 创建描述符
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};

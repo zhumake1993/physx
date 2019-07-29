@@ -12,6 +12,7 @@ public:
 	void Initialize();
 
 	void AddInstance(MeshRender* meshRender);
+	void DeleteInstance(MeshRender* meshRender);
 	void UpdateInstance(MeshRender* meshRender);
 
 	void UploadInstanceData();

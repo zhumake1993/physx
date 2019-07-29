@@ -3,20 +3,13 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
-
-extern DXGI_FORMAT gBackBufferFormat;
-extern DXGI_FORMAT gDepthStencilFormat;
+extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 
-extern bool g4xMsaaState;
-extern UINT g4xMsaaQuality;
-
-extern D3D12_VIEWPORT gScreenViewport;
-extern D3D12_RECT gScissorRect;
+#include "Manager/SceneManager.h"
+extern std::unique_ptr<SceneManager> gSceneManager;
 
 #include "Common/FrameResource.h"
 extern std::unique_ptr<FrameResource<PassConstants>> gPassCB;
@@ -25,6 +18,8 @@ extern std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> gRootSignatures;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> gShaders;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
+
+extern bool gDrawWireframe;
 
 MainRender::MainRender()
 {
@@ -54,8 +49,8 @@ void MainRender::SetSsao(ID3D12DescriptorHeap* srvDescriptorHeapPtr, CD3DX12_GPU
 void MainRender::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_DESCRIPTOR_HANDLE& dsv)
 {
 	//设置视口和剪裁矩形。每次重置指令列表后都要设置视口和剪裁矩形
-	gCommandList->RSSetViewports(1, &gScreenViewport);
-	gCommandList->RSSetScissorRects(1, &gScissorRect);
+	gCommandList->RSSetViewports(1, &gSetting.ScreenViewport);
+	gCommandList->RSSetScissorRects(1, &gSetting.ScissorRect);
 
 	//清空后背缓冲和深度模板缓冲
 	gCommandList->ClearRenderTargetView(rtv, DirectX::Colors::Black, 0, nullptr);
@@ -117,8 +112,10 @@ void MainRender::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_
 	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
 
 	// 绘制线框物体
-	gCommandList->SetPipelineState(gPSOs["Wireframe"].Get());
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Wireframe);
+	if (gDrawWireframe) {
+		gCommandList->SetPipelineState(gPSOs["Wireframe"].Get());
+		gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Wireframe);
+	}
 }
 
 void MainRender::BuildRootSignature()
@@ -222,10 +219,10 @@ void MainRender::BuildPSO()
 	opaquePsoDesc.SampleMask = UINT_MAX;
 	opaquePsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	opaquePsoDesc.NumRenderTargets = 1;
-	opaquePsoDesc.RTVFormats[0] = gBackBufferFormat;
-	opaquePsoDesc.SampleDesc.Count = g4xMsaaState ? 4 : 1;
-	opaquePsoDesc.SampleDesc.Quality = g4xMsaaState ? (g4xMsaaQuality - 1) : 0;
-	opaquePsoDesc.DSVFormat = gDepthStencilFormat;
+	opaquePsoDesc.RTVFormats[0] = gSetting.BackBufferFormat;
+	opaquePsoDesc.SampleDesc.Count = gSetting.X4MsaaState ? 4 : 1;
+	opaquePsoDesc.SampleDesc.Quality = gSetting.X4MsaaState ? (gSetting.X4MsaaQuality - 1) : 0;
+	opaquePsoDesc.DSVFormat = gSetting.DepthStencilFormat;
 	ThrowIfFailed(gD3D12Device->CreateGraphicsPipelineState(&opaquePsoDesc, IID_PPV_ARGS(&gPSOs["opaque"])));
 
 	//

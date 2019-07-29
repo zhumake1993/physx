@@ -3,14 +3,7 @@
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 
-extern int gClientWidth;
-extern int gClientHeight;
-
-#include "Common/GameTimer.h"
-extern GameTimer gTimer;
-
-#include "Common/Camera.h"
-extern std::unique_ptr<Camera> gCamera;
+extern Setting gSetting;
 
 #include "../physx/Main/PhysX.h"
 extern PhysX gPhysX;
@@ -23,6 +16,9 @@ Scene::Scene()
 	mMaterialManager = std::make_shared<MaterialManager>();
 	mMeshManager = std::make_shared<MeshManager>();
 	mInputManager = std::make_shared<InputManager>();
+
+	mMainCamera = std::make_shared<Camera>();
+	mMainCamera->SetLens(0.25f * MathHelper::Pi, static_cast<float>(gSetting.ClientWidth) / gSetting.ClientHeight, 1.0f, 1000.0f);
 }
 
 Scene::~Scene()
@@ -70,47 +66,47 @@ std::shared_ptr<InputManager> Scene::GetInputManager()
 	return mInputManager;
 }
 
-void Scene::Update()
+std::shared_ptr<Camera> Scene::GetMainCamera()
 {
-	gPhysX.Update(gTimer.DeltaTime());
+	return mMainCamera;
+}
+
+void Scene::Update(const GameTimer& gt)
+{
+	gPhysX.Update(gt.DeltaTime());
 
 	// 注意，更新顺序很重要！
+
+	// 游戏物体的更新放在最前面，因为其包含了游戏的主要逻辑，是游戏数据发生改变的原因
+	mGameObjectManager->Update(gt);
+}
+
+void Scene::PostUpdate(const GameTimer& gt)
+{
+	// 由于游戏逻辑可能修改了材质，因此材质的更新要放在游戏逻辑的更新的后面
 	mMaterialManager->UpdateMaterialData();
-	mGameObjectManager->Update();
-	mInputManager->Update();
+
+	// 由于游戏逻辑可能修改了渲染实例，因此渲染实例的更新要放在游戏逻辑的更新的后面
 	mInstanceManager->UploadInstanceData();
-}
 
-void Scene::MoveCamera()
-{
-}
-
-void Scene::OnMouseDown(WPARAM btnState, int x, int y)
-{
-}
-
-void Scene::OnMouseUp(WPARAM btnState, int x, int y)
-{
-}
-
-void Scene::OnMouseMove(WPARAM btnState, int x, int y)
-{
+	// 注意，输入管理器的更新函数要放在最后，否则GetKeyDown之类的函数会失效
+	mInputManager->Update(gt);
 }
 
 void Scene::Pick(int sx, int sy)
 {
-	XMFLOAT4X4 P = gCamera->GetProj4x4f();
+	XMFLOAT4X4 P = mMainCamera->GetProj4x4f();
 
 	// 计算视空间的选取射线
-	float vx = (+2.0f * sx / gClientWidth - 1.0f) / P(0, 0);
-	float vy = (-2.0f * sy / gClientHeight + 1.0f) / P(1, 1);
+	float vx = (+2.0f * sx / gSetting.ClientWidth - 1.0f) / P(0, 0);
+	float vy = (-2.0f * sy / gSetting.ClientHeight + 1.0f) / P(1, 1);
 
 	// 视空间的射线定义
 	XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 	XMVECTOR rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
 
 	// 将射线转换至世界空间
-	XMMATRIX V = gCamera->GetView();
+	XMMATRIX V = mMainCamera->GetView();
 	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(V), V);
 
 	XMVECTOR rayOriginW = XMVector3TransformCoord(rayOrigin, invView);

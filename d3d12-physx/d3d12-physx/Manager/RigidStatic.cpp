@@ -92,3 +92,9 @@ void RigidStatic::AddRigidStatic()
 	mMeshRender->mReceiveShadow = false;
 	mMeshRender->AddMeshRender();
 }
+
+void RigidStatic::Release()
+{
+	gPhysX.DeletePxRigid(mName);
+	mMeshRender->Release();
+}

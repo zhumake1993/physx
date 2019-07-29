@@ -28,7 +28,7 @@ BoxPx::~BoxPx()
 {
 }
 
-void BoxPx::Update()
+void BoxPx::Update(const GameTimer& gt)
 {
-	GameObject::Update();
+	GameObject::Update(gt);
 }

@@ -3,18 +3,13 @@
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
-
-extern DXGI_FORMAT gDepthStencilFormat;
+extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 
-extern bool g4xMsaaState;
-extern UINT g4xMsaaQuality;
-
-extern UINT gDsvDescriptorSize;
+#include "Manager/SceneManager.h"
+extern std::unique_ptr<SceneManager> gSceneManager;
 
 extern std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> gRootSignatures;
@@ -245,7 +240,7 @@ void ShadowMap::BuildDescriptor()
 	ThrowIfFailed(gD3D12Device->CreateDescriptorHeap(
 		&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
 
-	mhCpuDsv = CD3DX12_CPU_DESCRIPTOR_HANDLE(mDsvHeap->GetCPUDescriptorHandleForHeapStart(), 0, gDsvDescriptorSize);
+	mhCpuDsv = CD3DX12_CPU_DESCRIPTOR_HANDLE(mDsvHeap->GetCPUDescriptorHandleForHeapStart(), 0, gSetting.DsvDescriptorSize);
 
 	// 创建DSV，以便渲染到阴影贴图
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
@@ -301,9 +296,9 @@ void ShadowMap::BuildPSO()
 	smapPsoDesc.RTVFormats[0] = DXGI_FORMAT_UNKNOWN;
 	smapPsoDesc.NumRenderTargets = 0;
 
-	smapPsoDesc.SampleDesc.Count = g4xMsaaState ? 4 : 1;
-	smapPsoDesc.SampleDesc.Quality = g4xMsaaState ? (g4xMsaaQuality - 1) : 0;
-	smapPsoDesc.DSVFormat = gDepthStencilFormat;
+	smapPsoDesc.SampleDesc.Count = gSetting.X4MsaaState ? 4 : 1;
+	smapPsoDesc.SampleDesc.Quality = gSetting.X4MsaaState ? (gSetting.X4MsaaQuality - 1) : 0;
+	smapPsoDesc.DSVFormat = gSetting.DepthStencilFormat;
 
 	ThrowIfFailed(gD3D12Device->CreateGraphicsPipelineState(&smapPsoDesc, IID_PPV_ARGS(&gPSOs["Shadow"])));
 }

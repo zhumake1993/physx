@@ -132,3 +132,9 @@ void RigidDynamic::Update()
 	mMeshRender->mTransform.Quaternion = rigidBodyWorld.Quaternion;
 	mMeshRender->Update();
 }
+
+void RigidDynamic::Release()
+{
+	gPhysX.DeletePxRigid(mName);
+	mMeshRender->Release();
+}

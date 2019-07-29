@@ -19,7 +19,7 @@ Box::~Box()
 {
 }
 
-void Box::Update()
+void Box::Update(const GameTimer& gt)
 {
-	GameObject::Update();
+	GameObject::Update(gt);
 }

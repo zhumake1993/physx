@@ -20,6 +20,7 @@ struct InstanceData
 	float4x4 World;
 	float4x4 InvTraWorld;
 	float4x4 TexTransform;
+
 	uint     MaterialIndex;
 	uint     ReceiveShadow;
 	uint     InstPad1;
@@ -29,12 +30,16 @@ struct InstanceData
 struct MaterialData
 {
 	float4   DiffuseAlbedo;
+
 	float3   FresnelR0;
 	float    Roughness;
+
 	float4x4 MatTransform;
+	float4   LerpDiffuseAlbedo;
+
 	uint     DiffuseMapIndex;
 	uint     NormalMapIndex;
-	uint     MatPad1;
+	float     LerpPara;
 	uint     MatPad2;
 };
 
@@ -66,18 +71,23 @@ cbuffer cbPass : register(b1)
     float4x4 gInvViewProj;
 	float4x4 gViewProjTex;
 	float4x4 gShadowTransform;
+
     float3 gEyePosW;
     float cbPerObjectPad1;
+
     float2 gRenderTargetSize;
     float2 gInvRenderTargetSize;
+
     float gNearZ;
     float gFarZ;
     float gTotalTime;
     float gDeltaTime;
+
     float4 gAmbientLight;
 
 	// 允许用户每帧改变雾的参数
 	float4 gFogColor;
+
 	float gFogStart;
 	float gFogRange;
 	float2 cbPerObjectPad2;

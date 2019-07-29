@@ -2,10 +2,10 @@
 
 using Microsoft::WRL::ComPtr;
 
+extern Setting gSetting;
+
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
-
-extern UINT gCbvSrvUavDescriptorSize;
 
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3DBlob>> gShaders;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
@@ -202,12 +202,12 @@ void MultiplyFilter::BuildDescriptor()
 
 	// 保留描述符的引用
 	mInput0CpuSrv = hCpuDescriptor;
-	mInput1CpuSrv = hCpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mOutputCpuUav = hCpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
+	mInput1CpuSrv = hCpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mOutputCpuUav = hCpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
 
 	mInput0GpuSrv = hGpuDescriptor;
-	mInput1GpuSrv = hGpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mOutputGpuUav = hGpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
+	mInput1GpuSrv = hGpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mOutputGpuUav = hGpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
 
 	// 创建描述符
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};

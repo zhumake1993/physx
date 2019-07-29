@@ -3,9 +3,6 @@
 #include "Scenes/MainScene.h"
 #include "Scenes/Linkup.h"
 
-#include "Common/GameTimer.h"
-extern GameTimer gTimer;
-
 #include "../physx/Main/PhysX.h"
 extern PhysX gPhysX;
 
@@ -50,14 +47,18 @@ void SceneManager::ChangeScene()
 	mSceneCreateLambda[mNextScene]();
 	mCurrScene->Initialize();
 
-	gTimer.Reset();
-
 	mNextScene = "";
 }
 
-void SceneManager::Update()
+void SceneManager::Update(const GameTimer& gt)
 {
-	mCurrScene->Update();
+	mCurrScene->Update(gt);
+	mCurrScene->PostUpdate(gt);
+}
+
+std::shared_ptr<Scene> SceneManager::GetCurrScene()
+{
+	return mCurrScene;
 }
 
 std::shared_ptr<GameObjectManager> SceneManager::GetCurrGameObjectManager()
@@ -90,17 +91,7 @@ std::shared_ptr<InputManager> SceneManager::GetCurrInputManager()
 	return mCurrScene->GetInputManager();
 }
 
-void SceneManager::OnMouseDown(WPARAM btnState, int x, int y)
+std::shared_ptr<Camera> SceneManager::GetCurrMainCamera()
 {
-	mCurrScene->OnMouseDown(btnState, x, y);
-}
-
-void SceneManager::OnMouseUp(WPARAM btnState, int x, int y)
-{
-	mCurrScene->OnMouseUp(btnState, x, y);
-}
-
-void SceneManager::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	mCurrScene->OnMouseMove(btnState, x, y);
+	return mCurrScene->GetMainCamera();
 }

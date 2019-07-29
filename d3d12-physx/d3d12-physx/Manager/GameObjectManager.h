@@ -17,7 +17,7 @@ public:
 	void DeleteGameObject(std::string name);
 	void DeleteGameObject(std::shared_ptr<GameObject> gameObject);
 
-	void Update();
+	void Update(const GameTimer& gt);
 
 private:
 	//

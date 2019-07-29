@@ -28,6 +28,25 @@
 //===========================================================
 //===========================================================
 
+struct Setting {
+	std::wstring MainWndCaption = L"d3d12app";							// 标题
+	D3D_DRIVER_TYPE D3dDriverType = D3D_DRIVER_TYPE_HARDWARE;			// 硬件类型
+	DXGI_FORMAT BackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;			// 后缓冲格式
+	DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;		// 深度模板缓冲格式
+	int ClientWidth = 1200;												// 屏幕宽
+	int ClientHeight = 900;												// 屏幕高
+
+	bool X4MsaaState = false;											// 多重采样是否开启
+	UINT X4MsaaQuality = 0;												// 多重采样质量
+
+	D3D12_VIEWPORT ScreenViewport;										// 视口
+	D3D12_RECT ScissorRect;												// 剪裁矩形
+
+	UINT RtvDescriptorSize = 0;											// 渲染目标描述符的大小
+	UINT DsvDescriptorSize = 0;											// 深度模板描述符的大小
+	UINT CbvSrvUavDescriptorSize = 0;									// 常量缓冲描述符，着色器资源描述符，无序存取描述符的大小
+};
+
 struct Transform
 {
 	Transform(const DirectX::XMFLOAT3& t = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),

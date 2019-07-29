@@ -32,9 +32,9 @@ public:
 
 private:
 	virtual void OnResize()override;
-	virtual void Update()override;
+	virtual void Update(const GameTimer& gt)override;
 
-	virtual void Draw()override;
+	virtual void Draw(const GameTimer& gt)override;
 
 	// 鼠标输入处理
 	virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
@@ -45,7 +45,7 @@ private:
 	virtual void OnKeyDown(WPARAM vkCode)override;
 	virtual void OnKeyUp(WPARAM vkCode)override;
 
-	void UpdateFrameResource();
+	void UpdateFrameResource(const GameTimer& gt);
 
 	void BuildRenders();
 	void BuildFilters();

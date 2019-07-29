@@ -1,6 +1,7 @@
 #include "d3dUtil.h"
 
 using Microsoft::WRL::ComPtr;
+using namespace DirectX;
 
 //===========================================================
 //===========================================================
@@ -8,42 +9,25 @@ using Microsoft::WRL::ComPtr;
 //===========================================================
 //===========================================================
 
-std::wstring gMainWndCaption = L"d3d12app";							// 标题
-D3D_DRIVER_TYPE gd3dDriverType = D3D_DRIVER_TYPE_HARDWARE;			// 硬件类型
-DXGI_FORMAT gBackBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;			// 后缓冲格式
-DXGI_FORMAT gDepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;	// 深度模板缓冲格式
-int gClientWidth = 1200;											// 屏幕宽
-int gClientHeight = 900;											// 屏幕高
+// 参数
+Setting gSetting;
 
-ComPtr<ID3D12Device> gD3D12Device = nullptr;						// D3D12设备
-ComPtr<ID3D12GraphicsCommandList> gCommandList = nullptr;			// 指令列表
+// 设备与指令
+ComPtr<ID3D12Device> gD3D12Device = nullptr;							// D3D12设备
+ComPtr<ID3D12GraphicsCommandList> gCommandList = nullptr;				// 指令列表
 
-bool g4xMsaaState = false;											// 多重采样是否开启
-UINT g4xMsaaQuality = 0;											// 多重采样质量
-
-D3D12_VIEWPORT gScreenViewport;										// 视口
-D3D12_RECT gScissorRect;											// 剪裁矩形
-
-UINT gRtvDescriptorSize = 0;										// 渲染目标描述符的大小
-UINT gDsvDescriptorSize = 0;										// 深度模板描述符的大小
-UINT gCbvSrvUavDescriptorSize = 0;									// 常量缓冲描述符，着色器资源描述符，无序存取描述符的大小
-
-extern const int gNumFrameResources = 3;							// 帧资源数量（如果要在多个文件之间共享const对象，必须在变量的定义之前加extern关键字）
-int gCurrFrameResourceIndex = 0;									// 当前帧资源索引
-
-#include "GameTimer.h"
-GameTimer gTimer;													// 计时器
-
+// 帧资源
 #include "FrameResource.h"
+extern const int gNumFrameResources = 3;								// 帧资源数量(如果要在多个文件之间共享const对象，必须在变量的定义之前加extern关键字)
+int gCurrFrameResourceIndex = 0;										// 当前帧资源索引
 std::unique_ptr<MainFrameResource> gMainFrameResource = std::make_unique<MainFrameResource>();;				// Main帧资源
 std::unique_ptr<FrameResource<PassConstants>> gPassCB = std::make_unique<FrameResource<PassConstants>>();	// 渲染帧资源
 
-#include "Camera.h"
-std::unique_ptr<Camera> gCamera = std::make_unique<Camera>();
-
+// 场景
 #include "Manager/SceneManager.h"
 std::unique_ptr<SceneManager> gSceneManager = std::make_unique<SceneManager>();								// 场景管理器
 
+// 渲染
 std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout =														// 输入布局
 {
 	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -55,8 +39,10 @@ std::unordered_map<std::string, ComPtr<ID3D12RootSignature>> gRootSignatures;			
 std::unordered_map<std::string, ComPtr<ID3DBlob>> gShaders;													// 着色器
 std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> gPSOs;											// 渲染状态对象
 
+// PhysX物理引擎
 #include "../physx/Main/PhysX.h"
-PhysX gPhysX;																								// PhysX物理引擎
+PhysX gPhysX;						// PhysX物理引擎
+bool gDrawWireframe = false;		// 是否绘制碰撞体
 
 //===========================================================
 //===========================================================
@@ -65,15 +51,28 @@ PhysX gPhysX;																								// PhysX物理引擎
 //===========================================================
 
 // 将一个Transform转换成矩阵形式
-DirectX::XMMATRIX TransformToMatrix(Transform& transform)
+XMMATRIX TransformToMatrix(Transform& transform)
 {
-	DirectX::XMVECTOR S = XMLoadFloat3(&transform.Scale);
-	DirectX::XMVECTOR P = XMLoadFloat3(&transform.Translation);
-	DirectX::XMVECTOR Q = XMLoadFloat4(&transform.Quaternion);
+	XMVECTOR S = XMLoadFloat3(&transform.Scale);
+	XMVECTOR P = XMLoadFloat3(&transform.Translation);
+	XMVECTOR Q = XMLoadFloat4(&transform.Quaternion);
 
-	DirectX::XMVECTOR zero = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	XMVECTOR zero = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 
-	return DirectX::XMMatrixAffineTransformation(S, zero, Q, P);
+	return XMMatrixAffineTransformation(S, zero, Q, P);
+}
+
+// 根据视点，目标点和上方向构造四元数（左手坐标系）
+XMVECTOR QuaterionLookAtLH(FXMVECTOR EyePosition, FXMVECTOR FocusPosition, FXMVECTOR UpDirection)
+{
+	// 构造视矩阵
+	auto m = XMMatrixLookAtLH(EyePosition, FocusPosition, UpDirection);
+
+	// 上述的视矩阵表示从指定朝向到标准朝向的旋转，因此需要取逆
+	// 由于该矩阵是标准正交矩阵，因此可以直接求转置
+	m = XMMatrixTranspose(m);
+
+	return XMQuaternionRotationMatrix(m);
 }
 
 //===========================================================

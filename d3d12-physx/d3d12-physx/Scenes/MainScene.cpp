@@ -12,12 +12,6 @@
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 
-#include "Common/GameTimer.h"
-extern GameTimer gTimer;
-
-#include "Common/Camera.h"
-extern std::unique_ptr<Camera> gCamera;
-
 MainScene::MainScene()
 	:Scene()
 {
@@ -31,14 +25,35 @@ void MainScene::Initialize()
 {
 	Scene::Initialize();
 
-	gCamera->SetPosition(0.0f, 2.0f, -15.0f);
+	mMainCamera->SetPosition(0.0f, 2.0f, -15.0f);
 }
 
-void MainScene::Update()
+void MainScene::Update(const GameTimer& gt)
 {
-	Scene::Update();
+	Scene::Update(gt);
 
-	MoveCamera();
+	MoveCamera(gt);
+
+	if (mInputManager->GetMouseDown(0)) {
+		Pick(mInputManager->GetMouseX(), mInputManager->GetMouseY());
+	}
+
+	if (mInputManager->GetMouseDown(1)) {
+		mLastMousePos.x = mInputManager->GetMouseX();
+		mLastMousePos.y = mInputManager->GetMouseY();
+	}
+
+	if (mInputManager->GetMousePress(1)) {
+		// 每像素对应0.25度
+		float dx = XMConvertToRadians(0.25f * static_cast<float>(mInputManager->GetMouseX() - mLastMousePos.x));
+		float dy = XMConvertToRadians(0.25f * static_cast<float>(mInputManager->GetMouseY() - mLastMousePos.y));
+
+		mMainCamera->Pitch(dy);
+		mMainCamera->RotateY(dx);
+
+		mLastMousePos.x = mInputManager->GetMouseX();
+		mLastMousePos.y = mInputManager->GetMouseY();
+	}
 }
 
 void MainScene::BuildManagers()
@@ -217,55 +232,25 @@ void MainScene::BuildGameObjects()
 	mGameObjectManager->AddGameObject(boxPx);
 }
 
-void MainScene::MoveCamera()
+void MainScene::MoveCamera(const GameTimer& gt)
 {
-	const float dt = gTimer.DeltaTime();
+	const float dt = gt.DeltaTime();
 
 	if (GetAsyncKeyState('W') & 0x8000)
-		gCamera->Walk(10.0f * dt);
+		mMainCamera->Walk(10.0f * dt);
 
 	if (GetAsyncKeyState('S') & 0x8000)
-		gCamera->Walk(-10.0f * dt);
+		mMainCamera->Walk(-10.0f * dt);
 
 	if (GetAsyncKeyState('A') & 0x8000)
-		gCamera->Strafe(-10.0f * dt);
+		mMainCamera->Strafe(-10.0f * dt);
 
 	if (GetAsyncKeyState('D') & 0x8000)
-		gCamera->Strafe(10.0f * dt);
+		mMainCamera->Strafe(10.0f * dt);
 
 	if (GetAsyncKeyState('Q') & 0x8000)
-		gCamera->FlyUp(10.0f * dt);
+		mMainCamera->FlyUp(10.0f * dt);
 
 	if (GetAsyncKeyState('E') & 0x8000)
-		gCamera->FlyDown(10.0f * dt);
-}
-
-void MainScene::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	if ((btnState & MK_RBUTTON) != 0) {
-		mLastMousePos.x = x;
-		mLastMousePos.y = y;
-	}
-	else if ((btnState & MK_LBUTTON) != 0) {
-		Pick(x, y);
-	}
-}
-
-void MainScene::OnMouseUp(WPARAM btnState, int x, int y)
-{
-}
-
-void MainScene::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	if ((btnState & MK_RBUTTON) != 0) {
-		// 每像素对应0.25度
-		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
-
-		gCamera->Pitch(dy);
-		gCamera->RotateY(dx);
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
+		mMainCamera->FlyDown(10.0f * dt);
 }

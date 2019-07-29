@@ -11,7 +11,7 @@ public:
 
 	virtual void Initialize()override;
 
-	virtual void Update()override;
+	virtual void Update(const GameTimer& gt)override;
 
 private:
 
@@ -21,11 +21,7 @@ private:
 	virtual void BuildMeshes()override;
 	virtual void BuildGameObjects()override;
 
-	virtual void MoveCamera()override;
-
-	virtual void OnMouseDown(WPARAM btnState, int x, int y)override;
-	virtual void OnMouseUp(WPARAM btnState, int x, int y)override;
-	virtual void OnMouseMove(WPARAM btnState, int x, int y)override;
+	void MoveCamera(const GameTimer& gt);
 
 private:
 	POINT mLastMousePos;

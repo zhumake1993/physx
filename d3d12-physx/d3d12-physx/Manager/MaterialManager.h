@@ -6,14 +6,17 @@
 struct MaterialData
 {
 	DirectX::XMFLOAT4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+
 	DirectX::XMFLOAT3 FresnelR0 = { 0.01f, 0.01f, 0.01f };
 	float Roughness = 0.5f;
 
 	DirectX::XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
 
+	DirectX::XMFLOAT4 LerpDiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+
 	UINT DiffuseMapIndex = 0;
 	UINT NormalMapIndex = 0;
-	UINT MaterialPad1;
+	float LerpPara = 0;
 	UINT MaterialPad2;
 };
 
@@ -30,7 +33,6 @@ public:
 	std::shared_ptr<MaterialData> GetMaterial(const std::string name);
 	UINT GetIndex(const std::string& name);
 	void AddMaterial(const std::string& name, std::shared_ptr<MaterialData> materialData);
-	void SetMaterialData(const std::string& name, std::shared_ptr<MaterialData> materialData);
 
 	void UpdateMaterialData();
 

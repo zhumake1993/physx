@@ -3,20 +3,13 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
-
-extern DXGI_FORMAT gBackBufferFormat;
-extern DXGI_FORMAT gDepthStencilFormat;
+extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 
-extern bool g4xMsaaState;
-extern UINT g4xMsaaQuality;
-
-extern D3D12_VIEWPORT gScreenViewport;
-extern D3D12_RECT gScissorRect;
+#include "Manager/SceneManager.h"
+extern std::unique_ptr<SceneManager> gSceneManager;
 
 #include "Common/FrameResource.h"
 extern std::unique_ptr<FrameResource<PassConstants>> gPassCB;
@@ -36,8 +29,8 @@ DepthComplexityUseBlend::DepthComplexityUseBlend()
 void DepthComplexityUseBlend::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_DESCRIPTOR_HANDLE& dsv)
 {
 	//设置视口和剪裁矩形。每次重置指令列表后都要设置视口和剪裁矩形
-	gCommandList->RSSetViewports(1, &gScreenViewport);
-	gCommandList->RSSetScissorRects(1, &gScissorRect);
+	gCommandList->RSSetViewports(1, &gSetting.ScreenViewport);
+	gCommandList->RSSetScissorRects(1, &gSetting.ScissorRect);
 
 	//清空后背缓冲和深度模板缓冲
 	gCommandList->ClearRenderTargetView(rtv, DirectX::Colors::Black, 0, nullptr);
@@ -139,9 +132,9 @@ void DepthComplexityUseBlend::BuildPSO()
 	showDepthComplexityUseBlendPsoDesc.SampleMask = UINT_MAX;
 	showDepthComplexityUseBlendPsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	showDepthComplexityUseBlendPsoDesc.NumRenderTargets = 1;
-	showDepthComplexityUseBlendPsoDesc.RTVFormats[0] = gBackBufferFormat;
-	showDepthComplexityUseBlendPsoDesc.SampleDesc.Count = g4xMsaaState ? 4 : 1;
-	showDepthComplexityUseBlendPsoDesc.SampleDesc.Quality = g4xMsaaState ? (g4xMsaaQuality - 1) : 0;
-	showDepthComplexityUseBlendPsoDesc.DSVFormat = gDepthStencilFormat;
+	showDepthComplexityUseBlendPsoDesc.RTVFormats[0] = gSetting.BackBufferFormat;
+	showDepthComplexityUseBlendPsoDesc.SampleDesc.Count = gSetting.X4MsaaState ? 4 : 1;
+	showDepthComplexityUseBlendPsoDesc.SampleDesc.Quality = gSetting.X4MsaaState ? (gSetting.X4MsaaQuality - 1) : 0;
+	showDepthComplexityUseBlendPsoDesc.DSVFormat = gSetting.DepthStencilFormat;
 	ThrowIfFailed(gD3D12Device->CreateGraphicsPipelineState(&showDepthComplexityUseBlendPsoDesc, IID_PPV_ARGS(&gPSOs["ShowDepthComplexityUseBlend"])));
 }

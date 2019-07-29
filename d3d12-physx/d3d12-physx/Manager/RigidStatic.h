@@ -12,6 +12,8 @@ public:
 
 	void AddRigidStatic();
 
+	void Release();
+
 private:
 	//
 

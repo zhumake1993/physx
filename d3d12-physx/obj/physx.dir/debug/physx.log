@@ -1,3 +1,0 @@
-﻿cl : 命令行 warning D9025: 正在重写“/sdl”(用“/GS-”)
-  PhysX.cpp
-  physx.vcxproj -> F:\PhysX4.1-learn\d3d12-physx\physx\..\bin\debug\physx.lib

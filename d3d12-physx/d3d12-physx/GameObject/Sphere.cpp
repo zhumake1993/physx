@@ -19,7 +19,7 @@ Sphere::~Sphere()
 {
 }
 
-void Sphere::Update()
+void Sphere::Update(const GameTimer& gt)
 {
-	GameObject::Update();
+	GameObject::Update(gt);
 }

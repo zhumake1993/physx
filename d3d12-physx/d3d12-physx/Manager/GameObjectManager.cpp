@@ -46,7 +46,7 @@ void GameObjectManager::DeleteGameObject(std::string name)
 		ThrowMyEx("GameObject does not exist!")
 	}
 
-	mGameObjects.erase(name);
+	mGameObjects[name]->mToBeDeleted = true;
 }
 
 void GameObjectManager::DeleteGameObject(std::shared_ptr<GameObject> gameObject)
@@ -55,12 +55,20 @@ void GameObjectManager::DeleteGameObject(std::shared_ptr<GameObject> gameObject)
 		ThrowMyEx("GameObject does not exist!")
 	}
 
-	mGameObjects.erase(gameObject->mName);
+	gameObject->mToBeDeleted = true;
 }
 
-void GameObjectManager::Update()
+void GameObjectManager::Update(const GameTimer& gt)
 {
-	for (auto p : mGameObjects) {
-		p.second->Update();
+	for (auto it = mGameObjects.begin(); it != mGameObjects.end();) {
+		it->second->Update(gt);
+
+		if (it->second->mToBeDeleted) {
+			it->second->Release();
+			it = mGameObjects.erase(it);
+		}
+		else {
+			++it;
+		}
 	}
 }

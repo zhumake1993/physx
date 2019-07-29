@@ -14,6 +14,8 @@ public:
 
 	void Update();
 
+	void Release();
+
 private:
 	//
 

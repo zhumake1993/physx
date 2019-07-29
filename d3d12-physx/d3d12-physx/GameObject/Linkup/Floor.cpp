@@ -1,4 +1,4 @@
-#include "Floor.h"
+#include "LinkupGameObjects.h"
 
 using namespace DirectX;
 
@@ -27,7 +27,7 @@ Floor::~Floor()
 {
 }
 
-void Floor::Update()
+void Floor::Update(const GameTimer& gt)
 {
-	GameObject::Update();
+	GameObject::Update(gt);
 }

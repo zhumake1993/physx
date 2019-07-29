@@ -3,6 +3,8 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
+extern Setting gSetting;
+
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 
@@ -40,6 +42,8 @@ std::shared_ptr<MaterialData> MaterialManager::GetMaterial(const std::string nam
 		ThrowMyEx("Material does not exist!")
 	}
 
+	mNumFramesDirties[name] = gNumFrameResources;
+
 	return mMaterials[name];
 }
 
@@ -67,16 +71,6 @@ void MaterialManager::AddMaterial(const std::string& name, std::shared_ptr<Mater
 	mNumFramesDirties[name] = gNumFrameResources;
 }
 
-void MaterialManager::SetMaterialData(const std::string& name, std::shared_ptr<MaterialData> materialData)
-{
-	if (!HasMaterial(name)) {
-		ThrowMyEx("Material does not exist!")
-	}
-
-	mMaterials[name] = materialData;
-	mNumFramesDirties[name] = gNumFrameResources;
-}
-
 void MaterialManager::UpdateMaterialData()
 {
 	for (auto& p : mMaterials) {
@@ -89,8 +83,10 @@ void MaterialManager::UpdateMaterialData()
 			matData.FresnelR0 = p.second->FresnelR0;
 			matData.Roughness = p.second->Roughness;
 			XMStoreFloat4x4(&matData.MatTransform, XMMatrixTranspose(matTransform));
+			matData.LerpDiffuseAlbedo = p.second->LerpDiffuseAlbedo;
 			matData.DiffuseMapIndex = p.second->DiffuseMapIndex;
 			matData.NormalMapIndex = p.second->NormalMapIndex;
+			matData.LerpPara = p.second->LerpPara;
 
 			mFrameResource->Copy(mIndices[p.first], matData);
 

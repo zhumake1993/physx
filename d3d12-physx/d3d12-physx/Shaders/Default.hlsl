@@ -72,11 +72,19 @@ float4 PS(VertexOut pin) : SV_Target
 	float4 diffuseAlbedo = matData.DiffuseAlbedo;
 	float3 fresnelR0 = matData.FresnelR0;
 	float  roughness = matData.Roughness;
+	float4 lerpDiffuseAlbedo = matData.LerpDiffuseAlbedo;
 	uint diffuseMapIndex = matData.DiffuseMapIndex;
 	uint normalMapIndex = matData.NormalMapIndex;
+	float lerpPara = matData.LerpPara;
 
 	// 在数组中动态查找纹理
-	diffuseAlbedo *= gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+	if (diffuseMapIndex != -1) {
+		diffuseAlbedo *= gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+	}
+
+	// Lerp
+	lerpPara = saturate(lerpPara);
+	diffuseAlbedo = lerp(diffuseAlbedo, lerpDiffuseAlbedo, lerpPara);
 
 #ifdef ALPHA_TEST
 	// 丢弃纹理alpha值小于0.1的像素

@@ -1,17 +1,10 @@
 #include "Linkup.h"
 
+#include "GameObject/Linkup/LinkupGameObjects.h"
 #include "GameObject/Sky.h"
-#include "GameObject/Linkup/Cube.h"
-#include "GameObject/Linkup/Floor.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
-
-#include "Common/GameTimer.h"
-extern GameTimer gTimer;
-
-#include "Common/Camera.h"
-extern std::unique_ptr<Camera> gCamera;
 
 Linkup::Linkup()
 	:Scene()
@@ -26,14 +19,35 @@ void Linkup::Initialize()
 {
 	Scene::Initialize();
 
-	gCamera->SetPosition(0.0f, 2.0f, -15.0f);
+	mMainCamera->SetPosition(0.0f, 2.0f, -15.0f);
 }
 
-void Linkup::Update()
+void Linkup::Update(const GameTimer& gt)
 {
-	Scene::Update();
+	Scene::Update(gt);
 
-	MoveCamera();
+	MoveCamera(gt);
+
+	if (mInputManager->GetMouseDown(0)) {
+		Pick(mInputManager->GetMouseX(), mInputManager->GetMouseY());
+	}
+
+	if (mInputManager->GetMouseDown(1)) {
+		mLastMousePos.x = mInputManager->GetMouseX();
+		mLastMousePos.y = mInputManager->GetMouseY();
+	}
+
+	if (mInputManager->GetMousePress(1)) {
+		// 每像素对应0.25度
+		float dx = XMConvertToRadians(0.25f * static_cast<float>(mInputManager->GetMouseX() - mLastMousePos.x));
+		float dy = XMConvertToRadians(0.25f * static_cast<float>(mInputManager->GetMouseY() - mLastMousePos.y));
+
+		mMainCamera->Pitch(dy);
+		mMainCamera->RotateY(dx);
+
+		mLastMousePos.x = mInputManager->GetMouseX();
+		mLastMousePos.y = mInputManager->GetMouseY();
+	}
 }
 
 void Linkup::BuildManagers()
@@ -91,6 +105,14 @@ void Linkup::BuildMaterials()
 	tile->FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
 	tile->Roughness = 0.1f;
 	mMaterialManager->AddMaterial("tile", tile);
+
+	auto segment = std::make_shared<MaterialData>();
+	segment->DiffuseMapIndex = -1;
+	segment->NormalMapIndex = -1;
+	segment->DiffuseAlbedo = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	segment->FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
+	segment->Roughness = 0.1f;
+	mMaterialManager->AddMaterial("Line", segment);
 }
 
 void Linkup::BuildMeshes()
@@ -101,69 +123,48 @@ void Linkup::BuildMeshes()
 	mMeshManager->AddMesh("sphere", geoGen.CreateSphere(0.5f, 20, 20));
 
 	mMeshManager->AddMesh("rigidBox", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 0));
+
+	mMeshManager->AddMesh("Segment", geoGen.CreateCylinder(1.0f, 1.0f, 1.0f, 20, 20));
+	mMeshManager->AddMesh("Inflection", geoGen.CreateSphere(1.0f, 20, 20));
 }
 
 void Linkup::BuildGameObjects()
 {
+	auto logic = std::make_shared<Logic>("Logic");
+	mGameObjectManager->AddGameObject(logic);
+
 	auto sky = std::make_shared<Sky>("Sky", Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)));
 	mGameObjectManager->AddGameObject(sky);
 
-	auto cube = std::make_shared<Cube>("Cube", Transform(XMFLOAT3(0.0f, 10.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.99f, 0.99f, 0.99f)));
+	auto cube = std::make_shared<Cube>("Cube", Transform(XMFLOAT3(0.0f, 5.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.99f, 0.99f, 0.99f)));
 	mGameObjectManager->AddGameObject(cube);
+
+	auto cubeGreen = std::make_shared<CubeGreen>("CubeGreen", Transform(XMFLOAT3(3.0f, 5.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.99f, 0.99f, 0.99f)));
+	mGameObjectManager->AddGameObject(cubeGreen);
 
 	auto floor = std::make_shared<Floor>("Floor");
 	mGameObjectManager->AddGameObject(floor);
 }
 
-void Linkup::MoveCamera()
+void Linkup::MoveCamera(const GameTimer& gt)
 {
-	const float dt = gTimer.DeltaTime();
+	const float dt = gt.DeltaTime();
 
 	if (GetAsyncKeyState('W') & 0x8000)
-		gCamera->Walk(10.0f * dt);
+		mMainCamera->Walk(10.0f * dt);
 
 	if (GetAsyncKeyState('S') & 0x8000)
-		gCamera->Walk(-10.0f * dt);
+		mMainCamera->Walk(-10.0f * dt);
 
 	if (GetAsyncKeyState('A') & 0x8000)
-		gCamera->Strafe(-10.0f * dt);
+		mMainCamera->Strafe(-10.0f * dt);
 
 	if (GetAsyncKeyState('D') & 0x8000)
-		gCamera->Strafe(10.0f * dt);
+		mMainCamera->Strafe(10.0f * dt);
 
 	if (GetAsyncKeyState('Q') & 0x8000)
-		gCamera->FlyUp(10.0f * dt);
+		mMainCamera->FlyUp(10.0f * dt);
 
 	if (GetAsyncKeyState('E') & 0x8000)
-		gCamera->FlyDown(10.0f * dt);
-}
-
-void Linkup::OnMouseDown(WPARAM btnState, int x, int y)
-{
-	if ((btnState & MK_RBUTTON) != 0) {
-		mLastMousePos.x = x;
-		mLastMousePos.y = y;
-	}
-	else if ((btnState & MK_LBUTTON) != 0) {
-		Pick(x, y);
-	}
-}
-
-void Linkup::OnMouseUp(WPARAM btnState, int x, int y)
-{
-}
-
-void Linkup::OnMouseMove(WPARAM btnState, int x, int y)
-{
-	if ((btnState & MK_RBUTTON) != 0) {
-		// 每像素对应0.25度
-		float dx = XMConvertToRadians(0.25f * static_cast<float>(x - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f * static_cast<float>(y - mLastMousePos.y));
-
-		gCamera->Pitch(dy);
-		gCamera->RotateY(dx);
-	}
-
-	mLastMousePos.x = x;
-	mLastMousePos.y = y;
+		mMainCamera->FlyDown(10.0f * dt);
 }

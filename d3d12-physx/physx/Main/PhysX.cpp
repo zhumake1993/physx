@@ -64,6 +64,8 @@ void PhysX::CreateScene()
 
 void PhysX::CleanupScene()
 {
+	gPxRigidDynamicMap.clear();
+	gPxRigidStaticMap.clear();
 	PX_RELEASE(gScene);
 }
 
@@ -163,6 +165,19 @@ void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
 	gScene->addActor(*actor);
 
 	gPxRigidDynamicMap[name] = actor;
+}
+
+void PhysX::DeletePxRigid(std::string name)
+{
+	if (HasPxRigidDynamic(name)) {
+		gPxRigidDynamicMap[name]->release();
+	}
+	else if (HasPxRigidStatic(name)) {
+		gPxRigidStaticMap[name]->release();
+	}
+	else {
+		ThrowPxEx("Rigid does not exist!");
+	}
 }
 
 void PhysX::Update(float delta)

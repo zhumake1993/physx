@@ -3,20 +3,13 @@
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
-
-extern DXGI_FORMAT gBackBufferFormat;
-extern DXGI_FORMAT gDepthStencilFormat;
+extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 
-extern bool g4xMsaaState;
-extern UINT g4xMsaaQuality;
-
-extern D3D12_VIEWPORT gScreenViewport;
-extern D3D12_RECT gScissorRect;
+#include "Manager/SceneManager.h"
+extern std::unique_ptr<SceneManager> gSceneManager;
 
 #include "Common/FrameResource.h"
 extern std::unique_ptr<FrameResource<PassConstants>> gPassCB;
@@ -36,8 +29,8 @@ Wireframe::Wireframe()
 void Wireframe::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_DESCRIPTOR_HANDLE& dsv)
 {
 	//设置视口和剪裁矩形。每次重置指令列表后都要设置视口和剪裁矩形
-	gCommandList->RSSetViewports(1, &gScreenViewport);
-	gCommandList->RSSetScissorRects(1, &gScissorRect);
+	gCommandList->RSSetViewports(1, &gSetting.ScreenViewport);
+	gCommandList->RSSetScissorRects(1, &gSetting.ScissorRect);
 
 	//清空后背缓冲和深度模板缓冲
 	gCommandList->ClearRenderTargetView(rtv, DirectX::Colors::Black, 0, nullptr);
@@ -109,9 +102,9 @@ void Wireframe::BuildPSO()
 	opaqueWireframePsoDesc.SampleMask = UINT_MAX;
 	opaqueWireframePsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	opaqueWireframePsoDesc.NumRenderTargets = 1;
-	opaqueWireframePsoDesc.RTVFormats[0] = gBackBufferFormat;
-	opaqueWireframePsoDesc.SampleDesc.Count = g4xMsaaState ? 4 : 1;
-	opaqueWireframePsoDesc.SampleDesc.Quality = g4xMsaaState ? (g4xMsaaQuality - 1) : 0;
-	opaqueWireframePsoDesc.DSVFormat = gDepthStencilFormat;
+	opaqueWireframePsoDesc.RTVFormats[0] = gSetting.BackBufferFormat;
+	opaqueWireframePsoDesc.SampleDesc.Count = gSetting.X4MsaaState ? 4 : 1;
+	opaqueWireframePsoDesc.SampleDesc.Quality = gSetting.X4MsaaState ? (gSetting.X4MsaaQuality - 1) : 0;
+	opaqueWireframePsoDesc.DSVFormat = gSetting.DepthStencilFormat;
 	ThrowIfFailed(gD3D12Device->CreateGraphicsPipelineState(&opaqueWireframePsoDesc, IID_PPV_ARGS(&gPSOs["Wireframe"])));
 }

@@ -27,6 +27,10 @@ void InstanceManager::AddInstance(MeshRender* meshRender)
 	auto randerLayer = meshRender->mRenderLayer;
 	auto receiveShadow = meshRender->mReceiveShadow;
 
+	if (randerLayer < 0 || randerLayer >= (int)RenderLayer::Count) {
+		ThrowMyEx("RenderLayer illegel!");
+	}
+
 	auto& instanceMap = mInstanceLayers[randerLayer];
 
 	if (instanceMap.find(meshName) != instanceMap.end()) {
@@ -44,6 +48,25 @@ void InstanceManager::AddInstance(MeshRender* meshRender)
 	}
 }
 
+void InstanceManager::DeleteInstance(MeshRender* meshRender)
+{
+	auto name = meshRender->mName;
+	auto meshName = meshRender->mMeshName;
+	auto randerLayer = meshRender->mRenderLayer;
+
+	if (randerLayer < 0 || randerLayer >= (int)RenderLayer::Count) {
+		ThrowMyEx("RenderLayer illegel!");
+	}
+
+	auto& instanceMap = mInstanceLayers[randerLayer];
+
+	if (instanceMap.find(meshName) == instanceMap.end()) {
+		ThrowMyEx("meshName illegel!");
+	}
+
+	instanceMap[meshName]->DeleteInstanceData(name);
+}
+
 void InstanceManager::UpdateInstance(MeshRender* meshRender)
 {
 	auto name = meshRender->mName;
@@ -54,7 +77,16 @@ void InstanceManager::UpdateInstance(MeshRender* meshRender)
 	auto randerLayer = meshRender->mRenderLayer;
 	auto receiveShadow = meshRender->mReceiveShadow;
 
+	if (randerLayer < 0 || randerLayer >= (int)RenderLayer::Count) {
+		ThrowMyEx("RenderLayer illegel!");
+	}
+
 	auto& instanceMap = mInstanceLayers[randerLayer];
+
+	if (instanceMap.find(meshName) == instanceMap.end()) {
+		ThrowMyEx("meshName illegel!");
+	}
+
 	instanceMap[meshName]->UpdateInstanceData(name, world, gSceneManager->GetCurrMaterialManager()->GetIndex(matName), texTransform, receiveShadow);
 }
 
@@ -88,6 +120,10 @@ bool InstanceManager::Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW)
 		if (i == (int)RenderLayer::Sky)
 			continue;
 
+		// ÅÅ³ýÏß¿ò
+		if (i == (int)RenderLayer::Wireframe)
+			continue;
+
 		for (auto& p : mInstanceLayers[i]) {
 
 			std::string name;
@@ -107,11 +143,10 @@ bool InstanceManager::Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW)
 	}
 
 	if (result) {
-		XMFLOAT3 pp;
-		XMStoreFloat3(&pp, pointResult);
-		OutputDebug(nameResult);
-		OutputDebug(std::to_string(tminResult));
-		OutputDebug(std::to_string(pp.x) + ',' + std::to_string(pp.y) + ',' + std::to_string(pp.z));
+		XMFLOAT3 hitPoint;
+		XMStoreFloat3(&hitPoint, pointResult);
+
+		gSceneManager->GetCurrGameObjectManager()->GetGameObject(nameResult)->GetPicked(tminResult, hitPoint);
 	}
 
 	return result;

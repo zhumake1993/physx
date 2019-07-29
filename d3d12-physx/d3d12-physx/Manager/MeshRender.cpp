@@ -33,3 +33,8 @@ void MeshRender::Update()
 {
 	gSceneManager->GetCurrInstanceManager()->UpdateInstance(this);
 }
+
+void MeshRender::Release()
+{
+	gSceneManager->GetCurrInstanceManager()->DeleteInstance(this);
+}

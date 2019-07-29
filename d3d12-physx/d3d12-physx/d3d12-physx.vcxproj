@@ -158,7 +158,11 @@
     <ClCompile Include="GameObject\Globe.cpp" />
     <ClCompile Include="GameObject\Grid.cpp" />
     <ClCompile Include="GameObject\Linkup\Cube.cpp" />
+    <ClCompile Include="GameObject\Linkup\CubeGreen.cpp" />
     <ClCompile Include="GameObject\Linkup\Floor.cpp" />
+    <ClCompile Include="GameObject\Linkup\Inflection.cpp" />
+    <ClCompile Include="GameObject\Linkup\Logic.cpp" />
+    <ClCompile Include="GameObject\Linkup\Segment.cpp" />
     <ClCompile Include="GameObject\Skull.cpp" />
     <ClCompile Include="GameObject\Sky.cpp" />
     <ClCompile Include="GameObject\Sphere.cpp" />
@@ -211,7 +215,12 @@
     <ClInclude Include="GameObject\Globe.h" />
     <ClInclude Include="GameObject\Grid.h" />
     <ClInclude Include="GameObject\Linkup\Cube.h" />
+    <ClInclude Include="GameObject\Linkup\CubeGreen.h" />
     <ClInclude Include="GameObject\Linkup\Floor.h" />
+    <ClInclude Include="GameObject\Linkup\Inflection.h" />
+    <ClInclude Include="GameObject\Linkup\LinkupGameObjects.h" />
+    <ClInclude Include="GameObject\Linkup\Logic.h" />
+    <ClInclude Include="GameObject\Linkup\Segment.h" />
     <ClInclude Include="GameObject\Skull.h" />
     <ClInclude Include="GameObject\Sky.h" />
     <ClInclude Include="GameObject\Sphere.h" />

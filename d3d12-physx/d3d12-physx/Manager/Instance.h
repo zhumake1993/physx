@@ -33,6 +33,8 @@ public:
 		const UINT& matIndex, const DirectX::XMFLOAT4X4& texTransform,
 		const bool receiveShadow);
 
+	void DeleteInstanceData(const std::string& gameObjectName);
+
 	void UpdateInstanceData(const std::string& gameObjectName, const DirectX::XMFLOAT4X4& world,
 		const UINT& matIndex, const DirectX::XMFLOAT4X4& texTransform,
 		const bool receiveShadow);

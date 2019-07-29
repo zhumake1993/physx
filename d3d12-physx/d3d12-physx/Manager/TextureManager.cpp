@@ -3,10 +3,10 @@
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
 
+extern Setting gSetting;
+
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
-
-extern UINT gCbvSrvUavDescriptorSize;
 
 TextureManager::TextureManager()
 {
@@ -92,7 +92,7 @@ void TextureManager::BuildDescriptorHeaps()
 	srvDesc.Format = mCubeMap->Resource->GetDesc().Format;
 	gD3D12Device->CreateShaderResourceView(mCubeMap->Resource.Get(), &srvDesc, hDescriptor);
 	mCubeMap->Index = 0;
-	hDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
+	hDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
 
 	// 创建纹理的srv
 	UINT currIndex = 0;
@@ -107,14 +107,14 @@ void TextureManager::BuildDescriptorHeaps()
 		gD3D12Device->CreateShaderResourceView(p.second->Resource.Get(), &srvDesc, hDescriptor);
 
 		p.second->Index = currIndex++;
-		hDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
+		hDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
 	}
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetGpuSrvTex()
 {
 	CD3DX12_GPU_DESCRIPTOR_HANDLE hGpuSrv(mSrvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());
-	hGpuSrv.Offset(1, gCbvSrvUavDescriptorSize);
+	hGpuSrv.Offset(1, gSetting.CbvSrvUavDescriptorSize);
 	return hGpuSrv;
 }
 

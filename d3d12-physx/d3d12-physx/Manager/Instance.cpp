@@ -6,8 +6,8 @@ using Microsoft::WRL::ComPtr;
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 
-#include "Common/Camera.h"
-extern std::unique_ptr<Camera> gCamera;
+#include "Manager/SceneManager.h"
+extern std::unique_ptr<SceneManager> gSceneManager;
 
 Instance::Instance()
 {
@@ -60,6 +60,15 @@ void Instance::AddInstanceData(const std::string& gameObjectName, const XMFLOAT4
 	++mInstanceCount;
 }
 
+void Instance::DeleteInstanceData(const std::string& gameObjectName)
+{
+	if (!HasInstanceData(gameObjectName)) {
+		ThrowMyEx("InstanceData does not exist!")
+	}
+
+	mInstances.erase(gameObjectName);
+}
+
 void Instance::UpdateInstanceData(const std::string& gameObjectName, const XMFLOAT4X4& world, const UINT& matIndex, const XMFLOAT4X4& texTransform,
 	const bool receiveShadow)
 {
@@ -78,7 +87,7 @@ void Instance::UpdateInstanceData(const std::string& gameObjectName, const XMFLO
 
 void Instance::UploadInstanceData()
 {
-	XMMATRIX view = gCamera->GetView();
+	XMMATRIX view = gSceneManager->GetCurrMainCamera()->GetView();
 	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
 
 	mVisibleCount = 0;
@@ -95,14 +104,14 @@ void Instance::UploadInstanceData()
 
 		// 将平截头从视坐标空间转换到世界坐标空间
 		BoundingFrustum worldSpaceFrustum;
-		gCamera->mCamFrustum.Transform(worldSpaceFrustum, invView);
+		gSceneManager->GetCurrMainCamera()->mCamFrustum.Transform(worldSpaceFrustum, invView);
 
 		// 将包围盒从局部坐标空间转换到世界坐标空间
 		BoundingBox boundingBoxW;
 		mBounds.Transform(boundingBoxW, world);
 
 		// 平截头剔除
-		if ((worldSpaceFrustum.Contains(boundingBoxW) != DirectX::DISJOINT) || (gCamera->mFrustumCullingEnabled == false)) {
+		if ((worldSpaceFrustum.Contains(boundingBoxW) != DirectX::DISJOINT) || (gSceneManager->GetCurrMainCamera()->mFrustumCullingEnabled == false)) {
 
 			XMMATRIX world = XMLoadFloat4x4(&p.second.World);
 			XMMATRIX inverseTransposeWorld = XMLoadFloat4x4(&p.second.InverseTransposeWorld);
@@ -200,7 +209,7 @@ bool Instance::Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW, std::string& name, 
 				XMVECTOR pointW = XMVector3TransformCoord(pointL, W);
 
 				// 由于scale矩阵的存在，tminL不是实际的距离，因此需要使用两点间距离公式来计算实际距离
-				float tminW = XMVectorGetX(XMVector3Length(gCamera->GetPosition() - pointW));
+				float tminW = XMVectorGetX(XMVector3Length(gSceneManager->GetCurrMainCamera()->GetPosition() - pointW));
 
 				if (tminW < tmin) {
 					result = true;

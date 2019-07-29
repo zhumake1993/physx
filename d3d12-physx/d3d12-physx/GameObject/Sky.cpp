@@ -19,7 +19,7 @@ Sky::~Sky()
 {
 }
 
-void Sky::Update()
+void Sky::Update(const GameTimer& gt)
 {
-	GameObject::Update();
+	GameObject::Update(gt);
 }

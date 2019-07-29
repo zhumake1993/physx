@@ -5,27 +5,13 @@ using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
-#include "Common/Camera.h"
-extern std::unique_ptr<Camera> gCamera;
-
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
-
-extern DXGI_FORMAT gBackBufferFormat;
-extern DXGI_FORMAT gDepthStencilFormat;
+extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 
-extern bool g4xMsaaState;
-extern UINT g4xMsaaQuality;
-
-extern D3D12_VIEWPORT gScreenViewport;
-extern D3D12_RECT gScissorRect;
-
-extern UINT gRtvDescriptorSize;
-extern UINT gDsvDescriptorSize;
-extern UINT gCbvSrvUavDescriptorSize;
+#include "Manager/SceneManager.h"
+extern std::unique_ptr<SceneManager> gSceneManager;
 
 #include "Common/FrameResource.h"
 extern std::unique_ptr<FrameResource<PassConstants>> gPassCB;
@@ -91,8 +77,8 @@ void Ssao::DrawNormalsAndDepth()
 
 
 	//设置视口和剪裁矩形。每次重置指令列表后都要设置视口和剪裁矩形
-	gCommandList->RSSetViewports(1, &gScreenViewport);
-	gCommandList->RSSetScissorRects(1, &gScissorRect);
+	gCommandList->RSSetViewports(1, &gSetting.ScreenViewport);
+	gCommandList->RSSetScissorRects(1, &gSetting.ScissorRect);
 
 	// 清空屏幕法向量贴图和深度缓冲
 	float clearValue[] = { 0.0f, 0.0f, 1.0f, 0.0f };
@@ -140,7 +126,7 @@ void Ssao::UpdateSsaoConstantData(PassConstants& mainPassCB)
 {
 	SsaoConstants ssaoCB;
 
-	XMMATRIX P = gCamera->GetProj();
+	XMMATRIX P = gSceneManager->GetCurrMainCamera()->GetProj();
 
 	// 将NDC空间[-1,+1]^2转换至纹理空间[0,1]^2
 	XMMATRIX T(
@@ -345,14 +331,14 @@ void Ssao::BuildResource()
 	depthStencilDesc.Height = mHeight;
 	depthStencilDesc.DepthOrArraySize = 1;
 	depthStencilDesc.MipLevels = 1;
-	depthStencilDesc.Format = gDepthStencilFormat;
+	depthStencilDesc.Format = gSetting.DepthStencilFormat;
 	depthStencilDesc.SampleDesc.Count = 1;
 	depthStencilDesc.SampleDesc.Quality = 0;
 	depthStencilDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 	depthStencilDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
 	D3D12_CLEAR_VALUE optClear2;
-	optClear2.Format = gDepthStencilFormat;
+	optClear2.Format = gSetting.DepthStencilFormat;
 	optClear2.DepthStencil.Depth = 1.0f;
 	optClear2.DepthStencil.Stencil = 0;
 	ThrowIfFailed(gD3D12Device->CreateCommittedResource(
@@ -455,16 +441,16 @@ void Ssao::BuildDescriptor()
 
 	// 保留描述符的引用
 	mhNormalMapCpuSrv = hCpuDescriptor;
-	mhDepthMapCpuSrv = hCpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mhRandomVectorMapCpuSrv = hCpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mhAmbientMap0CpuSrv = hCpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mhAmbientMap1CpuSrv = hCpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
+	mhDepthMapCpuSrv = hCpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mhRandomVectorMapCpuSrv = hCpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mhAmbientMap0CpuSrv = hCpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mhAmbientMap1CpuSrv = hCpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
 
 	mhNormalMapGpuSrv = hGpuDescriptor;
-	mhDepthMapGpuSrv = hGpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mhRandomVectorMapGpuSrv = hGpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mhAmbientMap0GpuSrv = hGpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
-	mhAmbientMap1GpuSrv = hGpuDescriptor.Offset(1, gCbvSrvUavDescriptorSize);
+	mhDepthMapGpuSrv = hGpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mhRandomVectorMapGpuSrv = hGpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mhAmbientMap0GpuSrv = hGpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
+	mhAmbientMap1GpuSrv = hGpuDescriptor.Offset(1, gSetting.CbvSrvUavDescriptorSize);
 
 	// 创建描述符
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -499,8 +485,8 @@ void Ssao::BuildDescriptor()
 
 	// 保留描述符的引用
 	mhNormalMapCpuRtv = hCpuRtvDescriptor;
-	mhAmbientMap0CpuRtv = hCpuRtvDescriptor.Offset(1, gRtvDescriptorSize);
-	mhAmbientMap1CpuRtv = hCpuRtvDescriptor.Offset(1, gRtvDescriptorSize);
+	mhAmbientMap0CpuRtv = hCpuRtvDescriptor.Offset(1, gSetting.RtvDescriptorSize);
+	mhAmbientMap1CpuRtv = hCpuRtvDescriptor.Offset(1, gSetting.RtvDescriptorSize);
 
 	// 创建描述符
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
@@ -524,7 +510,7 @@ void Ssao::BuildDescriptor()
 	ThrowIfFailed(gD3D12Device->CreateDescriptorHeap(
 		&dsvHeapDesc, IID_PPV_ARGS(mDsvHeap.GetAddressOf())));
 
-	mhDepthMapCpuDsv = CD3DX12_CPU_DESCRIPTOR_HANDLE(mDsvHeap->GetCPUDescriptorHandleForHeapStart(), 0, gDsvDescriptorSize);
+	mhDepthMapCpuDsv = CD3DX12_CPU_DESCRIPTOR_HANDLE(mDsvHeap->GetCPUDescriptorHandleForHeapStart(), 0, gSetting.DsvDescriptorSize);
 
 	// 创建深度模板视图
 	gD3D12Device->CreateDepthStencilView(mDepthMap.Get(), nullptr, mhDepthMapCpuDsv);
@@ -564,10 +550,10 @@ void Ssao::BuildPSO()
 	basePsoDesc.SampleMask = UINT_MAX;
 	basePsoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	basePsoDesc.NumRenderTargets = 1;
-	basePsoDesc.RTVFormats[0] = gBackBufferFormat;
-	basePsoDesc.SampleDesc.Count = g4xMsaaState ? 4 : 1;
-	basePsoDesc.SampleDesc.Quality = g4xMsaaState ? (g4xMsaaQuality - 1) : 0;
-	basePsoDesc.DSVFormat = gDepthStencilFormat;
+	basePsoDesc.RTVFormats[0] = gSetting.BackBufferFormat;
+	basePsoDesc.SampleDesc.Count = gSetting.X4MsaaState ? 4 : 1;
+	basePsoDesc.SampleDesc.Quality = gSetting.X4MsaaState ? (gSetting.X4MsaaQuality - 1) : 0;
+	basePsoDesc.DSVFormat = gSetting.DepthStencilFormat;
 
 	// 绘制法向量
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC drawNormalsPsoDesc = basePsoDesc;
@@ -584,7 +570,7 @@ void Ssao::BuildPSO()
 	drawNormalsPsoDesc.RTVFormats[0] = mNormalMapFormat;
 	drawNormalsPsoDesc.SampleDesc.Count = 1;
 	drawNormalsPsoDesc.SampleDesc.Quality = 0;
-	drawNormalsPsoDesc.DSVFormat = gDepthStencilFormat;
+	drawNormalsPsoDesc.DSVFormat = gSetting.DepthStencilFormat;
 	ThrowIfFailed(gD3D12Device->CreateGraphicsPipelineState(&drawNormalsPsoDesc, IID_PPV_ARGS(&gPSOs["DrawNormals"])));
 
 	// SSAO.

@@ -16,7 +16,9 @@ public:
 	bool ChangingScene();
 	void ChangeScene();
 
-	void Update();
+	void Update(const GameTimer& gt);
+
+	std::shared_ptr<Scene> GetCurrScene();
 
 	std::shared_ptr<GameObjectManager> GetCurrGameObjectManager();
 	std::shared_ptr<InstanceManager> GetCurrInstanceManager();
@@ -25,13 +27,11 @@ public:
 	std::shared_ptr<MeshManager> GetCurrMeshManager();
 	std::shared_ptr<InputManager> GetCurrInputManager();
 
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
+	std::shared_ptr<Camera> GetCurrMainCamera();
 
 private:
 	
 	std::unordered_map < std::string, std::function<void()> > mSceneCreateLambda;
-	std::shared_ptr<Scene> mCurrScene;				// µ±Ç°³¡¾°
+	std::shared_ptr<Scene> mCurrScene;
 	std::string mNextScene;
 };

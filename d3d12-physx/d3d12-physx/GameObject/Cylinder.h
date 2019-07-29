@@ -10,7 +10,7 @@ public:
 	~Cylinder();
 
 private:
-	virtual void Update()override;
+	virtual void Update(const GameTimer& gt)override;
 
 public:
 

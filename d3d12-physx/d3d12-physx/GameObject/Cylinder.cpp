@@ -19,7 +19,7 @@ Cylinder::~Cylinder()
 {
 }
 
-void Cylinder::Update()
+void Cylinder::Update(const GameTimer& gt)
 {
-	GameObject::Update();
+	GameObject::Update(gt);
 }

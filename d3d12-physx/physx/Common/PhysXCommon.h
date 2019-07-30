@@ -9,12 +9,16 @@
 //===========================================================
 
 struct PxFloat3 {
+	PxFloat3() :x(0.0f), y(0.0f), z(0.0f) {}
+	PxFloat3(float _x, float _y, float _z) :x(_x), y(_y), z(_z) {}
 	float x;
 	float y;
 	float z;
 };
 
 struct PxFloat4 {
+	PxFloat4() :x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
+	PxFloat4(float _x, float _y, float _z, float _w) :x(_x), y(_y), z(_z), w(_w) {}
 	float x;
 	float y;
 	float z;

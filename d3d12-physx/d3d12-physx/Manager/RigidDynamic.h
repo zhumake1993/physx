@@ -16,6 +16,9 @@ public:
 
 	void Release();
 
+	void SetAngularDamping(float ad);
+	void SetLinearVelocity(DirectX::XMFLOAT3 v);
+
 private:
 	//
 

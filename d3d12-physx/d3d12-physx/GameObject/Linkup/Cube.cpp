@@ -25,22 +25,24 @@ Cube::Cube(const std::string& name, const Transform& transform)
 	mMeshRender->mReceiveShadow = true;
 	mMeshRender->AddMeshRender();
 
-	//// ∏’ÃÂ
-	//Transform rigidDynamicLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-	//mRigidDynamic = std::make_unique<RigidDynamic>(name, transform, rigidDynamicLocal);
-	//mRigidDynamic->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
-	//mRigidDynamic->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
-	//mRigidDynamic->mPxGeometry = PxBoxEnum;
-	//mRigidDynamic->mDensity = 10.0f;
-	//mRigidDynamic->AddRigidDynamic();
+	// ∏’ÃÂ
+	Transform rigidDynamicLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	mRigidDynamic = std::make_unique<RigidDynamic>(name, transform, rigidDynamicLocal);
+	mRigidDynamic->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
+	mRigidDynamic->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
+	mRigidDynamic->mPxGeometry = PxBoxEnum;
+	mRigidDynamic->mDensity = 10.0f;
+	mRigidDynamic->AddRigidDynamic();
 
 	// ∏’ÃÂ
-	Transform rigidStaticLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-	mRigidStatic = std::make_unique<RigidStatic>(name, transform, rigidStaticLocal);
-	mRigidStatic->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
-	mRigidStatic->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
-	mRigidStatic->mPxGeometry = PxBoxEnum;
-	mRigidStatic->AddRigidStatic();
+	//Transform rigidStaticLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
+	//mRigidStatic = std::make_unique<RigidStatic>(name, transform, rigidStaticLocal);
+	//mRigidStatic->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
+	//mRigidStatic->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
+	//mRigidStatic->mPxGeometry = PxBoxEnum;
+	//mRigidStatic->AddRigidStatic();
+
+
 }
 
 Cube::~Cube()
@@ -95,6 +97,11 @@ void Cube::Update(const GameTimer& gt)
 	if (GetKeyDown('F')) {
 		DeleteGameObject(mName);
 		return;
+	}
+
+	if (GetKeyDown('C')) {
+		mRigidDynamic->SetAngularDamping(0.5f);
+		mRigidDynamic->SetLinearVelocity(XMFLOAT3(0.0f, 10.5f, 0.0f));
 	}
 
 	if (mBlink) {

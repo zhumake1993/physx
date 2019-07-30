@@ -19,14 +19,17 @@ void Logic::Update(const GameTimer& gt)
 
 	if (GetKeyDown('X')) {
 
+		std::vector<DirectX::XMFLOAT3> mLinePoints;
+
 		// ≤‚ ‘œﬂ∂Œƒ£ƒ‚
 		mLinePoints.push_back(XMFLOAT3(0.0f, 1.0f, 0.0f));
 		mLinePoints.push_back(XMFLOAT3(0.0f, 5.0f, 5.0f));
 		mLinePoints.push_back(XMFLOAT3(5.0f, 5.0f, -1.0f));
+		mLinePoints.push_back(XMFLOAT3(-5.0f, 9.0f, 0.0f));
 		float radius = 0.1f;
 
 		// ªÊπ’µ„
-		for (int i = 0; i < mLinePoints.size(); i++) {
+		for (int i = 1; i < mLinePoints.size() - 1; i++) {
 			Transform a;
 			a.Translation = mLinePoints[i];
 			a.Scale = XMFLOAT3(radius, radius, radius);

@@ -138,3 +138,13 @@ void RigidDynamic::Release()
 	gPhysX.DeletePxRigid(mName);
 	mMeshRender->Release();
 }
+
+void RigidDynamic::SetAngularDamping(float ad)
+{
+	gPhysX.SetAngularDamping(mName, ad);
+}
+
+void RigidDynamic::SetLinearVelocity(DirectX::XMFLOAT3 v)
+{
+	gPhysX.SetLinearVelocity(mName, PxFloat3(v.x, v.y, v.z));
+}

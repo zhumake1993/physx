@@ -17,6 +17,14 @@ GameObject::~GameObject()
 
 void GameObject::Update(const GameTimer& gt)
 {
+	if (mGameTimer) {
+		mGameTimer->Tick();
+		if (mGameTimer->TotalTime() >= mLifeTime) {
+			DeleteGameObject(mName);
+			return;
+		}
+	}
+
 	if (mRigidDynamic) {
 		mRigidDynamic->Update();
 		mTransform.Translation = mRigidDynamic->mParentTransform.Translation;
@@ -101,4 +109,11 @@ void GameObject::AddMaterial(const std::string& name, std::shared_ptr<MaterialDa
 void GameObject::SwitchScene(std::string name)
 {
 	gSceneManager->SwitchScene(name);
+}
+
+void GameObject::Destroy(float time)
+{
+	mGameTimer = std::make_unique<GameTimer>();
+	mGameTimer->Reset();
+	mLifeTime = time;
 }

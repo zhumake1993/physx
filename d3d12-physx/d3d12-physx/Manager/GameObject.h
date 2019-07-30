@@ -23,17 +23,27 @@ public:
 	void Release();
 
 protected:
+
+	// 键盘输入
 	bool GetKeyDown(int key);
 	bool GetKeyPress(int key);
 	bool GetKeyUp(int key);
 
+	// 游戏物体
 	bool HasGameObject(std::string name);
 	std::shared_ptr<GameObject> GetGameObject(std::string name);
 	void AddGameObject(std::shared_ptr<GameObject> gameObject);
 	void DeleteGameObject(std::string name);
+
+	// 材质
 	std::shared_ptr<MaterialData> GetMaterial();
 	void AddMaterial(const std::string& name, std::shared_ptr<MaterialData> materialData);
+
+	// 场景
 	void SwitchScene(std::string name);
+
+	// 定时删除
+	void Destroy(float time);
 
 public:
 	std::string mName;
@@ -42,6 +52,9 @@ public:
 	std::unique_ptr<MeshRender> mMeshRender = nullptr;
 	std::unique_ptr<RigidDynamic> mRigidDynamic = nullptr;
 	std::unique_ptr<RigidStatic> mRigidStatic = nullptr;
+
+	std::unique_ptr<GameTimer> mGameTimer = nullptr;
+	float mLifeTime = 0.0f;
 
 private:
 

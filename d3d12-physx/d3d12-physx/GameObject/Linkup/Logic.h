@@ -16,5 +16,5 @@ public:
 	std::string mLastPickCube = "";
 
 private:
-	std::vector<DirectX::XMFLOAT3> mLinePoints;
+	//
 };

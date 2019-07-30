@@ -167,6 +167,17 @@ void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
 	gPxRigidDynamicMap[name] = actor;
 }
 
+void PhysX::SetAngularDamping(std::string name, float ad)
+{
+	gPxRigidDynamicMap[name]->setAngularDamping(ad);
+}
+
+void PhysX::SetLinearVelocity(std::string name, PxFloat3 v)
+{
+	PxVec3 velocity = PxVec3(v.x, v.y, v.z);
+	gPxRigidDynamicMap[name]->setLinearVelocity(velocity);
+}
+
 void PhysX::DeletePxRigid(std::string name)
 {
 	if (HasPxRigidDynamic(name)) {

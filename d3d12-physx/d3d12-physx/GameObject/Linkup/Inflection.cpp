@@ -13,6 +13,8 @@ Inflection::Inflection(const std::string& name, const Transform& transform)
 	mMeshRender->mRenderLayer = (int)RenderLayer::Opaque;
 	mMeshRender->mReceiveShadow = false;
 	mMeshRender->AddMeshRender();
+
+	Destroy(1.0f);
 }
 
 Inflection::~Inflection()

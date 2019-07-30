@@ -16,9 +16,15 @@ public:
 	void CreateScene();
 	void CleanupScene();
 
-	// 刚体
+	// 静态刚体
 	void CreatePxRigidStatic(std::string name, void* pdesc);
+
+	// 动态刚体
 	void CreatePxRigidDynamic(std::string name, void* pdesc);
+	void SetAngularDamping(std::string name, float ad);
+	void SetLinearVelocity(std::string name, PxFloat3 v);
+
+	// 刚体通用方法
 	void DeletePxRigid(std::string name);
 
 	void Update(float delta);

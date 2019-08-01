@@ -17,10 +17,10 @@ public:
 	void CleanupScene();
 
 	// æ≤Ã¨∏’ÃÂ
-	void CreatePxRigidStatic(std::string name, void* pdesc);
+	std::string CreatePxRigidStatic(void* pdesc);
 
 	// ∂ØÃ¨∏’ÃÂ
-	void CreatePxRigidDynamic(std::string name, void* pdesc);
+	std::string CreatePxRigidDynamic(void* pdesc);
 	void SetAngularDamping(std::string name, float ad);
 	void SetLinearVelocity(std::string name, PxFloat3 v);
 

@@ -5,7 +5,7 @@
 class MeshRender
 {
 public:
-	MeshRender(const std::string& name, const Transform& transform);
+	MeshRender(const Transform& transform);
 	virtual ~MeshRender();
 
 	DirectX::XMFLOAT4X4 GetWorld();
@@ -15,6 +15,9 @@ public:
 	void Update();
 
 	void Release();
+
+	void SetParent(std::string name);
+	std::string GetParent();
 
 private:
 	//
@@ -29,4 +32,8 @@ public:
 	std::string mMeshName = "";
 	int mRenderLayer = -1;
 	bool mReceiveShadow = true;
+
+private:
+
+	std::string mParent = "";
 };

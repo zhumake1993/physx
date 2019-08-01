@@ -2,8 +2,8 @@
 
 using namespace DirectX;
 
-Cube::Cube(const std::string& name, const Transform& transform)
-	:GameObject(name, transform)
+Cube::Cube(const Transform& transform)
+	:GameObject(transform)
 {
 	// 个人材质
 	auto red = std::make_shared<MaterialData>();
@@ -14,11 +14,11 @@ Cube::Cube(const std::string& name, const Transform& transform)
 	red->Roughness = 0.1f;
 	red->LerpDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	red->LerpPara = 0.0f;
-	AddMaterial(name, red);
+	auto matName = AddMaterial(red);
 
 	// MeshRender
-	mMeshRender = std::make_unique<MeshRender>(name, transform);
-	mMeshRender->mMatName = name;
+	mMeshRender = std::make_unique<MeshRender>(transform);
+	mMeshRender->mMatName = matName;
 	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
 	mMeshRender->mMeshName = "box";
 	mMeshRender->mRenderLayer = (int)RenderLayer::Opaque;
@@ -27,7 +27,7 @@ Cube::Cube(const std::string& name, const Transform& transform)
 
 	//// 刚体
 	//Transform rigidDynamicLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-	//mRigidDynamic = std::make_unique<RigidDynamic>(name, transform, rigidDynamicLocal);
+	//mRigidDynamic = std::make_unique<RigidDynamic>(transform, rigidDynamicLocal);
 	//mRigidDynamic->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
 	//mRigidDynamic->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
 	//mRigidDynamic->mPxGeometry = PxBoxEnum;
@@ -36,7 +36,7 @@ Cube::Cube(const std::string& name, const Transform& transform)
 
 	// 刚体
 	Transform rigidStaticLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-	mRigidStatic = std::make_unique<RigidStatic>(name, transform, rigidStaticLocal);
+	mRigidStatic = std::make_unique<RigidStatic>(transform, rigidStaticLocal);
 	mRigidStatic->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
 	mRigidStatic->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
 	mRigidStatic->mPxGeometry = PxBoxEnum;

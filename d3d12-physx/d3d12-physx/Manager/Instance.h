@@ -27,15 +27,15 @@ public:
 
 	void CalculateBoundingBox();
 
-	bool HasInstanceData(const std::string& gameObjectName);
+	bool HasInstanceData(const std::string& name);
 
-	void AddInstanceData(const std::string& gameObjectName, const DirectX::XMFLOAT4X4& world,
+	std::string AddInstanceData(const DirectX::XMFLOAT4X4& world,
 		const UINT& matIndex, const DirectX::XMFLOAT4X4& texTransform,
 		const bool receiveShadow);
 
-	void DeleteInstanceData(const std::string& gameObjectName);
+	void DeleteInstanceData(const std::string& name);
 
-	void UpdateInstanceData(const std::string& gameObjectName, const DirectX::XMFLOAT4X4& world,
+	void UpdateInstanceData(const std::string& name, const DirectX::XMFLOAT4X4& world,
 		const UINT& matIndex, const DirectX::XMFLOAT4X4& texTransform,
 		const bool receiveShadow);
 

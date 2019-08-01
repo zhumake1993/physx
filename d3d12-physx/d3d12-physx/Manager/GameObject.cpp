@@ -5,9 +5,9 @@ using namespace DirectX;
 #include "Manager/SceneManager.h"
 extern std::unique_ptr<SceneManager> gSceneManager;
 
-GameObject::GameObject(const std::string& name, const Transform& transform)
+GameObject::GameObject(const Transform& transform)
 {
-	mName = name;
+	mName = "";
 	mTransform = transform;
 }
 
@@ -87,6 +87,11 @@ void GameObject::AddGameObject(std::shared_ptr<GameObject> gameObject)
 	gSceneManager->GetCurrGameObjectManager()->AddGameObject(gameObject);
 }
 
+void GameObject::AddGameObject(std::string name, std::shared_ptr<GameObject> gameObject)
+{
+	gSceneManager->GetCurrGameObjectManager()->AddGameObject(name, gameObject);
+}
+
 void GameObject::DeleteGameObject(std::string name)
 {
 	gSceneManager->GetCurrGameObjectManager()->DeleteGameObject(name);
@@ -104,6 +109,11 @@ std::shared_ptr<MaterialData> GameObject::GetMaterial()
 void GameObject::AddMaterial(const std::string& name, std::shared_ptr<MaterialData> materialData)
 {
 	gSceneManager->GetCurrMaterialManager()->AddMaterial(name, materialData);
+}
+
+std::string GameObject::AddMaterial(std::shared_ptr<MaterialData> materialData)
+{
+	return gSceneManager->GetCurrMaterialManager()->AddMaterial(materialData);
 }
 
 int GameObject::GetTextureIndex(std::string name)

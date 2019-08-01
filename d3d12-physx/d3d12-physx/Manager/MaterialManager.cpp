@@ -71,6 +71,20 @@ void MaterialManager::AddMaterial(const std::string& name, std::shared_ptr<Mater
 	mNumFramesDirties[name] = gNumFrameResources;
 }
 
+std::string MaterialManager::AddMaterial(std::shared_ptr<MaterialData> materialData)
+{
+	int ran = rand();
+	auto hash = std::hash<int>()(ran);
+	while (mMaterials.find(std::to_string(hash)) != mMaterials.end()) {
+		ran = rand();
+		hash = std::hash<int>()(ran);
+	}
+
+	AddMaterial(std::to_string(hash), materialData);
+
+	return std::to_string(hash);
+}
+
 void MaterialManager::UpdateMaterialData()
 {
 	for (auto& p : mMaterials) {

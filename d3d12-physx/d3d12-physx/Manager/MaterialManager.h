@@ -33,6 +33,7 @@ public:
 	std::shared_ptr<MaterialData> GetMaterial(const std::string name);
 	UINT GetIndex(const std::string& name);
 	void AddMaterial(const std::string& name, std::shared_ptr<MaterialData> materialData);
+	std::string AddMaterial(std::shared_ptr<MaterialData> materialData);
 
 	void UpdateMaterialData();
 

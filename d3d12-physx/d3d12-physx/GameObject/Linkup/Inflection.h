@@ -6,7 +6,7 @@ class Inflection :
 	public GameObject
 {
 public:
-	Inflection(const std::string& name, const Transform& transform = Transform());
+	Inflection(const Transform& transform = Transform());
 	~Inflection();
 
 private:

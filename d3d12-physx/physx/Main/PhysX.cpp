@@ -69,10 +69,13 @@ void PhysX::CleanupScene()
 	PX_RELEASE(gScene);
 }
 
-void PhysX::CreatePxRigidStatic(std::string name, void* pdesc)
+std::string PhysX::CreatePxRigidStatic(void* pdesc)
 {
-	if (HasPxRigidStatic(name)) {
-		ThrowPxEx("RigidStatic already exists!");
+	int ran = rand();
+	auto hash = std::hash<int>()(ran);
+	while (HasPxRigidStatic(std::to_string(hash))) {
+		ran = rand();
+		hash = std::hash<int>()(ran);
 	}
 
 	auto desc = *static_cast<PxRigidStaticDesc*>(pdesc);
@@ -117,13 +120,18 @@ void PhysX::CreatePxRigidStatic(std::string name, void* pdesc)
 	// Ìí¼Óactor
 	gScene->addActor(*actor);
 
-	gPxRigidStaticMap[name] = actor;
+	gPxRigidStaticMap[std::to_string(hash)] = actor;
+
+	return std::to_string(hash);
 }
 
-void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
+std::string PhysX::CreatePxRigidDynamic(void* pdesc)
 {
-	if (HasPxRigidDynamic(name)) {
-		ThrowPxEx("RigidDynamic already exists!");
+	int ran = rand();
+	auto hash = std::hash<int>()(ran);
+	while (HasPxRigidDynamic(std::to_string(hash))) {
+		ran = rand();
+		hash = std::hash<int>()(ran);
 	}
 
 	auto desc = *static_cast<PxRigidDynamicDesc*>(pdesc);
@@ -164,7 +172,9 @@ void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
 	// Ìí¼Óactor
 	gScene->addActor(*actor);
 
-	gPxRigidDynamicMap[name] = actor;
+	gPxRigidDynamicMap[std::to_string(hash)] = actor;
+
+	return std::to_string(hash);
 }
 
 void PhysX::SetAngularDamping(std::string name, float ad)

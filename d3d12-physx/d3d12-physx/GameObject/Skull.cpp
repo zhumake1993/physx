@@ -2,11 +2,11 @@
 
 using namespace DirectX;
 
-Skull::Skull(const std::string& name, const Transform& transform)
-	:GameObject(name, transform)
+Skull::Skull(const Transform& transform)
+	:GameObject(transform)
 {
 	// MeshRender
-	mMeshRender = std::make_unique<MeshRender>(name, transform);
+	mMeshRender = std::make_unique<MeshRender>(transform);
 	mMeshRender->mMatName = "skullMat";
 	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
 	mMeshRender->mMeshName = "skull";

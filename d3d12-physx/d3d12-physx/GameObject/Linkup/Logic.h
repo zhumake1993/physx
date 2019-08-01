@@ -6,7 +6,7 @@ class Logic :
 	public GameObject
 {
 public:
-	Logic(const std::string& name, const Transform& transform = Transform());
+	Logic(const Transform& transform = Transform());
 	~Logic();
 
 	void PickCube(Int3 int3);

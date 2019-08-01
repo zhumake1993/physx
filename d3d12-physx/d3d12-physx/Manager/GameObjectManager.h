@@ -14,6 +14,7 @@ public:
 	bool HasGameObject(std::shared_ptr<GameObject> gameObject);
 	std::shared_ptr<GameObject> GetGameObject(std::string name);
 	void AddGameObject(std::shared_ptr<GameObject> gameObject);
+	void AddGameObject(std::string name, std::shared_ptr<GameObject> gameObject);
 	void DeleteGameObject(std::string name);
 	void DeleteGameObject(std::shared_ptr<GameObject> gameObject);
 

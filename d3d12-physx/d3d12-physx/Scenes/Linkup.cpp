@@ -130,14 +130,14 @@ void Linkup::BuildMeshes()
 
 void Linkup::BuildGameObjects()
 {
-	auto logic = std::make_shared<Logic>("Logic");
-	mGameObjectManager->AddGameObject(logic);
+	auto logic = std::make_shared<Logic>();
+	mGameObjectManager->AddGameObject("Logic", logic);
 
-	auto sky = std::make_shared<Sky>("Sky", Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)));
-	mGameObjectManager->AddGameObject(sky);
+	auto sky = std::make_shared<Sky>(Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)));
+	mGameObjectManager->AddGameObject("Sky", sky);
 
-	auto floor = std::make_shared<Floor>("Floor");
-	mGameObjectManager->AddGameObject(floor);
+	auto floor = std::make_shared<Floor>();
+	mGameObjectManager->AddGameObject("Floor", floor);
 }
 
 void Linkup::MoveCamera(const GameTimer& gt)

@@ -19,7 +19,6 @@ void InstanceManager::Initialize()
 
 void InstanceManager::AddInstance(MeshRender* meshRender)
 {
-	auto name = meshRender->mName;
 	auto world = meshRender->GetWorld();
 	auto matName = meshRender->mMatName;
 	auto texTransform = meshRender->mTexTransform;
@@ -34,7 +33,7 @@ void InstanceManager::AddInstance(MeshRender* meshRender)
 	auto& instanceMap = mInstanceLayers[randerLayer];
 
 	if (instanceMap.find(meshName) != instanceMap.end()) {
-		instanceMap[meshName]->AddInstanceData(name, world, gSceneManager->GetCurrMaterialManager()->GetIndex(matName), texTransform, receiveShadow);
+		meshRender->mName = instanceMap[meshName]->AddInstanceData(world, gSceneManager->GetCurrMaterialManager()->GetIndex(matName), texTransform, receiveShadow);
 	}
 	else {
 		auto instance = std::make_unique<Instance>();
@@ -42,10 +41,12 @@ void InstanceManager::AddInstance(MeshRender* meshRender)
 		instance->mMesh = gSceneManager->GetCurrMeshManager()->GetMesh(meshName);
 		instance->CalculateBoundingBox();
 
-		instance->AddInstanceData(name, world, gSceneManager->GetCurrMaterialManager()->GetIndex(matName), texTransform, receiveShadow);
+		meshRender->mName = instance->AddInstanceData(world, gSceneManager->GetCurrMaterialManager()->GetIndex(matName), texTransform, receiveShadow);
 
 		instanceMap[meshName] = std::move(instance);
 	}
+
+	mMeshRenders[meshRender->mName] = meshRender;
 }
 
 void InstanceManager::DeleteInstance(MeshRender* meshRender)
@@ -146,7 +147,7 @@ bool InstanceManager::Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW)
 		XMFLOAT3 hitPoint;
 		XMStoreFloat3(&hitPoint, pointResult);
 
-		gSceneManager->GetCurrGameObjectManager()->GetGameObject(nameResult)->GetPicked(tminResult, hitPoint);
+		gSceneManager->GetCurrGameObjectManager()->GetGameObject(mMeshRenders[nameResult]->GetParent())->GetPicked(tminResult, hitPoint);
 	}
 
 	return result;

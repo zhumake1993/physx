@@ -7,7 +7,7 @@ class RigidDynamic
 {
 public:
 
-	RigidDynamic(const std::string& name, const Transform& parent, const Transform& local);
+	RigidDynamic(const Transform& parent, const Transform& local);
 	virtual ~RigidDynamic();
 
 	void AddRigidDynamic();

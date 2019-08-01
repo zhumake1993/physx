@@ -10,9 +10,8 @@ extern PhysX gPhysX;
 
 extern XMMATRIX TransformToMatrix(Transform& transform);
 
-RigidDynamic::RigidDynamic(const std::string& name, const Transform& parent, const Transform& local)
+RigidDynamic::RigidDynamic(const Transform& parent, const Transform& local)
 {
-	mName = name;
 	mParentTransform = parent;
 	mLocalTransform = local;
 
@@ -70,7 +69,7 @@ void RigidDynamic::AddRigidDynamic()
 
 	desc.density = mDensity;
 
-	gPhysX.CreatePxRigidDynamic(mName, &desc);
+	mName = gPhysX.CreatePxRigidDynamic(&desc);
 
 	// ÃÌº”∏’ÃÂMeshRender
 
@@ -93,7 +92,7 @@ void RigidDynamic::AddRigidDynamic()
 		}
 	}
 
-	mMeshRender = std::make_unique<MeshRender>(mName + "RigidDynamic", Transform(worldPos, worldQuat));
+	mMeshRender = std::make_unique<MeshRender>(Transform(worldPos, worldQuat));
 	mMeshRender->mMatName = "null";
 	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
 	mMeshRender->mMeshName = mName + "RigidDynamicMesh";

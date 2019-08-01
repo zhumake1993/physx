@@ -12,7 +12,7 @@ class GameObject
 {
 	friend class GameObjectManager;
 public:
-	GameObject(const std::string& name, const Transform& transform);
+	GameObject(const Transform& transform);
 	virtual ~GameObject();
 
 	virtual void Update(const GameTimer& gt);
@@ -33,11 +33,13 @@ protected:
 	bool HasGameObject(std::string name);
 	std::shared_ptr<GameObject> GetGameObject(std::string name);
 	void AddGameObject(std::shared_ptr<GameObject> gameObject);
+	void AddGameObject(std::string name, std::shared_ptr<GameObject> gameObject);
 	void DeleteGameObject(std::string name);
 
 	// ≤ƒ÷ 
 	std::shared_ptr<MaterialData> GetMaterial();
 	void AddMaterial(const std::string& name, std::shared_ptr<MaterialData> materialData);
+	std::string AddMaterial(std::shared_ptr<MaterialData> materialData);
 
 	// Œ∆¿Ì
 	int GetTextureIndex(std::string name);

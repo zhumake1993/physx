@@ -30,8 +30,8 @@ XMFLOAT3 Int3ToXMFLOAT3(const Int3& int3) {
 	return XMFLOAT3(static_cast<float>(int3.x), static_cast<float>(int3.y), static_cast<float>(int3.z));
 }
 
-Logic::Logic(const std::string& name, const Transform& transform)
-	:GameObject(name, transform)
+Logic::Logic(const Transform& transform)
+	:GameObject(transform)
 {
 	// 至少有一个必须是偶数
 	mMapX = 4;
@@ -131,9 +131,9 @@ void Logic::CreateCubes()
 				std::string n = "Cube_" + std::to_string(x) + "_" + std::to_string(y) + "_" + std::to_string(z);
 				Transform t = Transform(XMFLOAT3(static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)),
 					XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.95f, 0.95f, 0.95f));
-				auto cube = std::make_shared<Cube>(n, t);
+				auto cube = std::make_shared<Cube>(t);
 				cube->mMapIndex = Int3(x, y, z);
-				AddGameObject(cube);
+				AddGameObject(n, cube);
 
 				mCubeMapping[Int3(x, y, z)] = cube;
 			}
@@ -162,7 +162,7 @@ void Logic::CreateSegments(const Int3& end)
 		a.Translation = linePoints[i];
 		a.Scale = XMFLOAT3(radius, radius, radius);
 
-		auto inflection = std::make_shared<Inflection>("Inflection" + std::to_string(i), a);
+		auto inflection = std::make_shared<Inflection>(a);
 		AddGameObject(inflection);
 	}
 
@@ -178,7 +178,7 @@ void Logic::CreateSegments(const Int3& end)
 		XMStoreFloat4(&a.Quaternion, XMQuaternionMultiply(q1, q2));
 		a.Scale = XMFLOAT3(radius, XMVectorGetX(XMVector3Length(end - start)), radius);
 
-		auto s1 = std::make_shared<Segment>("Segment" + std::to_string(i), a);
+		auto s1 = std::make_shared<Segment>(a);
 		AddGameObject(s1);
 	}
 }

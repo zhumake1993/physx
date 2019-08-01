@@ -10,9 +10,8 @@ extern PhysX gPhysX;
 
 extern XMMATRIX TransformToMatrix(Transform& transform);
 
-RigidStatic::RigidStatic(const std::string& name, const Transform& parent, const Transform& local)
+RigidStatic::RigidStatic(const Transform& parent, const Transform& local)
 {
-	mName = name;
 	mParentTransform = parent;
 	mLocalTransform = local;
 }
@@ -57,7 +56,7 @@ void RigidStatic::AddRigidStatic()
 	desc.scale.z = mScale.z;
 	desc.scale.w = mScale.w;
 
-	gPhysX.CreatePxRigidStatic(mName, &desc);
+	mName = gPhysX.CreatePxRigidStatic(&desc);
 
 	// ÃÌº”∏’ÃÂMeshRender
 
@@ -84,7 +83,7 @@ void RigidStatic::AddRigidStatic()
 		}
 	}
 
-	mMeshRender = std::make_unique<MeshRender>(mName + "RigidStatic", Transform(worldPos, worldQuat));
+	mMeshRender = std::make_unique<MeshRender>(Transform(worldPos, worldQuat));
 	mMeshRender->mMatName = "null";
 	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
 	mMeshRender->mMeshName = mName + "RigidStaticMesh";

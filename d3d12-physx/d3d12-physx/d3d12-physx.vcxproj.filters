@@ -180,9 +180,6 @@
     <ClCompile Include="Manager\RigidDynamic.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject\Linkup\CubeGreen.cpp">
-      <Filter>GameObject\Linkup</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject\Linkup\Logic.cpp">
       <Filter>GameObject\Linkup</Filter>
     </ClCompile>
@@ -343,9 +340,6 @@
     </ClInclude>
     <ClInclude Include="Manager\RigidDynamic.h">
       <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Linkup\CubeGreen.h">
-      <Filter>GameObject\Linkup</Filter>
     </ClInclude>
     <ClInclude Include="GameObject\Linkup\Logic.h">
       <Filter>GameObject\Linkup</Filter>

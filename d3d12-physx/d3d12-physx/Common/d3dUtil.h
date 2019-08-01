@@ -60,6 +60,30 @@ struct Transform
 	DirectX::XMFLOAT3 Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 };
 
+struct Int3
+{
+	Int3() :x(0), y(0), z(0) {}
+	Int3(int _x, int _y, int _z) :x(_x), y(_y), z(_z) {}
+	int x;
+	int y;
+	int z;
+};
+
+struct Int3_Hash
+{
+	size_t operator()(const Int3& int3) const
+	{
+		return std::hash<int>()(int3.x) ^ std::hash<int>()(int3.y) ^ std::hash<int>()(int3.z);
+	}
+};
+
+struct Int3_Cmp
+{
+	bool operator()(const Int3& lhs, const Int3& rhs) const {
+		return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
+	}
+};
+
 struct Vertex
 {
 	DirectX::XMFLOAT3 Pos;

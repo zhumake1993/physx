@@ -158,7 +158,6 @@
     <ClCompile Include="GameObject\Globe.cpp" />
     <ClCompile Include="GameObject\Grid.cpp" />
     <ClCompile Include="GameObject\Linkup\Cube.cpp" />
-    <ClCompile Include="GameObject\Linkup\CubeGreen.cpp" />
     <ClCompile Include="GameObject\Linkup\Floor.cpp" />
     <ClCompile Include="GameObject\Linkup\Inflection.cpp" />
     <ClCompile Include="GameObject\Linkup\Logic.cpp" />
@@ -215,7 +214,6 @@
     <ClInclude Include="GameObject\Globe.h" />
     <ClInclude Include="GameObject\Grid.h" />
     <ClInclude Include="GameObject\Linkup\Cube.h" />
-    <ClInclude Include="GameObject\Linkup\CubeGreen.h" />
     <ClInclude Include="GameObject\Linkup\Floor.h" />
     <ClInclude Include="GameObject\Linkup\Inflection.h" />
     <ClInclude Include="GameObject\Linkup\LinkupGameObjects.h" />

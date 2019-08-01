@@ -106,6 +106,11 @@ void GameObject::AddMaterial(const std::string& name, std::shared_ptr<MaterialDa
 	gSceneManager->GetCurrMaterialManager()->AddMaterial(name, materialData);
 }
 
+int GameObject::GetTextureIndex(std::string name)
+{
+	return gSceneManager->GetCurrTextureManager()->GetIndex(name);
+}
+
 void GameObject::SwitchScene(std::string name)
 {
 	gSceneManager->SwitchScene(name);

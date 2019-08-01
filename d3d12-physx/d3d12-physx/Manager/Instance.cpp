@@ -67,6 +67,8 @@ void Instance::DeleteInstanceData(const std::string& gameObjectName)
 	}
 
 	mInstances.erase(gameObjectName);
+
+	--mInstanceCount;
 }
 
 void Instance::UpdateInstanceData(const std::string& gameObjectName, const XMFLOAT4X4& world, const UINT& matIndex, const XMFLOAT4X4& texTransform,

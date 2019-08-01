@@ -39,6 +39,9 @@ protected:
 	std::shared_ptr<MaterialData> GetMaterial();
 	void AddMaterial(const std::string& name, std::shared_ptr<MaterialData> materialData);
 
+	// Œ∆¿Ì
+	int GetTextureIndex(std::string name);
+
 	// ≥°æ∞
 	void SwitchScene(std::string name);
 

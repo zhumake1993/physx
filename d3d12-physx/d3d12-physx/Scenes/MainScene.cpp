@@ -195,41 +195,43 @@ void MainScene::BuildMeshes()
 	mMeshManager->AddMesh("sphere", geoGen.CreateSphere(0.5f, 20, 20));
 	mMeshManager->AddMesh("cylinder", geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20));
 	mMeshManager->AddMesh("box2", geoGen.CreateBox(8.0f, 8.0f, 8.0f, 3));
+
+	mMeshManager->AddMesh("UnitBox", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 0));
 }
 
 void MainScene::BuildGameObjects()
 {
-	auto sky = std::make_shared<Sky>("Sky", Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)));
-	mGameObjectManager->AddGameObject(sky);
+	auto sky = std::make_shared<Sky>(Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)));
+	mGameObjectManager->AddGameObject("Sky", sky);
 
-	auto box = std::make_shared<Box>("Box", Transform(XMFLOAT3(0.0f, 0.5f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(2.0f, 1.0f, 2.0f)));
-	mGameObjectManager->AddGameObject(box);
+	auto box = std::make_shared<Box>(Transform(XMFLOAT3(0.0f, 0.5f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(2.0f, 1.0f, 2.0f)));
+	mGameObjectManager->AddGameObject("Box", box);
 
-	auto globe = std::make_shared<Globe>("Globe", Transform(XMFLOAT3(0.0f, 2.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(2.0f, 2.0f, 2.0f)));
-	mGameObjectManager->AddGameObject(globe);
+	auto globe = std::make_shared<Globe>(Transform(XMFLOAT3(0.0f, 2.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(2.0f, 2.0f, 2.0f)));
+	mGameObjectManager->AddGameObject("Globe", globe);
 
-	auto grid = std::make_shared<Grid>("Grid");
-	mGameObjectManager->AddGameObject(grid);
+	auto grid = std::make_shared<Grid>();
+	mGameObjectManager->AddGameObject("Grid", grid);
 
 	for (int i = 0; i < 5; ++i) {
-		auto leftCyl = std::make_shared<Cylinder>("LeftCyl" + std::to_string(i), Transform(XMFLOAT3(-5.0f, 1.5f, -10.0f + i * 5.0f)));
+		auto leftCyl = std::make_shared<Cylinder>(Transform(XMFLOAT3(-5.0f, 1.5f, -10.0f + i * 5.0f)));
 		mGameObjectManager->AddGameObject(leftCyl);
 
-		auto rightCyl = std::make_shared<Cylinder>("RightCyl" + std::to_string(i), Transform(XMFLOAT3(+5.0f, 1.5f, -10.0f + i * 5.0f)));
+		auto rightCyl = std::make_shared<Cylinder>(Transform(XMFLOAT3(+5.0f, 1.5f, -10.0f + i * 5.0f)));
 		mGameObjectManager->AddGameObject(rightCyl);
 
-		auto leftSphere = std::make_shared<Sphere>("LeftSphere" + std::to_string(i), Transform(XMFLOAT3(-5.0f, 3.5f, -10.0f + i * 5.0f)));
+		auto leftSphere = std::make_shared<Sphere>(Transform(XMFLOAT3(-5.0f, 3.5f, -10.0f + i * 5.0f)));
 		mGameObjectManager->AddGameObject(leftSphere);
 
-		auto rightSphere = std::make_shared<Sphere>("RightSphere" + std::to_string(i), Transform(XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f)));
+		auto rightSphere = std::make_shared<Sphere>(Transform(XMFLOAT3(+5.0f, 3.5f, -10.0f + i * 5.0f)));
 		mGameObjectManager->AddGameObject(rightSphere);
 	}
 
-	auto skull = std::make_shared<Skull>("Skull", Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.2f, 0.2f, 0.2f)));
-	mGameObjectManager->AddGameObject(skull);
+	auto skull = std::make_shared<Skull>(Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.2f, 0.2f, 0.2f)));
+	mGameObjectManager->AddGameObject("Skull", skull);
 
-	auto boxPx = std::make_shared<BoxPx>("BoxPx", Transform(XMFLOAT3(0.0f, 10.0f, -10.0f)));
-	mGameObjectManager->AddGameObject(boxPx);
+	auto boxPx = std::make_shared<BoxPx>(Transform(XMFLOAT3(0.0f, 10.0f, -10.0f)));
+	mGameObjectManager->AddGameObject("BoxPx", boxPx);
 }
 
 void MainScene::MoveCamera(const GameTimer& gt)

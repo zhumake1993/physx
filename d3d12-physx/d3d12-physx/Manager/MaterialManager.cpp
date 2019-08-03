@@ -71,6 +71,18 @@ void MaterialManager::AddMaterial(const std::string& name, std::shared_ptr<Mater
 	mNumFramesDirties[name] = gNumFrameResources;
 }
 
+std::string MaterialManager::AddMaterial(std::shared_ptr<MaterialData> materialData)
+{
+	auto name = MathHelper::RandStr();
+	while (mMaterials.find(name) != mMaterials.end()) {
+		name = MathHelper::RandStr();
+	}
+
+	AddMaterial(name, materialData);
+
+	return name;
+}
+
 void MaterialManager::UpdateMaterialData()
 {
 	for (auto& p : mMaterials) {

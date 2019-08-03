@@ -7,9 +7,8 @@ extern std::unique_ptr<SceneManager> gSceneManager;
 
 extern XMMATRIX TransformToMatrix(Transform& transform);
 
-MeshRender::MeshRender(const std::string& name, const Transform& transform)
+MeshRender::MeshRender(const Transform& transform)
 {
-	mName = name;
 	mTransform = transform;
 }
 
@@ -37,4 +36,14 @@ void MeshRender::Update()
 void MeshRender::Release()
 {
 	gSceneManager->GetCurrInstanceManager()->DeleteInstance(this);
+}
+
+void MeshRender::SetParent(std::string name)
+{
+	mParent = name;
+}
+
+std::string MeshRender::GetParent()
+{
+	return mParent;
 }

@@ -10,9 +10,8 @@ extern PhysX gPhysX;
 
 extern XMMATRIX TransformToMatrix(Transform& transform);
 
-RigidDynamic::RigidDynamic(const std::string& name, const Transform& parent, const Transform& local)
+RigidDynamic::RigidDynamic(const Transform& parent, const Transform& local)
 {
-	mName = name;
 	mParentTransform = parent;
 	mLocalTransform = local;
 
@@ -70,33 +69,13 @@ void RigidDynamic::AddRigidDynamic()
 
 	desc.density = mDensity;
 
-	gPhysX.CreatePxRigidDynamic(mName, &desc);
+	mName = gPhysX.CreatePxRigidDynamic(&desc);
 
 	// Ìí¼Ó¸ÕÌåMeshRender
-
-	GeometryGenerator geoGen;
-	switch (mPxGeometry) {
-		case PxSphereEnum: {
-			assert(false);
-			break;
-		}
-		case PxBoxEnum: {
-			gSceneManager->GetCurrMeshManager()->AddMesh(mName + "RigidDynamicMesh", geoGen.CreateBox(mScale.x * 2, mScale.y * 2, mScale.z * 2, 0));
-			break;
-		}
-		case PxCapsuleEnum: {
-			assert(false);
-			break;
-		}
-		default: {
-			assert(false);
-		}
-	}
-
-	mMeshRender = std::make_unique<MeshRender>(mName + "RigidDynamic", Transform(worldPos, worldQuat));
+	mMeshRender = std::make_unique<MeshRender>(Transform(worldPos, worldQuat,XMFLOAT3(mScale.x * 2, mScale.y * 2, mScale.z * 2)));
 	mMeshRender->mMatName = "null";
 	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	mMeshRender->mMeshName = mName + "RigidDynamicMesh";
+	mMeshRender->mMeshName = "UnitBox";
 	mMeshRender->mRenderLayer = (int)RenderLayer::Wireframe;
 	mMeshRender->mReceiveShadow = false;
 	mMeshRender->AddMeshRender();
@@ -135,6 +114,16 @@ void RigidDynamic::Update()
 
 void RigidDynamic::Release()
 {
-	gPhysX.DeletePxRigid(mName);
+	gPhysX.DeletePxRigidDynamic(mName);
 	mMeshRender->Release();
+}
+
+void RigidDynamic::SetAngularDamping(float ad)
+{
+	gPhysX.SetAngularDamping(mName, ad);
+}
+
+void RigidDynamic::SetLinearVelocity(DirectX::XMFLOAT3 v)
+{
+	gPhysX.SetLinearVelocity(mName, PxFloat3(v.x, v.y, v.z));
 }

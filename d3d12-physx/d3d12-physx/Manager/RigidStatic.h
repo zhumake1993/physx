@@ -7,7 +7,7 @@ class RigidStatic
 {
 public:
 
-	RigidStatic(const std::string& name, const Transform& parent, const Transform& local);
+	RigidStatic(const Transform& parent, const Transform& local);
 	virtual ~RigidStatic();
 
 	void AddRigidStatic();

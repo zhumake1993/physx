@@ -69,10 +69,11 @@ void PhysX::CleanupScene()
 	PX_RELEASE(gScene);
 }
 
-void PhysX::CreatePxRigidStatic(std::string name, void* pdesc)
+std::string PhysX::CreatePxRigidStatic(void* pdesc)
 {
-	if (HasPxRigidStatic(name)) {
-		ThrowPxEx("RigidStatic already exists!");
+	auto name = MathHelper::RandStr();
+	while (HasPxRigidStatic(name)) {
+		name = MathHelper::RandStr();
 	}
 
 	auto desc = *static_cast<PxRigidStaticDesc*>(pdesc);
@@ -118,12 +119,15 @@ void PhysX::CreatePxRigidStatic(std::string name, void* pdesc)
 	gScene->addActor(*actor);
 
 	gPxRigidStaticMap[name] = actor;
+
+	return name;
 }
 
-void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
+std::string PhysX::CreatePxRigidDynamic(void* pdesc)
 {
-	if (HasPxRigidDynamic(name)) {
-		ThrowPxEx("RigidDynamic already exists!");
+	auto name = MathHelper::RandStr();
+	while (HasPxRigidDynamic(name)) {
+		name = MathHelper::RandStr();
 	}
 
 	auto desc = *static_cast<PxRigidDynamicDesc*>(pdesc);
@@ -165,18 +169,38 @@ void PhysX::CreatePxRigidDynamic(std::string name, void* pdesc)
 	gScene->addActor(*actor);
 
 	gPxRigidDynamicMap[name] = actor;
+
+	return name;
 }
 
-void PhysX::DeletePxRigid(std::string name)
+void PhysX::SetAngularDamping(std::string name, float ad)
+{
+	gPxRigidDynamicMap[name]->setAngularDamping(ad);
+}
+
+void PhysX::SetLinearVelocity(std::string name, PxFloat3 v)
+{
+	PxVec3 velocity = PxVec3(v.x, v.y, v.z);
+	gPxRigidDynamicMap[name]->setLinearVelocity(velocity);
+}
+
+void PhysX::DeletePxRigidDynamic(std::string name)
 {
 	if (HasPxRigidDynamic(name)) {
 		gPxRigidDynamicMap[name]->release();
 	}
-	else if (HasPxRigidStatic(name)) {
+	else {
+		ThrowPxEx("PxRigidDynamic does not exist!");
+	}
+}
+
+void PhysX::DeletePxRigidStatic(std::string name)
+{
+	if (HasPxRigidStatic(name)) {
 		gPxRigidStaticMap[name]->release();
 	}
 	else {
-		ThrowPxEx("Rigid does not exist!");
+		ThrowPxEx("PxRigidStatic does not exist!");
 	}
 }
 
@@ -194,6 +218,10 @@ void PhysX::Update(float delta)
 
 void PhysX::GetPxRigidDynamicTransform(std::string name, PxFloat3& pos, PxFloat4& quat)
 {
+	if (!HasPxRigidDynamic(name)) {
+		ThrowPxEx("PxRigidDynamic does not exist!");
+	}
+
 	auto pg = gPxRigidDynamicMap[name];
 	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
 	pg->getShapes(shapes, 1);

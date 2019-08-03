@@ -30,20 +30,21 @@ void Instance::CalculateBoundingBox()
 	BoundingBox::CreateFromPoints(mBounds, size, &vertices[0].Pos, sizeof(Vertex));
 }
 
-bool Instance::HasInstanceData(const std::string& gameObjectName)
+bool Instance::HasInstanceData(const std::string& name)
 {
-	return mInstances.find(gameObjectName) != mInstances.end();
+	return mInstances.find(name) != mInstances.end();
 }
 
-void Instance::AddInstanceData(const std::string& gameObjectName, const XMFLOAT4X4& world, const UINT& matIndex, const XMFLOAT4X4& texTransform,
+std::string Instance::AddInstanceData(const XMFLOAT4X4& world, const UINT& matIndex, const XMFLOAT4X4& texTransform,
 	const bool receiveShadow)
 {
 	if (mInstanceCount == mInstanceDataCapacity) {
 		ThrowMyEx("Can not add new instance data!")
 	}
 
-	if (HasInstanceData(gameObjectName)) {
-		ThrowMyEx("InstanceData already exists!")
+	auto name = MathHelper::RandStr();
+	while (HasInstanceData(name)) {
+		name = MathHelper::RandStr();
 	}
 
 	InstanceData instance;
@@ -55,34 +56,38 @@ void Instance::AddInstanceData(const std::string& gameObjectName, const XMFLOAT4
 	instance.TexTransform = texTransform;
 	instance.ReceiveShadow = receiveShadow ? 1 : 0;
 
-	mInstances[gameObjectName] = instance;
+	mInstances[name] = instance;
 
 	++mInstanceCount;
+
+	return name;
 }
 
-void Instance::DeleteInstanceData(const std::string& gameObjectName)
+void Instance::DeleteInstanceData(const std::string& name)
 {
-	if (!HasInstanceData(gameObjectName)) {
+	if (!HasInstanceData(name)) {
 		ThrowMyEx("InstanceData does not exist!")
 	}
 
-	mInstances.erase(gameObjectName);
+	mInstances.erase(name);
+
+	--mInstanceCount;
 }
 
-void Instance::UpdateInstanceData(const std::string& gameObjectName, const XMFLOAT4X4& world, const UINT& matIndex, const XMFLOAT4X4& texTransform,
+void Instance::UpdateInstanceData(const std::string& name, const XMFLOAT4X4& world, const UINT& matIndex, const XMFLOAT4X4& texTransform,
 	const bool receiveShadow)
 {
-	if (!HasInstanceData(gameObjectName)) {
+	if (!HasInstanceData(name)) {
 		ThrowMyEx("InstanceData does not exist!")
 	}
 
-	mInstances[gameObjectName].World = world;
+	mInstances[name].World = world;
 	XMMATRIX worldMatrix = XMLoadFloat4x4(&world);
 	XMMATRIX inverseTransposeWorldMatrix = MathHelper::InverseTranspose(worldMatrix);
-	XMStoreFloat4x4(&mInstances[gameObjectName].InverseTransposeWorld, inverseTransposeWorldMatrix);
-	mInstances[gameObjectName].MaterialIndex = matIndex;
-	mInstances[gameObjectName].TexTransform = texTransform;
-	mInstances[gameObjectName].ReceiveShadow = receiveShadow ? 1 : 0;
+	XMStoreFloat4x4(&mInstances[name].InverseTransposeWorld, inverseTransposeWorldMatrix);
+	mInstances[name].MaterialIndex = matIndex;
+	mInstances[name].TexTransform = texTransform;
+	mInstances[name].ReceiveShadow = receiveShadow ? 1 : 0;
 }
 
 void Instance::UploadInstanceData()

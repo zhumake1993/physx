@@ -122,7 +122,7 @@ void Linkup::BuildMeshes()
 	mMeshManager->AddMesh("grid", geoGen.CreateGrid(20.0f, 30.0f, 60, 40));
 	mMeshManager->AddMesh("sphere", geoGen.CreateSphere(0.5f, 20, 20));
 
-	mMeshManager->AddMesh("rigidBox", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 0));
+	mMeshManager->AddMesh("UnitBox", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 0));
 
 	mMeshManager->AddMesh("Segment", geoGen.CreateCylinder(1.0f, 1.0f, 1.0f, 20, 20));
 	mMeshManager->AddMesh("Inflection", geoGen.CreateSphere(1.0f, 20, 20));
@@ -130,20 +130,14 @@ void Linkup::BuildMeshes()
 
 void Linkup::BuildGameObjects()
 {
-	auto logic = std::make_shared<Logic>("Logic");
-	mGameObjectManager->AddGameObject(logic);
+	auto logic = std::make_shared<Logic>();
+	mGameObjectManager->AddGameObject("Logic", logic);
 
-	auto sky = std::make_shared<Sky>("Sky", Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)));
-	mGameObjectManager->AddGameObject(sky);
+	auto sky = std::make_shared<Sky>(Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)));
+	mGameObjectManager->AddGameObject("Sky", sky);
 
-	auto cube = std::make_shared<Cube>("Cube", Transform(XMFLOAT3(0.0f, 5.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.99f, 0.99f, 0.99f)));
-	mGameObjectManager->AddGameObject(cube);
-
-	auto cubeGreen = std::make_shared<CubeGreen>("CubeGreen", Transform(XMFLOAT3(3.0f, 5.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.99f, 0.99f, 0.99f)));
-	mGameObjectManager->AddGameObject(cubeGreen);
-
-	auto floor = std::make_shared<Floor>("Floor");
-	mGameObjectManager->AddGameObject(floor);
+	auto floor = std::make_shared<Floor>();
+	mGameObjectManager->AddGameObject("Floor", floor);
 }
 
 void Linkup::MoveCamera(const GameTimer& gt)

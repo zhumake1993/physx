@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "../d3d12-physx/Common/MathHelper.h"
 #include "../physx/Common/PhysXCommon.h"
 
 class PhysX
@@ -16,10 +17,17 @@ public:
 	void CreateScene();
 	void CleanupScene();
 
-	// 刚体
-	void CreatePxRigidStatic(std::string name, void* pdesc);
-	void CreatePxRigidDynamic(std::string name, void* pdesc);
-	void DeletePxRigid(std::string name);
+	// 静态刚体
+	std::string CreatePxRigidStatic(void* pdesc);
+
+	// 动态刚体
+	std::string CreatePxRigidDynamic(void* pdesc);
+	void SetAngularDamping(std::string name, float ad);
+	void SetLinearVelocity(std::string name, PxFloat3 v);
+
+	// 刚体通用方法
+	void DeletePxRigidDynamic(std::string name);
+	void DeletePxRigidStatic(std::string name);
 
 	void Update(float delta);
 

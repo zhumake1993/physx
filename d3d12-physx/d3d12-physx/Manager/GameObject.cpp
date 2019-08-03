@@ -5,9 +5,9 @@ using namespace DirectX;
 #include "Manager/SceneManager.h"
 extern std::unique_ptr<SceneManager> gSceneManager;
 
-GameObject::GameObject(const std::string& name, const Transform& transform)
+GameObject::GameObject(const Transform& transform)
 {
-	mName = name;
+	mName = "";
 	mTransform = transform;
 }
 
@@ -17,6 +17,14 @@ GameObject::~GameObject()
 
 void GameObject::Update(const GameTimer& gt)
 {
+	if (mGameTimer) {
+		mGameTimer->Tick();
+		if (mGameTimer->TotalTime() >= mLifeTime) {
+			DeleteGameObject(mName);
+			return;
+		}
+	}
+
 	if (mRigidDynamic) {
 		mRigidDynamic->Update();
 		mTransform.Translation = mRigidDynamic->mParentTransform.Translation;
@@ -79,6 +87,11 @@ void GameObject::AddGameObject(std::shared_ptr<GameObject> gameObject)
 	gSceneManager->GetCurrGameObjectManager()->AddGameObject(gameObject);
 }
 
+void GameObject::AddGameObject(std::string name, std::shared_ptr<GameObject> gameObject)
+{
+	gSceneManager->GetCurrGameObjectManager()->AddGameObject(name, gameObject);
+}
+
 void GameObject::DeleteGameObject(std::string name)
 {
 	gSceneManager->GetCurrGameObjectManager()->DeleteGameObject(name);
@@ -98,7 +111,24 @@ void GameObject::AddMaterial(const std::string& name, std::shared_ptr<MaterialDa
 	gSceneManager->GetCurrMaterialManager()->AddMaterial(name, materialData);
 }
 
+std::string GameObject::AddMaterial(std::shared_ptr<MaterialData> materialData)
+{
+	return gSceneManager->GetCurrMaterialManager()->AddMaterial(materialData);
+}
+
+int GameObject::GetTextureIndex(std::string name)
+{
+	return gSceneManager->GetCurrTextureManager()->GetIndex(name);
+}
+
 void GameObject::SwitchScene(std::string name)
 {
 	gSceneManager->SwitchScene(name);
+}
+
+void GameObject::Destroy(float time)
+{
+	mGameTimer = std::make_unique<GameTimer>();
+	mGameTimer->Reset();
+	mLifeTime = time;
 }

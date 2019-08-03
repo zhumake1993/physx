@@ -33,8 +33,30 @@ std::shared_ptr<GameObject> GameObjectManager::GetGameObject(std::string name)
 
 void GameObjectManager::AddGameObject(std::shared_ptr<GameObject> gameObject)
 {
-	if (HasGameObject(gameObject)) {
+	auto name = MathHelper::RandStr();
+	while (mGameObjects.find(name) != mGameObjects.end()) {
+		name = MathHelper::RandStr();
+	}
+
+	gameObject->mName = name;
+
+	if (gameObject->mMeshRender) {
+		gameObject->mMeshRender->SetParent(gameObject->mName);
+	}
+	
+	mGameObjects[gameObject->mName] = gameObject;
+}
+
+void GameObjectManager::AddGameObject(std::string name, std::shared_ptr<GameObject> gameObject)
+{
+	if (HasGameObject(name)) {
 		ThrowMyEx("GameObject already exists!")
+	}
+
+	gameObject->mName = name;
+
+	if (gameObject->mMeshRender) {
+		gameObject->mMeshRender->SetParent(gameObject->mName);
 	}
 
 	mGameObjects[gameObject->mName] = gameObject;

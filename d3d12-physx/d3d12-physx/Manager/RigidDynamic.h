@@ -7,7 +7,7 @@ class RigidDynamic
 {
 public:
 
-	RigidDynamic(const std::string& name, const Transform& parent, const Transform& local);
+	RigidDynamic(const Transform& parent, const Transform& local);
 	virtual ~RigidDynamic();
 
 	void AddRigidDynamic();
@@ -15,6 +15,9 @@ public:
 	void Update();
 
 	void Release();
+
+	void SetAngularDamping(float ad);
+	void SetLinearVelocity(DirectX::XMFLOAT3 v);
 
 private:
 	//

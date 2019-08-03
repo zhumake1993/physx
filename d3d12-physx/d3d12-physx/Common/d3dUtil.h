@@ -10,6 +10,7 @@
 #include <vector>
 #include <unordered_map>
 #include <array>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <comdef.h>
@@ -18,7 +19,9 @@
 #include <DirectXCollision.h>
 
 #include "d3dx12.h"
+#include "Log.h"
 #include "MathHelper.h"
+#include "MyException.h"
 #include "DDSTextureLoader.h"
 #include "../physx/Common/PhysXCommon.h"
 
@@ -58,6 +61,30 @@ struct Transform
 	DirectX::XMFLOAT3 Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 	DirectX::XMFLOAT4 Quaternion = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	DirectX::XMFLOAT3 Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+};
+
+struct Int3
+{
+	Int3() :x(0), y(0), z(0) {}
+	Int3(int _x, int _y, int _z) :x(_x), y(_y), z(_z) {}
+	int x;
+	int y;
+	int z;
+};
+
+struct Int3_Hash
+{
+	size_t operator()(const Int3& int3) const
+	{
+		return std::hash<int>()(int3.x) ^ std::hash<int>()(int3.y) ^ std::hash<int>()(int3.z);
+	}
+};
+
+struct Int3_Cmp
+{
+	bool operator()(const Int3& lhs, const Int3& rhs) const {
+		return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
+	}
 };
 
 struct Vertex
@@ -175,133 +202,9 @@ public:
 
 //===========================================================
 //===========================================================
-// 异常与调试
+// 其他
 //===========================================================
 //===========================================================
-
-inline std::wstring AnsiToWString(const std::string& str)
-{
-	WCHAR buffer[512];
-	MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, buffer, 512);
-	return std::wstring(buffer);
-}
-
-inline std::wstring StringToWString(const std::string& str)
-{
-	int num = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, NULL, 0);
-	wchar_t* wide = new wchar_t[num];
-	MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, wide, num);
-	std::wstring w_str(wide);
-	delete[] wide;
-	return w_str;
-}
-
-inline std::string WStringToString(const std::wstring& wstr)
-{
-	std::string str;
-	int nLen = (int)wstr.length();
-	str.resize(nLen, ' ');
-	int nResult = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)wstr.c_str(), nLen, (LPSTR)str.c_str(), nLen, NULL, NULL);
-	if (nResult == 0) {
-		return "";
-	}
-	return str;
-}
-
-class DxException
-{
-public:
-	DxException() = default;
-	DxException(HRESULT hr, const std::wstring& functionName, const std::wstring& filename, int lineNumber) :
-		ErrorCode(hr),
-		FunctionName(functionName),
-		Filename(filename),
-		LineNumber(lineNumber)
-	{
-	}
-
-	std::wstring ToString()const {
-		_com_error err(ErrorCode);
-		std::wstring msg = err.ErrorMessage();
-		return FunctionName + L" failed in " + Filename + L"; line " + std::to_wstring(LineNumber) + L"; error: " + msg;
-	}
-
-	HRESULT ErrorCode = S_OK;
-	std::wstring FunctionName;
-	std::wstring Filename;
-	int LineNumber = -1;
-};
-
-class MyException
-{
-public:
-	MyException() = default;
-	MyException(const std::string& err, const std::wstring& filename, int lineNumber) :
-		Err(err) ,
-		Filename(filename),
-		LineNumber(lineNumber)
-	{
-	}
-
-	std::wstring ToString()const { 
-		return StringToWString(Err) + L" failed in " + Filename + L"; line " + std::to_wstring(LineNumber);
-	}
-
-	std::string Err;
-	std::wstring Filename;
-	int LineNumber = -1;
-};
-
-inline void OutputDebug(int i)
-{
-	std::wstring text = L"OutputDebug: ";
-	text += std::to_wstring(i);
-	text += L"\n";
-	OutputDebugString(text.c_str());
-}
-
-inline void OutputDebug(float f)
-{
-	std::wstring text = L"OutputDebug: ";
-	text += std::to_wstring(f);
-	text += L"\n";
-	OutputDebugString(text.c_str());
-}
-
-inline void OutputDebug(std::string s)
-{
-	std::wstring text = L"OutputDebug: ";
-	text += StringToWString(s);
-	text += L"\n";
-	OutputDebugString(text.c_str());
-}
-
-inline void OutputMessageBox(int i)
-{
-	MessageBox(nullptr, std::to_wstring(i).c_str(), L"Debug", MB_OK);
-}
-
-inline void OutputMessageBox(std::string s)
-{
-	MessageBox(nullptr, StringToWString(s).c_str(), L"Debug", MB_OK);
-}
-
-#ifndef ThrowIfFailed
-#define ThrowIfFailed(x)                                              \
-{                                                                     \
-    HRESULT hr__ = (x);                                               \
-    std::wstring wfn = AnsiToWString(__FILE__);                       \
-    if(FAILED(hr__)) { throw DxException(hr__, L#x, wfn, __LINE__); } \
-}
-#endif
-
-#ifndef ThrowMyEx
-#define ThrowMyEx(x)										          \
-{                                                                     \
-    std::wstring wfn = AnsiToWString(__FILE__);                       \
-    throw MyException(x, wfn, __LINE__);							  \
-}
-#endif
 
 #ifndef ReleaseCom
 #define ReleaseCom(x) { if(x){ x->Release(); x = 0; } }

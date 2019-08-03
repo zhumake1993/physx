@@ -6,7 +6,7 @@ class Grid :
 	public GameObject
 {
 public:
-	Grid(const std::string& name, const Transform& transform = Transform());
+	Grid(const Transform& transform = Transform());
 	~Grid();
 
 private:

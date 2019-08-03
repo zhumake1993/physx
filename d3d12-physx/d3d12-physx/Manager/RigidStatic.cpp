@@ -10,9 +10,8 @@ extern PhysX gPhysX;
 
 extern XMMATRIX TransformToMatrix(Transform& transform);
 
-RigidStatic::RigidStatic(const std::string& name, const Transform& parent, const Transform& local)
+RigidStatic::RigidStatic(const Transform& parent, const Transform& local)
 {
-	mName = name;
 	mParentTransform = parent;
 	mLocalTransform = local;
 }
@@ -57,37 +56,13 @@ void RigidStatic::AddRigidStatic()
 	desc.scale.z = mScale.z;
 	desc.scale.w = mScale.w;
 
-	gPhysX.CreatePxRigidStatic(mName, &desc);
+	mName = gPhysX.CreatePxRigidStatic(&desc);
 
 	// Ìí¼Ó¸ÕÌåMeshRender
-
-	GeometryGenerator geoGen;
-	switch (mPxGeometry) {
-		case PxSphereEnum: {
-			assert(false);
-			break;
-		}
-		case PxBoxEnum: {
-			gSceneManager->GetCurrMeshManager()->AddMesh(mName + "RigidStaticMesh", geoGen.CreateBox(mScale.x * 2, mScale.y * 2, mScale.z * 2, 0));
-			break;
-		}
-		case PxCapsuleEnum: {
-			assert(false);
-			break;
-		}
-		case PxPlaneEnum: {
-			assert(false);
-			break;
-		}
-		default: {
-			assert(false);
-		}
-	}
-
-	mMeshRender = std::make_unique<MeshRender>(mName + "RigidStatic", Transform(worldPos, worldQuat));
+	mMeshRender = std::make_unique<MeshRender>(Transform(worldPos, worldQuat, XMFLOAT3(mScale.x * 2, mScale.y * 2, mScale.z * 2)));
 	mMeshRender->mMatName = "null";
 	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	mMeshRender->mMeshName = mName + "RigidStaticMesh";
+	mMeshRender->mMeshName = "UnitBox";
 	mMeshRender->mRenderLayer = (int)RenderLayer::Wireframe;
 	mMeshRender->mReceiveShadow = false;
 	mMeshRender->AddMeshRender();
@@ -95,6 +70,6 @@ void RigidStatic::AddRigidStatic()
 
 void RigidStatic::Release()
 {
-	gPhysX.DeletePxRigid(mName);
+	gPhysX.DeletePxRigidStatic(mName);
 	mMeshRender->Release();
 }

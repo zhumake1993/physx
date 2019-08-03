@@ -8,6 +8,10 @@ using namespace DirectX;
 const float MathHelper::Infinity = FLT_MAX;
 const float MathHelper::Pi = 3.1415926535f;
 
+std::default_random_engine MathHelper::E;
+std::uniform_int_distribution<int> MathHelper::UI;
+std::uniform_real_distribution<float> MathHelper::UF;
+
 float MathHelper::AngleFromXY(float x, float y)
 {
 	float theta = 0.0f;

@@ -33,6 +33,7 @@ public:
 	std::shared_ptr<MaterialData> GetMaterial(const std::string name);
 	UINT GetIndex(const std::string& name);
 	void AddMaterial(const std::string& name, std::shared_ptr<MaterialData> materialData);
+	std::string AddMaterial(std::shared_ptr<MaterialData> materialData);
 
 	void UpdateMaterialData();
 
@@ -46,7 +47,7 @@ public:
 
 private:
 
-	const UINT mMaterialDataCapacity = 100;
+	const UINT mMaterialDataCapacity = 500;
 	UINT mMaterialCount = 0;
 
 	std::unique_ptr<FrameResource<MaterialData>> mFrameResource; // ึกืสิด

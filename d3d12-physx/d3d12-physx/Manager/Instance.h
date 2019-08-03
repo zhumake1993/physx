@@ -57,7 +57,7 @@ private:
 
 	std::shared_ptr<Mesh> mMesh = nullptr;
 
-	UINT mInstanceDataCapacity = 100;
+	UINT mInstanceDataCapacity = 500;
 	UINT mInstanceCount = 0;
 	std::unique_ptr<FrameResource<InstanceData>> mFrameResource; // ึกืสิด
 

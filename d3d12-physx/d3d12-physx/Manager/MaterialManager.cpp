@@ -73,16 +73,14 @@ void MaterialManager::AddMaterial(const std::string& name, std::shared_ptr<Mater
 
 std::string MaterialManager::AddMaterial(std::shared_ptr<MaterialData> materialData)
 {
-	int ran = rand();
-	auto hash = std::hash<int>()(ran);
-	while (mMaterials.find(std::to_string(hash)) != mMaterials.end()) {
-		ran = rand();
-		hash = std::hash<int>()(ran);
+	auto name = MathHelper::RandStr();
+	while (mMaterials.find(name) != mMaterials.end()) {
+		name = MathHelper::RandStr();
 	}
 
-	AddMaterial(std::to_string(hash), materialData);
+	AddMaterial(name, materialData);
 
-	return std::to_string(hash);
+	return name;
 }
 
 void MaterialManager::UpdateMaterialData()

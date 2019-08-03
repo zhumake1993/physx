@@ -72,30 +72,10 @@ void RigidDynamic::AddRigidDynamic()
 	mName = gPhysX.CreatePxRigidDynamic(&desc);
 
 	// Ìí¼Ó¸ÕÌåMeshRender
-
-	GeometryGenerator geoGen;
-	switch (mPxGeometry) {
-		case PxSphereEnum: {
-			assert(false);
-			break;
-		}
-		case PxBoxEnum: {
-			gSceneManager->GetCurrMeshManager()->AddMesh(mName + "RigidDynamicMesh", geoGen.CreateBox(mScale.x * 2, mScale.y * 2, mScale.z * 2, 0));
-			break;
-		}
-		case PxCapsuleEnum: {
-			assert(false);
-			break;
-		}
-		default: {
-			assert(false);
-		}
-	}
-
-	mMeshRender = std::make_unique<MeshRender>(Transform(worldPos, worldQuat));
+	mMeshRender = std::make_unique<MeshRender>(Transform(worldPos, worldQuat,XMFLOAT3(mScale.x * 2, mScale.y * 2, mScale.z * 2)));
 	mMeshRender->mMatName = "null";
 	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	mMeshRender->mMeshName = mName + "RigidDynamicMesh";
+	mMeshRender->mMeshName = "UnitBox";
 	mMeshRender->mRenderLayer = (int)RenderLayer::Wireframe;
 	mMeshRender->mReceiveShadow = false;
 	mMeshRender->AddMeshRender();
@@ -134,7 +114,7 @@ void RigidDynamic::Update()
 
 void RigidDynamic::Release()
 {
-	gPhysX.DeletePxRigid(mName);
+	gPhysX.DeletePxRigidDynamic(mName);
 	mMeshRender->Release();
 }
 

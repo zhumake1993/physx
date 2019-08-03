@@ -71,11 +71,9 @@ void PhysX::CleanupScene()
 
 std::string PhysX::CreatePxRigidStatic(void* pdesc)
 {
-	int ran = rand();
-	auto hash = std::hash<int>()(ran);
-	while (HasPxRigidStatic(std::to_string(hash))) {
-		ran = rand();
-		hash = std::hash<int>()(ran);
+	auto name = MathHelper::RandStr();
+	while (HasPxRigidStatic(name)) {
+		name = MathHelper::RandStr();
 	}
 
 	auto desc = *static_cast<PxRigidStaticDesc*>(pdesc);
@@ -120,18 +118,16 @@ std::string PhysX::CreatePxRigidStatic(void* pdesc)
 	// Ìí¼Óactor
 	gScene->addActor(*actor);
 
-	gPxRigidStaticMap[std::to_string(hash)] = actor;
+	gPxRigidStaticMap[name] = actor;
 
-	return std::to_string(hash);
+	return name;
 }
 
 std::string PhysX::CreatePxRigidDynamic(void* pdesc)
 {
-	int ran = rand();
-	auto hash = std::hash<int>()(ran);
-	while (HasPxRigidDynamic(std::to_string(hash))) {
-		ran = rand();
-		hash = std::hash<int>()(ran);
+	auto name = MathHelper::RandStr();
+	while (HasPxRigidDynamic(name)) {
+		name = MathHelper::RandStr();
 	}
 
 	auto desc = *static_cast<PxRigidDynamicDesc*>(pdesc);
@@ -172,9 +168,9 @@ std::string PhysX::CreatePxRigidDynamic(void* pdesc)
 	// Ìí¼Óactor
 	gScene->addActor(*actor);
 
-	gPxRigidDynamicMap[std::to_string(hash)] = actor;
+	gPxRigidDynamicMap[name] = actor;
 
-	return std::to_string(hash);
+	return name;
 }
 
 void PhysX::SetAngularDamping(std::string name, float ad)
@@ -188,16 +184,23 @@ void PhysX::SetLinearVelocity(std::string name, PxFloat3 v)
 	gPxRigidDynamicMap[name]->setLinearVelocity(velocity);
 }
 
-void PhysX::DeletePxRigid(std::string name)
+void PhysX::DeletePxRigidDynamic(std::string name)
 {
 	if (HasPxRigidDynamic(name)) {
 		gPxRigidDynamicMap[name]->release();
 	}
-	else if (HasPxRigidStatic(name)) {
+	else {
+		ThrowPxEx("PxRigidDynamic does not exist!");
+	}
+}
+
+void PhysX::DeletePxRigidStatic(std::string name)
+{
+	if (HasPxRigidStatic(name)) {
 		gPxRigidStaticMap[name]->release();
 	}
 	else {
-		ThrowPxEx("Rigid does not exist!");
+		ThrowPxEx("PxRigidStatic does not exist!");
 	}
 }
 
@@ -215,6 +218,10 @@ void PhysX::Update(float delta)
 
 void PhysX::GetPxRigidDynamicTransform(std::string name, PxFloat3& pos, PxFloat4& quat)
 {
+	if (!HasPxRigidDynamic(name)) {
+		ThrowPxEx("PxRigidDynamic does not exist!");
+	}
+
 	auto pg = gPxRigidDynamicMap[name];
 	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
 	pg->getShapes(shapes, 1);

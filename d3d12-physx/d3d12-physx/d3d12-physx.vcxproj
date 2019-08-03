@@ -89,7 +89,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <AdditionalDependencies>..\bin\debug\lib\PhysXPvdSDK_static_64.lib;..\bin\debug\lib\PhysXVehicle_static_64.lib;..\bin\debug\lib\PhysXCharacterKinematic_static_64.lib;..\bin\debug\lib\PhysXExtensions_static_64.lib;..\bin\debug\lib\PhysXCooking_64.lib;..\bin\debug\lib\PhysXCommon_64.lib;..\bin\debug\lib\SnippetUtils_static_64.lib;..\bin\debug\lib\SnippetRender_static_64.lib;..\bin\debug\lib\PhysX_64.lib;..\bin\debug\lib\PhysXFoundation_64.lib;..\bin\debug\lib\glut32.lib;..\bin\debug\physx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -105,7 +105,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <AdditionalDependencies>..\bin\debug\lib\PhysXPvdSDK_static_64.lib;..\bin\debug\lib\PhysXVehicle_static_64.lib;..\bin\debug\lib\PhysXCharacterKinematic_static_64.lib;..\bin\debug\lib\PhysXExtensions_static_64.lib;..\bin\debug\lib\PhysXCooking_64.lib;..\bin\debug\lib\PhysXCommon_64.lib;..\bin\debug\lib\SnippetUtils_static_64.lib;..\bin\debug\lib\SnippetRender_static_64.lib;..\bin\debug\lib\PhysX_64.lib;..\bin\debug\lib\PhysXFoundation_64.lib;..\bin\debug\lib\glut32.lib;..\bin\debug\physx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -147,6 +147,7 @@
     <ClCompile Include="Common\FrameResource.cpp" />
     <ClCompile Include="Common\GameTimer.cpp" />
     <ClCompile Include="Common\GeometryGenerator.cpp" />
+    <ClCompile Include="Common\Log.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Filter\BlurFilter.cpp" />
     <ClCompile Include="Filter\InverseFilter.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="GameObject\Grid.cpp" />
     <ClCompile Include="GameObject\Linkup\Cube.cpp" />
     <ClCompile Include="GameObject\Linkup\Floor.cpp" />
+    <ClCompile Include="GameObject\Linkup\Fragment.cpp" />
     <ClCompile Include="GameObject\Linkup\Inflection.cpp" />
     <ClCompile Include="GameObject\Linkup\Logic.cpp" />
     <ClCompile Include="GameObject\Linkup\Segment.cpp" />
@@ -199,10 +201,13 @@
     <ClInclude Include="Common\d3dUtil.h" />
     <ClInclude Include="Common\d3dx12.h" />
     <ClInclude Include="Common\DDSTextureLoader.h" />
+    <ClInclude Include="Common\Log.h" />
+    <ClInclude Include="Common\StringConvert.h" />
     <ClInclude Include="Common\FrameResource.h" />
     <ClInclude Include="Common\GameTimer.h" />
     <ClInclude Include="Common\GeometryGenerator.h" />
     <ClInclude Include="Common\MathHelper.h" />
+    <ClInclude Include="Common\MyException.h" />
     <ClInclude Include="Common\UploadBuffer.h" />
     <ClInclude Include="Filter\BlurFilter.h" />
     <ClInclude Include="Filter\InverseFilter.h" />
@@ -215,6 +220,7 @@
     <ClInclude Include="GameObject\Grid.h" />
     <ClInclude Include="GameObject\Linkup\Cube.h" />
     <ClInclude Include="GameObject\Linkup\Floor.h" />
+    <ClInclude Include="GameObject\Linkup\Fragment.h" />
     <ClInclude Include="GameObject\Linkup\Inflection.h" />
     <ClInclude Include="GameObject\Linkup\LinkupGameObjects.h" />
     <ClInclude Include="GameObject\Linkup\Logic.h" />

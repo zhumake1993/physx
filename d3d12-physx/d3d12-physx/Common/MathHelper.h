@@ -3,26 +3,34 @@
 #include <Windows.h>
 #include <DirectXMath.h>
 #include <cstdint>
+#include <string>
+#include <random>
 
 class MathHelper
 {
 public:
-	//返回[0, 1)内的随机浮点数
+	//返回[0, 1]内的随机浮点数
 	static float RandF()
 	{
-		return (float)(rand()) / (float)RAND_MAX;
+		return UF(E);
 	}
 
-	//返回[a, b)内的随机浮点数
+	//返回[a, b]内的随机浮点数
 	static float RandF(float a, float b)
 	{
-		return a + RandF() * (b - a);
+		return a + UF(E) * (b - a);
 	}
 
 	//返回[a, b]内的随机整数
 	static int Rand(int a, int b)
 	{
-		return a + rand() % ((b - a) + 1);
+		return a + UI(E) % ((b - a) + 1);
+	}
+
+	//返回随机字符串
+	static std::string RandStr()
+	{
+		return std::to_string(UI(E));
 	}
 
 	template<typename T>
@@ -94,5 +102,7 @@ public:
 	static const float Infinity;
 	static const float Pi;
 
-
+	static std::default_random_engine E;
+	static std::uniform_int_distribution<int> UI;
+	static std::uniform_real_distribution<float> UF;
 };

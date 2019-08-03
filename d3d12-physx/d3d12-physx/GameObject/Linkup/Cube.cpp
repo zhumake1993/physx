@@ -25,24 +25,13 @@ Cube::Cube(const Transform& transform)
 	mMeshRender->mReceiveShadow = true;
 	mMeshRender->AddMeshRender();
 
-	//// ∏’ÃÂ
-	//Transform rigidDynamicLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-	//mRigidDynamic = std::make_unique<RigidDynamic>(transform, rigidDynamicLocal);
-	//mRigidDynamic->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
-	//mRigidDynamic->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
-	//mRigidDynamic->mPxGeometry = PxBoxEnum;
-	//mRigidDynamic->mDensity = 10.0f;
-	//mRigidDynamic->AddRigidDynamic();
-
 	// ∏’ÃÂ
 	Transform rigidStaticLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	mRigidStatic = std::make_unique<RigidStatic>(transform, rigidStaticLocal);
-	mRigidStatic->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
+	mRigidStatic->mScale = XMFLOAT4(0.48f, 0.48f, 0.48f, 0.48f);
 	mRigidStatic->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
 	mRigidStatic->mPxGeometry = PxBoxEnum;
 	mRigidStatic->AddRigidStatic();
-
-
 }
 
 Cube::~Cube()

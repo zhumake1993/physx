@@ -42,11 +42,9 @@ std::string Instance::AddInstanceData(const XMFLOAT4X4& world, const UINT& matIn
 		ThrowMyEx("Can not add new instance data!")
 	}
 
-	int ran = rand();
-	auto hash = std::hash<int>()(ran);
-	while (HasInstanceData(std::to_string(hash))) {
-		ran = rand();
-		hash = std::hash<int>()(ran);
+	auto name = MathHelper::RandStr();
+	while (HasInstanceData(name)) {
+		name = MathHelper::RandStr();
 	}
 
 	InstanceData instance;
@@ -58,11 +56,11 @@ std::string Instance::AddInstanceData(const XMFLOAT4X4& world, const UINT& matIn
 	instance.TexTransform = texTransform;
 	instance.ReceiveShadow = receiveShadow ? 1 : 0;
 
-	mInstances[std::to_string(hash)] = instance;
+	mInstances[name] = instance;
 
 	++mInstanceCount;
 
-	return std::to_string(hash);
+	return name;
 }
 
 void Instance::DeleteInstanceData(const std::string& name)

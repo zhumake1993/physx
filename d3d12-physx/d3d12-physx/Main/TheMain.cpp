@@ -1,33 +1,37 @@
 #include "D3D12App.h"
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
+int main()
 {
 	// Enable run-time memory check for debug builds.
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
+	HINSTANCE hMyInstance = GetModuleHandle(NULL);
+
 	try
 	{
-		D3D12App theApp(hInstance);
+		D3D12App theApp(hMyInstance);
 		if (!theApp.Initialize())
 			return 0;
 
 		return theApp.Run();
 	}
-	catch (DxException & e)
+	catch (DxException& e)
 	{
-		MessageBox(nullptr, e.ToString().c_str(), L"HR Failed", MB_OK);
+		Log(WStringToString(e.ToString()));
 		return 0;
 	}
 	catch (MyException& e)
 	{
-		MessageBox(nullptr, e.ToString().c_str(), L"D3D Error", MB_OK);
+		Log(e.ToString().c_str());
 		return 0;
 	}
 	catch (MyPxException& e)
 	{
-		MessageBox(nullptr, StringToWString(e.ToString()).c_str(), L"PhysX Error", MB_OK);
+		Log(e.ToString().c_str());
 		return 0;
 	}
+
+	return 0;
 }

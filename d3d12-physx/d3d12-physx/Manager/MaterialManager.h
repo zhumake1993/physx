@@ -47,7 +47,7 @@ public:
 
 private:
 
-	const UINT mMaterialDataCapacity = 100;
+	const UINT mMaterialDataCapacity = 500;
 	UINT mMaterialCount = 0;
 
 	std::unique_ptr<FrameResource<MaterialData>> mFrameResource; // ึกืสิด

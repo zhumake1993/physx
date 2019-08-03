@@ -189,6 +189,12 @@
     <ClCompile Include="GameObject\Linkup\Inflection.cpp">
       <Filter>GameObject\Linkup</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject\Linkup\Fragment.cpp">
+      <Filter>GameObject\Linkup</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Log.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h">
@@ -352,6 +358,18 @@
     </ClInclude>
     <ClInclude Include="GameObject\Linkup\Inflection.h">
       <Filter>GameObject\Linkup</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Linkup\Fragment.h">
+      <Filter>GameObject\Linkup</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\MyException.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\StringConvert.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Log.h">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

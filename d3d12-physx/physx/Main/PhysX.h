@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "../d3d12-physx/Common/MathHelper.h"
 #include "../physx/Common/PhysXCommon.h"
 
 class PhysX
@@ -25,7 +26,8 @@ public:
 	void SetLinearVelocity(std::string name, PxFloat3 v);
 
 	// 刚体通用方法
-	void DeletePxRigid(std::string name);
+	void DeletePxRigidDynamic(std::string name);
+	void DeletePxRigidStatic(std::string name);
 
 	void Update(float delta);
 

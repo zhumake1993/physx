@@ -122,7 +122,7 @@ void Linkup::BuildMeshes()
 	mMeshManager->AddMesh("grid", geoGen.CreateGrid(20.0f, 30.0f, 60, 40));
 	mMeshManager->AddMesh("sphere", geoGen.CreateSphere(0.5f, 20, 20));
 
-	mMeshManager->AddMesh("rigidBox", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 0));
+	mMeshManager->AddMesh("UnitBox", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 0));
 
 	mMeshManager->AddMesh("Segment", geoGen.CreateCylinder(1.0f, 1.0f, 1.0f, 20, 20));
 	mMeshManager->AddMesh("Inflection", geoGen.CreateSphere(1.0f, 20, 20));

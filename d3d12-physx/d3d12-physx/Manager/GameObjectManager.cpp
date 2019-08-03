@@ -33,14 +33,12 @@ std::shared_ptr<GameObject> GameObjectManager::GetGameObject(std::string name)
 
 void GameObjectManager::AddGameObject(std::shared_ptr<GameObject> gameObject)
 {
-	int ran = rand();
-	auto hash = std::hash<int>()(ran);
-	while (mGameObjects.find(std::to_string(hash)) != mGameObjects.end()) {
-		ran = rand();
-		hash = std::hash<int>()(ran);
+	auto name = MathHelper::RandStr();
+	while (mGameObjects.find(name) != mGameObjects.end()) {
+		name = MathHelper::RandStr();
 	}
 
-	gameObject->mName = std::to_string(hash);
+	gameObject->mName = name;
 
 	if (gameObject->mMeshRender) {
 		gameObject->mMeshRender->SetParent(gameObject->mName);

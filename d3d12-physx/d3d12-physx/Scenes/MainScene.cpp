@@ -195,6 +195,8 @@ void MainScene::BuildMeshes()
 	mMeshManager->AddMesh("sphere", geoGen.CreateSphere(0.5f, 20, 20));
 	mMeshManager->AddMesh("cylinder", geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20));
 	mMeshManager->AddMesh("box2", geoGen.CreateBox(8.0f, 8.0f, 8.0f, 3));
+
+	mMeshManager->AddMesh("UnitBox", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 0));
 }
 
 void MainScene::BuildGameObjects()

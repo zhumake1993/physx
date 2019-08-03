@@ -71,6 +71,9 @@ void Logic::PickCube(Int3 int3)
 
 			CreateSegments(int3);
 
+			CreateFragment(mLastPick);
+			CreateFragment(int3);
+
 			mCubeMap[mLastPick] = 0;
 			mCubeMap[int3] = 0;
 
@@ -98,6 +101,10 @@ void Logic::Update(const GameTimer& gt)
 
 	if (GetKeyDown('C')) {
 		Shuffle();
+	}
+
+	if (GetKeyDown('V')) {
+		Test(Int3(1, 2, 1));
 	}
 }
 
@@ -235,10 +242,20 @@ bool Logic::IsLinkPair(Int3 a, Int3 b)
 		}
 	}
 
-	mTurns[a] = 0;
+	/*mTurns[a] = 0;
 	DeepFirstSearch(a);
 
 	if (mMarked[b]) {
+		auto cube1 = std::dynamic_pointer_cast<Cube>(mCubeMapping[a]);
+		auto cube2 = std::dynamic_pointer_cast<Cube>(mCubeMapping[b]);
+		auto color1 = cube1->GetColor();
+		auto color2 = cube2->GetColor();
+		return color1.x == color2.x && color1.y == color2.y && color1.z == color2.z;
+	}*/
+
+	mTurns[a] = 0;
+
+	if (DeepFirstSearch(a, b)) {
 		auto cube1 = std::dynamic_pointer_cast<Cube>(mCubeMapping[a]);
 		auto cube2 = std::dynamic_pointer_cast<Cube>(mCubeMapping[b]);
 		auto color1 = cube1->GetColor();
@@ -249,17 +266,21 @@ bool Logic::IsLinkPair(Int3 a, Int3 b)
 	return false;
 }
 
-void Logic::DeepFirstSearch(Int3 v)
+bool Logic::DeepFirstSearch(Int3 v, Int3 t)
 {
+	if (Int3_Cmp()(v, t)) {
+		return true;
+	}
+
 	mMarked[v] = true;
 
 	std::unordered_map<int, Int3> faces = {
-		{(int)Face::up,Int3(v.x,v.y+1,v.z)},
-		{(int)Face::down,Int3(v.x,v.y-1,v.z)},
-		{(int)Face::left,Int3(v.x-1,v.y,v.z)},
-		{(int)Face::right,Int3(v.x+1,v.y,v.z)},
-		{(int)Face::forward,Int3(v.x,v.y,v.z+1)},
-		{(int)Face::back,Int3(v.x,v.y,v.z-1)}
+		{(int)Face::up,Int3(v.x,v.y + 1,v.z)},
+		{(int)Face::down,Int3(v.x,v.y - 1,v.z)},
+		{(int)Face::left,Int3(v.x - 1,v.y,v.z)},
+		{(int)Face::right,Int3(v.x + 1,v.y,v.z)},
+		{(int)Face::forward,Int3(v.x,v.y,v.z + 1)},
+		{(int)Face::back,Int3(v.x,v.y,v.z - 1)}
 	};
 
 	for (auto p : faces) {
@@ -275,15 +296,17 @@ void Logic::DeepFirstSearch(Int3 v)
 						continue;
 					}
 					else {
-						mMarked[p.second] = true;
-						mEdgeTo[p.second] = v;
-						continue;
+						if (Int3_Cmp()(p.second, t)) {
+							mEdgeTo[p.second] = v;
+							return true;
+						}
 					}
 				}
 				else {
-					mMarked[p.second] = true;
-					mEdgeTo[p.second] = v;
-					continue;
+					if (Int3_Cmp()(p.second, t)) {
+						mEdgeTo[p.second] = v;
+						return true;
+					}
 				}
 			}
 		}
@@ -298,37 +321,132 @@ void Logic::DeepFirstSearch(Int3 v)
 					else {
 						mEdgeTo[p.second] = v;
 						mTurns[p.second] = mTurns[v] + 1;
-						DeepFirstSearch(p.second);
+
+						if (DeepFirstSearch(p.second, t)) {
+							return true;
+						}
 					}
 				}
 				else {
 					mEdgeTo[p.second] = v;
 					mTurns[p.second] = mTurns[v];
-					DeepFirstSearch(p.second);
+					
+					if (DeepFirstSearch(p.second, t)) {
+						return true;
+					}
 				}
 			}
 			else {
 
 				if (IsTurning(v, p.second)) {
 
-					if (mTurns[p.second] > mTurns[v] + 1) {
+					if (mTurns[p.second] >= mTurns[v] + 1) {
 						mEdgeTo[p.second] = v;
 						mTurns[p.second] = mTurns[v] + 1;
-						DeepFirstSearch(p.second);
+						
+						if (DeepFirstSearch(p.second, t)) {
+							return true;
+						}
 					}
 				}
 				else {
-					
-					if (mTurns[p.second] > mTurns[v]) {
+
+					if (mTurns[p.second] >= mTurns[v]) {
 						mEdgeTo[p.second] = v;
 						mTurns[p.second] = mTurns[v];
-						DeepFirstSearch(p.second);
+						
+						if (DeepFirstSearch(p.second, t)) {
+							return true;
+						}
 					}
 				}
 			}
 		}
 	}
+
+	return false;
 }
+
+//void Logic::DeepFirstSearch(Int3 v)
+//{
+//	mMarked[v] = true;
+//
+//	std::unordered_map<int, Int3> faces = {
+//		{(int)Face::up,Int3(v.x,v.y+1,v.z)},
+//		{(int)Face::down,Int3(v.x,v.y-1,v.z)},
+//		{(int)Face::left,Int3(v.x-1,v.y,v.z)},
+//		{(int)Face::right,Int3(v.x+1,v.y,v.z)},
+//		{(int)Face::forward,Int3(v.x,v.y,v.z+1)},
+//		{(int)Face::back,Int3(v.x,v.y,v.z-1)}
+//	};
+//
+//	for (auto p : faces) {
+//		if (mCubeMap[p.second] == -1) {
+//			continue;
+//		}
+//
+//		if (mCubeMap[p.second] == 1) {
+//			if (!mMarked[p.second]) {
+//
+//				if (IsTurning(v, p.second)) {
+//					if (mTurns[v] == 2) {
+//						continue;
+//					}
+//					else {
+//						mMarked[p.second] = true;
+//						mEdgeTo[p.second] = v;
+//						continue;
+//					}
+//				}
+//				else {
+//					mMarked[p.second] = true;
+//					mEdgeTo[p.second] = v;
+//					continue;
+//				}
+//			}
+//		}
+//
+//		if (mCubeMap[p.second] == 0) {
+//			if (!mMarked[p.second]) {
+//
+//				if (IsTurning(v, p.second)) {
+//					if (mTurns[v] == 2) {
+//						continue;
+//					}
+//					else {
+//						mEdgeTo[p.second] = v;
+//						mTurns[p.second] = mTurns[v] + 1;
+//						DeepFirstSearch(p.second);
+//					}
+//				}
+//				else {
+//					mEdgeTo[p.second] = v;
+//					mTurns[p.second] = mTurns[v];
+//					DeepFirstSearch(p.second);
+//				}
+//			}
+//			else {
+//
+//				if (IsTurning(v, p.second)) {
+//
+//					if (mTurns[p.second] > mTurns[v] + 1) {
+//						mEdgeTo[p.second] = v;
+//						mTurns[p.second] = mTurns[v] + 1;
+//						DeepFirstSearch(p.second);
+//					}
+//				}
+//				else {
+//					
+//					if (mTurns[p.second] > mTurns[v]) {
+//						mEdgeTo[p.second] = v;
+//						mTurns[p.second] = mTurns[v];
+//						DeepFirstSearch(p.second);
+//					}
+//				}
+//			}
+//		}
+//	}
+//}
 
 bool Logic::IsTurning(const Int3& curr, const Int3& next)
 {
@@ -342,4 +460,49 @@ bool Logic::IsTurning(const Int3& curr, const Int3& next)
 	Int3 b = Int3(next.x - curr.x, next.y - curr.y, next.z - curr.z);
 
 	return !Int3_Cmp()(a, b);
+}
+
+void Logic::CreateFragment(Int3 int3)
+{
+	for (float x = int3.x - 0.375f; x <= int3.x + 0.375f; x += 0.25f) {
+		for (float y = int3.y - 0.375f; y <= int3.y + 0.375f; y += 0.25f) {
+			for (float z = int3.z - 0.375f; z <= int3.z + 0.375f; z += 0.25f) {
+
+				if (MathHelper::RandF() > 0.2f)continue;
+
+				Transform t = Transform(XMFLOAT3(x, y, z), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.2f, 0.2f, 0.2f));
+				auto fragment = std::make_shared<Fragment>(t);
+
+				fragment->SetColor(rainbowColors[MathHelper::Rand(1, static_cast<int>(rainbowColors.size()))]);
+
+				fragment->mRigidDynamic->SetAngularDamping(0.5f);
+
+				auto v = XMFLOAT3(MathHelper::RandF(-10.0f, 10.0f), MathHelper::RandF(-10.0f, 10.0f), MathHelper::RandF(-10.0f, 10.0f));
+				fragment->mRigidDynamic->SetLinearVelocity(v);
+
+				AddGameObject(fragment);
+			}
+		}
+	}
+}
+
+void Logic::Test(Int3 s)
+{
+	for (int x = 1; x <= mMapX; x++) {
+		for (int y = 1; y <= mMapY; y++) {
+			for (int z = 1; z <= mMapZ; z++) {
+
+				Transform t = Transform(XMFLOAT3(static_cast<float>(x-5), static_cast<float>(y), static_cast<float>(z)),
+					XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.95f, 0.95f, 0.95f));
+				auto cube = std::make_shared<Cube>(t);
+
+				if(mMarked[Int3(x,y,z)])
+					cube->SetColor(rainbowColors[4]);
+				else
+					cube->SetColor(rainbowColors[1]);
+
+				AddGameObject(cube);
+			}
+		}
+	}
 }

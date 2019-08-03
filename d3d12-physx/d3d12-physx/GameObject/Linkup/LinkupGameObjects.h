@@ -5,3 +5,4 @@
 #include "Logic.h"
 #include "Segment.h"
 #include "Inflection.h"
+#include "Fragment.h"

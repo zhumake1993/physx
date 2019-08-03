@@ -19,8 +19,11 @@ private:
 	std::vector<DirectX::XMFLOAT3> CalRandColor();
 	void Shuffle();
 	bool IsLinkPair(Int3 a, Int3 b);
-	void DeepFirstSearch(Int3 v);
+	bool DeepFirstSearch(Int3 v, Int3 t);
 	bool IsTurning(const Int3& curr, const Int3& next);
+	void CreateFragment(Int3 int3);
+
+	void Test(Int3 s);
 
 public:
 	//

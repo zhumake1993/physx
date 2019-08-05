@@ -6,7 +6,7 @@ class Logic :
 	public GameObject
 {
 public:
-	Logic(const Transform& transform = Transform());
+	Logic(const Transform& transform = Transform(), const std::string & name = "");
 	~Logic();
 
 	void PickCube(Int3 int3);
@@ -22,8 +22,6 @@ private:
 	bool DeepFirstSearch(Int3 v, Int3 t);
 	bool IsTurning(const Int3& curr, const Int3& next);
 	void CreateFragment(Int3 int3);
-
-	void Test(Int3 s);
 
 public:
 	//

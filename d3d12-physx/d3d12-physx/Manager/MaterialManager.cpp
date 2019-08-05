@@ -22,13 +22,18 @@ void MaterialManager::Initialize()
 {
 	mFrameResource = std::make_unique<FrameResource<MaterialData>>(gD3D12Device.Get(), mMaterialDataCapacity, false);
 
-	auto null = std::make_shared<MaterialData>();
-	null->DiffuseMapIndex = -1;
-	null->NormalMapIndex = -1;
-	null->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	null->FresnelR0 = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	null->Roughness = 0.0f;
-	AddMaterial("null", null);
+	for (UINT i = 0; i < mMaterialDataCapacity; i++) {
+		mIndicesUnused.push_back(i);
+	}
+
+	auto DefaultMaterial = std::make_shared<Material>();
+	DefaultMaterial->mName = "DefaultMaterial";
+	DefaultMaterial->mDiffuseMapIndex = -1;
+	DefaultMaterial->mNormalMapIndex = -1;
+	DefaultMaterial->mDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	DefaultMaterial->mFresnelR0 = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	DefaultMaterial->mRoughness = 0.0f;
+	AddMaterial(DefaultMaterial);
 }
 
 bool MaterialManager::HasMaterial(std::string name)
@@ -36,51 +41,58 @@ bool MaterialManager::HasMaterial(std::string name)
 	return mMaterials.find(name) != mMaterials.end();
 }
 
-std::shared_ptr<MaterialData> MaterialManager::GetMaterial(const std::string name)
+std::shared_ptr<Material> MaterialManager::GetDefaultMaterial()
 {
-	if (!HasMaterial(name)) {
-		ThrowMyEx("Material does not exist!")
-	}
-
-	mNumFramesDirties[name] = gNumFrameResources;
-
-	return mMaterials[name];
+	return mMaterials["DefaultMaterial"];
 }
 
-UINT MaterialManager::GetIndex(const std::string& name)
+void MaterialManager::AddMaterial(std::shared_ptr<Material> material)
 {
-	if (!HasMaterial(name)) {
-		ThrowMyEx("Material does not exist!")
-	}
-
-	return mIndices[name];
-}
-
-void MaterialManager::AddMaterial(const std::string& name, std::shared_ptr<MaterialData> materialData)
-{
-	if (HasMaterial(name)) {
-		ThrowMyEx("Material already exists!")
-	}
-
 	if (mMaterialCount == mMaterialDataCapacity) {
 		ThrowMyEx("Can not add new material data!")
 	}
 
-	mMaterials[name] = materialData;
-	mIndices[name] = mMaterialCount++;
-	mNumFramesDirties[name] = gNumFrameResources;
-}
+	if (material->mName != "") {
 
-std::string MaterialManager::AddMaterial(std::shared_ptr<MaterialData> materialData)
-{
-	auto name = MathHelper::RandStr();
-	while (mMaterials.find(name) != mMaterials.end()) {
-		name = MathHelper::RandStr();
+		if (HasMaterial(material->mName)) {
+			ThrowMyEx("Material already exists!")
+		}
+	}
+	else {
+
+		material->mName = MathHelper::RandStr();
+		while (mMaterials.find(material->mName) != mMaterials.end()) {
+			material->mName = MathHelper::RandStr();
+		}
 	}
 
-	AddMaterial(name, materialData);
+	material->mIndex = mIndicesUnused.back();
+	mIndicesUnused.pop_back();
 
-	return name;
+	mMaterials[material->mName] = material;
+	mNumFramesDirties[material->mName] = gNumFrameResources;
+	++mMaterialCount;
+}
+
+void MaterialManager::SetMaterial(std::shared_ptr<Material> material)
+{
+	if (!HasMaterial(material->mName)) {
+		ThrowMyEx("Material does not exist!")
+	}
+
+	mNumFramesDirties[material->mName] = gNumFrameResources;
+}
+
+void MaterialManager::DeleteMaterial(const std::string& name)
+{
+	if (!HasMaterial(name)) {
+		ThrowMyEx("Material does not exist!")
+	}
+
+	mIndicesUnused.push_back(mMaterials[name]->mIndex);
+	mMaterials.erase(name);
+	mNumFramesDirties.erase(name);
+	--mMaterialCount;
 }
 
 void MaterialManager::UpdateMaterialData()
@@ -88,19 +100,19 @@ void MaterialManager::UpdateMaterialData()
 	for (auto& p : mMaterials) {
 		if (mNumFramesDirties[p.first] > 0) {
 
-			XMMATRIX matTransform = XMLoadFloat4x4(&p.second->MatTransform);
+			XMMATRIX matTransform = XMLoadFloat4x4(&p.second->mMatTransform);
 
 			MaterialData matData;
-			matData.DiffuseAlbedo = p.second->DiffuseAlbedo;
-			matData.FresnelR0 = p.second->FresnelR0;
-			matData.Roughness = p.second->Roughness;
+			matData.DiffuseAlbedo = p.second->mDiffuseAlbedo;
+			matData.FresnelR0 = p.second->mFresnelR0;
+			matData.Roughness = p.second->mRoughness;
 			XMStoreFloat4x4(&matData.MatTransform, XMMatrixTranspose(matTransform));
-			matData.LerpDiffuseAlbedo = p.second->LerpDiffuseAlbedo;
-			matData.DiffuseMapIndex = p.second->DiffuseMapIndex;
-			matData.NormalMapIndex = p.second->NormalMapIndex;
-			matData.LerpPara = p.second->LerpPara;
+			matData.LerpDiffuseAlbedo = p.second->mLerpDiffuseAlbedo;
+			matData.DiffuseMapIndex = p.second->mDiffuseMapIndex;
+			matData.NormalMapIndex = p.second->mNormalMapIndex;
+			matData.LerpPara = p.second->mLerpPara;
 
-			mFrameResource->Copy(mIndices[p.first], matData);
+			mFrameResource->Copy(p.second->mIndex, matData);
 
 			--mNumFramesDirties[p.first];
 		}

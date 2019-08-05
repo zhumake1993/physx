@@ -21,7 +21,7 @@ public:
 	std::shared_ptr<Scene> GetCurrScene();
 
 	std::shared_ptr<GameObjectManager> GetCurrGameObjectManager();
-	std::shared_ptr<InstanceManager> GetCurrInstanceManager();
+	std::shared_ptr<MeshRenderInstanceManager> GetCurrMeshRenderInstanceManager();
 	std::shared_ptr<TextureManager> GetCurrTextureManager();
 	std::shared_ptr<MaterialManager> GetCurrMaterialManager();
 	std::shared_ptr<MeshManager> GetCurrMeshManager();

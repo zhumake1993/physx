@@ -114,8 +114,8 @@ void Ssao::DrawNormalsAndDepth()
 
 
 	gCommandList->SetPipelineState(gPSOs["DrawNormals"].Get());
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Opaque);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
 
 	// 转换状态至GENERIC_READ，使得能够在shader中读取该纹理
 	gCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(mNormalMap.Get(),

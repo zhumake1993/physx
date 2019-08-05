@@ -164,16 +164,16 @@ void CubeMap::DrawSceneToCubeMap()
 		gCommandList->SetGraphicsRootDescriptorTable(6, mSsaoSrv);
 
 		gCommandList->SetPipelineState(gPSOs["opaque"].Get());
-		gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Opaque);
+		gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
 
 		gCommandList->SetPipelineState(gPSOs["alphaTested"].Get());
-		gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::AlphaTested);
+		gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::AlphaTested);
 
 		gCommandList->SetPipelineState(gPSOs["transparent"].Get());
-		gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Transparent);
+		gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Transparent);
 
 		gCommandList->SetPipelineState(gPSOs["sky"].Get());
-		gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Sky);
+		gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Sky);
 	}
 
 	// 将资源状态改回GENERIC_READ，使得能够在着色器中读取纹理

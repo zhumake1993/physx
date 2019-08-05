@@ -3,24 +3,22 @@
 #include "Common/d3dUtil.h"
 #include "Common/GameTimer.h"
 
-#include "Manager/MaterialManager.h"
-#include "Manager/MeshRender.h"
-#include "Manager/RigidDynamic.h"
-#include "Manager/RigidStatic.h"
+#include "Component/MeshRenderCPT.h"
+#include "Component/RigidDynamicCPT.h"
+#include "Component/RigidStaticCPT.h"
 
 class GameObject
 {
 	friend class GameObjectManager;
 public:
-	GameObject(const Transform& transform);
+	GameObject(const Transform& transform, const std::string& name);
 	virtual ~GameObject();
 
 	virtual void Update(const GameTimer& gt);
 
 	virtual void GetPicked(float dst, DirectX::XMFLOAT3 hitPoint);
 
-
-	void Release();
+	virtual void Release();
 
 protected:
 
@@ -33,13 +31,12 @@ protected:
 	bool HasGameObject(std::string name);
 	std::shared_ptr<GameObject> GetGameObject(std::string name);
 	void AddGameObject(std::shared_ptr<GameObject> gameObject);
-	void AddGameObject(std::string name, std::shared_ptr<GameObject> gameObject);
 	void DeleteGameObject(std::string name);
 
 	// ≤ƒ÷ 
-	std::shared_ptr<MaterialData> GetMaterial();
-	void AddMaterial(const std::string& name, std::shared_ptr<MaterialData> materialData);
-	std::string AddMaterial(std::shared_ptr<MaterialData> materialData);
+	void AddMaterial();
+	std::shared_ptr<Material> GetMaterial();
+	void SetMaterial(std::shared_ptr<Material> material);
 
 	// Œ∆¿Ì
 	int GetTextureIndex(std::string name);
@@ -54,11 +51,12 @@ public:
 	std::string mName;
 	Transform mTransform;
 
-	std::unique_ptr<MeshRender> mMeshRender = nullptr;
-	std::unique_ptr<RigidDynamic> mRigidDynamic = nullptr;
-	std::unique_ptr<RigidStatic> mRigidStatic = nullptr;
+	std::shared_ptr<Material> mMaterial = nullptr;
+	std::shared_ptr<MeshRenderCPT> mMeshRenderCPT = nullptr;
+	std::shared_ptr<RigidDynamicCPT> mRigidDynamicCPT = nullptr;
+	std::shared_ptr<RigidStaticCPT> mRigidStaticCPT = nullptr;
 
-	std::unique_ptr<GameTimer> mGameTimer = nullptr;
+	std::shared_ptr<GameTimer> mGameTimer = nullptr;
 	float mLifeTime = 0.0f;
 
 private:

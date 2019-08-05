@@ -61,10 +61,10 @@ void DepthComplexityUseBlend::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, con
 	gCommandList->SetGraphicsRootDescriptorTable(4, gSceneManager->GetCurrTextureManager()->GetGpuSrvCube());
 
 	gCommandList->SetPipelineState(gPSOs["ShowDepthComplexityUseBlend"].Get());
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Opaque);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::AlphaTested);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Transparent);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::AlphaTested);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Transparent);
 }
 
 void DepthComplexityUseBlend::BuildRootSignature()

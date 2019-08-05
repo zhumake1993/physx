@@ -2,17 +2,26 @@
 
 using namespace DirectX;
 
-Segment::Segment(const Transform& transform)
-	:GameObject(transform)
+Segment::Segment(const Transform& transform, const std::string& name)
+	:GameObject(transform, name)
 {
+	// Material
+	mMaterial = std::make_shared<Material>();
+	mMaterial->mDiffuseMapIndex = -1;
+	mMaterial->mNormalMapIndex = -1;
+	mMaterial->mDiffuseAlbedo = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	mMaterial->mFresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
+	mMaterial->mRoughness = 0.1f;
+	AddMaterial();
+
 	// MeshRender
-	mMeshRender = std::make_unique<MeshRender>(transform);
-	mMeshRender->mMatName = "Line";
-	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	mMeshRender->mMeshName = "Segment";
-	mMeshRender->mRenderLayer = (int)RenderLayer::Opaque;
-	mMeshRender->mReceiveShadow = false;
-	mMeshRender->AddMeshRender();
+	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
+	mMeshRenderCPT->mMaterial = mMaterial;
+	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
+	mMeshRenderCPT->mMeshName = "Segment";
+	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
+	mMeshRenderCPT->mReceiveShadow = false;
+	mMeshRenderCPT->AddMeshRender();
 
 	Destroy(1.0f);
 }

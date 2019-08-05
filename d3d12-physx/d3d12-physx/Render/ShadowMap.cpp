@@ -157,10 +157,10 @@ void ShadowMap::DrawSceneToShadowMap()
 	gCommandList->SetGraphicsRootDescriptorTable(4, gSceneManager->GetCurrTextureManager()->GetGpuSrvCube());
 
 	gCommandList->SetPipelineState(gPSOs["Shadow"].Get());
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Opaque);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::AlphaTested);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Transparent);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::AlphaTested);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Transparent);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
 
 	// 转换回GENERIC_READ，使得能够在着色器中读取该纹理
 	gCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(mShadowMap.Get(),

@@ -1,13 +1,17 @@
 #include "GameObject.h"
+#include "Manager/CurrManagers.h"
 
 using namespace DirectX;
 
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
-
-GameObject::GameObject(const Transform& transform)
+GameObject::GameObject(const Transform& transform, const std::string& name)
 {
-	mName = "";
+	if (name != "") {
+		mName = name;
+	}
+	else {
+		mName = GetCurrGameObjectManager()->NewGameObjectName();
+	}
+
 	mTransform = transform;
 }
 
@@ -25,16 +29,16 @@ void GameObject::Update(const GameTimer& gt)
 		}
 	}
 
-	if (mRigidDynamic) {
-		mRigidDynamic->Update();
-		mTransform.Translation = mRigidDynamic->mParentTransform.Translation;
-		mTransform.Quaternion = mRigidDynamic->mParentTransform.Quaternion;
+	if (mRigidDynamicCPT) {
+		mRigidDynamicCPT->Update();
+		mTransform.Translation = mRigidDynamicCPT->mParentTransform.Translation;
+		mTransform.Quaternion = mRigidDynamicCPT->mParentTransform.Quaternion;
 	}
 
-	if (mMeshRender) {
-		mMeshRender->mTransform.Translation = mTransform.Translation;
-		mMeshRender->mTransform.Quaternion = mTransform.Quaternion;
-		mMeshRender->Update();
+	if (mMeshRenderCPT) {
+		mMeshRenderCPT->mTransform.Translation = mTransform.Translation;
+		mMeshRenderCPT->mTransform.Quaternion = mTransform.Quaternion;
+		mMeshRenderCPT->Update();
 	}
 }
 
@@ -44,86 +48,86 @@ void GameObject::GetPicked(float dst, DirectX::XMFLOAT3 hitPoint)
 
 void GameObject::Release()
 {
-	if (mMeshRender) {
-		mMeshRender->Release();
+	if (mMaterial) {
+		GetCurrMaterialManager()->DeleteMaterial(mMaterial->mName);
 	}
 
-	if (mRigidDynamic) {
-		mRigidDynamic->Release();
+	if (mMeshRenderCPT) {
+		mMeshRenderCPT->Release();
 	}
 
-	if (mRigidStatic) {
-		mRigidStatic->Release();
+	if (mRigidDynamicCPT) {
+		mRigidDynamicCPT->Release();
+	}
+
+	if (mRigidStaticCPT) {
+		mRigidStaticCPT->Release();
 	}
 }
 
 bool GameObject::GetKeyDown(int key)
 {
-	return gSceneManager->GetCurrInputManager()->GetKeyDown(key);
+	return GetCurrInputManager()->GetKeyDown(key);
 }
 
 bool GameObject::GetKeyPress(int key)
 {
-	return gSceneManager->GetCurrInputManager()->GetKeyPress(key);
+	return GetCurrInputManager()->GetKeyPress(key);
 }
 
 bool GameObject::GetKeyUp(int key)
 {
-	return gSceneManager->GetCurrInputManager()->GetKeyUp(key);
+	return GetCurrInputManager()->GetKeyUp(key);
 }
 
 bool GameObject::HasGameObject(std::string name)
 {
-	return gSceneManager->GetCurrGameObjectManager()->HasGameObject(name);
+	return GetCurrGameObjectManager()->HasGameObject(name);
 }
 
 std::shared_ptr<GameObject> GameObject::GetGameObject(std::string name)
 {
-	return gSceneManager->GetCurrGameObjectManager()->GetGameObject(name);
+	return GetCurrGameObjectManager()->GetGameObject(name);
 }
 
 void GameObject::AddGameObject(std::shared_ptr<GameObject> gameObject)
 {
-	gSceneManager->GetCurrGameObjectManager()->AddGameObject(gameObject);
-}
-
-void GameObject::AddGameObject(std::string name, std::shared_ptr<GameObject> gameObject)
-{
-	gSceneManager->GetCurrGameObjectManager()->AddGameObject(name, gameObject);
+	GetCurrGameObjectManager()->AddGameObject(gameObject);
 }
 
 void GameObject::DeleteGameObject(std::string name)
 {
-	gSceneManager->GetCurrGameObjectManager()->DeleteGameObject(name);
+	GetCurrGameObjectManager()->DeleteGameObject(name);
 }
 
-std::shared_ptr<MaterialData> GameObject::GetMaterial()
+void GameObject::AddMaterial()
 {
-	if (!mMeshRender) {
-		ThrowMyEx("The current gameobject does not have MeshRender!")
+	GetCurrMaterialManager()->AddMaterial(mMaterial);
+}
+
+std::shared_ptr<Material> GameObject::GetMaterial()
+{
+	if (mMaterial) {
+		return mMaterial;
 	}
-
-	return gSceneManager->GetCurrMaterialManager()->GetMaterial(mMeshRender->mMatName);
+	else {
+		return mMeshRenderCPT->mMaterial;
+	}
 }
 
-void GameObject::AddMaterial(const std::string& name, std::shared_ptr<MaterialData> materialData)
+void GameObject::SetMaterial(std::shared_ptr<Material> material)
 {
-	gSceneManager->GetCurrMaterialManager()->AddMaterial(name, materialData);
-}
-
-std::string GameObject::AddMaterial(std::shared_ptr<MaterialData> materialData)
-{
-	return gSceneManager->GetCurrMaterialManager()->AddMaterial(materialData);
+	GetCurrMaterialManager()->SetMaterial(material);
 }
 
 int GameObject::GetTextureIndex(std::string name)
 {
-	return gSceneManager->GetCurrTextureManager()->GetIndex(name);
+	return GetCurrTextureManager()->GetIndex(name);
 }
 
 void GameObject::SwitchScene(std::string name)
 {
-	gSceneManager->SwitchScene(name);
+	SwitchScene(name);
 }
 
 void GameObject::Destroy(float time)

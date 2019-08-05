@@ -11,12 +11,10 @@ public:
 	void Initialize();
 
 	bool HasGameObject(std::string name);
-	bool HasGameObject(std::shared_ptr<GameObject> gameObject);
 	std::shared_ptr<GameObject> GetGameObject(std::string name);
+	std::string NewGameObjectName();
 	void AddGameObject(std::shared_ptr<GameObject> gameObject);
-	void AddGameObject(std::string name, std::shared_ptr<GameObject> gameObject);
 	void DeleteGameObject(std::string name);
-	void DeleteGameObject(std::shared_ptr<GameObject> gameObject);
 
 	void Update(const GameTimer& gt);
 

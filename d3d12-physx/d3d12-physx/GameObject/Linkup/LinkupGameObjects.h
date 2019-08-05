@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameObject/Sky.h"
 #include "Cube.h"
 #include "Floor.h"
 #include "Logic.h"

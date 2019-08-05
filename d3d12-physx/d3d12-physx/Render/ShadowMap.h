@@ -2,7 +2,7 @@
 
 #include "Common/d3dUtil.h"
 #include "Common/FrameResource.h"
-#include "Manager/InstanceManager.h"
+#include "Manager/MeshRenderInstanceManager.h"
 #include "Manager/TextureManager.h"
 
 class ShadowMap

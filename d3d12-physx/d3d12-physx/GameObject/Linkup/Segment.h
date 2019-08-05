@@ -6,7 +6,7 @@ class Segment :
 	public GameObject
 {
 public:
-	Segment(const Transform& transform = Transform());
+	Segment(const Transform& transform = Transform(), const std::string& name = "");
 	~Segment();
 
 private:

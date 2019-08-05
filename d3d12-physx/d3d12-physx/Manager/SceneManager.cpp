@@ -66,9 +66,9 @@ std::shared_ptr<GameObjectManager> SceneManager::GetCurrGameObjectManager()
 	return mCurrScene->GetGameObjectManager();
 }
 
-std::shared_ptr<InstanceManager> SceneManager::GetCurrInstanceManager()
+std::shared_ptr<MeshRenderInstanceManager> SceneManager::GetCurrMeshRenderInstanceManager()
 {
-	return mCurrScene->GetInstanceManager();
+	return mCurrScene->GetMeshRenderInstanceManager();
 }
 
 std::shared_ptr<TextureManager> SceneManager::GetCurrTextureManager()

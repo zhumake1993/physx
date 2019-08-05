@@ -61,10 +61,10 @@ void Wireframe::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_D
 	gCommandList->SetGraphicsRootDescriptorTable(4, gSceneManager->GetCurrTextureManager()->GetGpuSrvCube());
 
 	gCommandList->SetPipelineState(gPSOs["Wireframe"].Get());
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Opaque);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::AlphaTested);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Transparent);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::AlphaTested);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Transparent);
 }
 
 void Wireframe::BuildRootSignature()

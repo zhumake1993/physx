@@ -91,16 +91,16 @@ void MainRender::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_
 	gCommandList->SetGraphicsRootDescriptorTable(6, mSsaoSrv);
 
 	gCommandList->SetPipelineState(gPSOs["opaque"].Get());
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Opaque);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
 
 	gCommandList->SetPipelineState(gPSOs["alphaTested"].Get());
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::AlphaTested);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::AlphaTested);
 
 	gCommandList->SetPipelineState(gPSOs["sky"].Get());
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Sky);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Sky);
 
 	gCommandList->SetPipelineState(gPSOs["transparent"].Get());
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Transparent);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Transparent);
 
 	// 使用动态立方体贴图绘制动态反射物体
 	// 绑定动态立方体贴图的描述符堆
@@ -109,12 +109,12 @@ void MainRender::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_
 	gCommandList->SetGraphicsRootDescriptorTable(4, mCubeMapSrv);
 
 	gCommandList->SetPipelineState(gPSOs["opaque"].Get());
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
 
 	// 绘制线框物体
 	if (gDrawWireframe) {
 		gCommandList->SetPipelineState(gPSOs["Wireframe"].Get());
-		gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Wireframe);
+		gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Wireframe);
 	}
 }
 

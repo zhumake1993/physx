@@ -2,7 +2,7 @@
 
 #include "Common/Camera.h"
 #include "Manager/GameObjectManager.h"
-#include "Manager/InstanceManager.h"
+#include "Manager/MeshRenderInstanceManager.h"
 #include "Manager/TextureManager.h"
 #include "Manager/MaterialManager.h"
 #include "Manager/MeshManager.h"
@@ -18,7 +18,7 @@ public:
 	virtual void Initialize();
 
 	std::shared_ptr<GameObjectManager> GetGameObjectManager();
-	std::shared_ptr<InstanceManager> GetInstanceManager();
+	std::shared_ptr<MeshRenderInstanceManager> GetMeshRenderInstanceManager();
 	std::shared_ptr<TextureManager> GetTextureManager();
 	std::shared_ptr<MaterialManager> GetMaterialManager();
 	std::shared_ptr<MeshManager> GetMeshManager();
@@ -42,7 +42,7 @@ protected:
 protected:
 	
 	std::shared_ptr<GameObjectManager> mGameObjectManager;				// 游戏物体管理器
-	std::shared_ptr<InstanceManager> mInstanceManager;					// 渲染实例管理器
+	std::shared_ptr<MeshRenderInstanceManager> mMeshRenderInstanceManager;					// 渲染实例管理器
 	std::shared_ptr<TextureManager> mTextureManager;					// 纹理管理器
 	std::shared_ptr<MaterialManager> mMaterialManager;					// 材质管理器
 	std::shared_ptr<MeshManager> mMeshManager;							// 网格管理器

@@ -62,10 +62,10 @@ void DepthComplexityUseStencil::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, c
 
 	// 计算深度复杂度
 	gCommandList->SetPipelineState(gPSOs["CountDepthComplexityUseStencil"].Get());
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Opaque);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::AlphaTested);
-	gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Transparent);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::AlphaTested);
+	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Transparent);
 
 	// 显示深度复杂度（使用模板缓冲）
 	gCommandList->SetGraphicsRootSignature(mRootSignature.Get());

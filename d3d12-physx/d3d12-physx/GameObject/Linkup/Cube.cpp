@@ -2,36 +2,37 @@
 
 using namespace DirectX;
 
-Cube::Cube(const Transform& transform)
-	:GameObject(transform)
+Cube::Cube(const Transform& transform, const std::string& name)
+	:GameObject(transform, name)
 {
-	// 个人材质
-	auto red = std::make_shared<MaterialData>();
-	red->DiffuseMapIndex = -1;
-	red->NormalMapIndex = GetTextureIndex("tile_nmap");
-	red->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	red->FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
-	red->Roughness = 0.1f;
-	red->LerpDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	red->LerpPara = 0.0f;
-	auto matName = AddMaterial(red);
+	// Material
+	mMaterial = std::make_shared<Material>();
+	mMaterial->mDiffuseMapIndex = -1;
+	mMaterial->mNormalMapIndex = GetTextureIndex("tile_nmap");
+	mMaterial->mDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mMaterial->mFresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
+	mMaterial->mRoughness = 0.1f;
+	mMaterial->mLerpDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mMaterial->mLerpPara = 0.0f;
+	AddMaterial();
 
 	// MeshRender
-	mMeshRender = std::make_unique<MeshRender>(transform);
-	mMeshRender->mMatName = matName;
-	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	mMeshRender->mMeshName = "box";
-	mMeshRender->mRenderLayer = (int)RenderLayer::Opaque;
-	mMeshRender->mReceiveShadow = true;
-	mMeshRender->AddMeshRender();
+	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
+	mMeshRenderCPT->mMaterial = mMaterial;
+	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
+	mMeshRenderCPT->mMeshName = "box";
+	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
+	mMeshRenderCPT->mReceiveShadow = true;
+	mMeshRenderCPT->mParent = mName;
+	mMeshRenderCPT->AddMeshRender();
 
-	// 刚体
+	// Rigidbody
 	Transform rigidStaticLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-	mRigidStatic = std::make_unique<RigidStatic>(transform, rigidStaticLocal);
-	mRigidStatic->mScale = XMFLOAT4(0.48f, 0.48f, 0.48f, 0.48f);
-	mRigidStatic->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
-	mRigidStatic->mPxGeometry = PxBoxEnum;
-	mRigidStatic->AddRigidStatic();
+	mRigidStaticCPT = std::make_shared<RigidStaticCPT>(transform, rigidStaticLocal);
+	mRigidStaticCPT->mScale = XMFLOAT4(0.48f, 0.48f, 0.48f, 0.48f);
+	mRigidStaticCPT->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
+	mRigidStaticCPT->mPxGeometry = PxBoxEnum;
+	mRigidStaticCPT->AddRigidStatic();
 }
 
 Cube::~Cube()
@@ -54,19 +55,21 @@ void Cube::TurnOffBlink()
 {
 	mBlink = false;
 	auto mat = GetMaterial();
-	mat->LerpPara = 0.0f;
+	mat->mLerpPara = 0.0f;
+	SetMaterial(mat);
 }
 
 void Cube::SetColor(DirectX::XMFLOAT3 color)
 {
 	auto mat = GetMaterial();
-	mat->DiffuseAlbedo = XMFLOAT4(color.x, color.y, color.z, 1.0f);
+	mat->mDiffuseAlbedo = XMFLOAT4(color.x, color.y, color.z, 1.0f);
+	SetMaterial(mat);
 }
 
 DirectX::XMFLOAT3 Cube::GetColor()
 {
 	auto mat = GetMaterial();
-	return XMFLOAT3(mat->DiffuseAlbedo.x, mat->DiffuseAlbedo.y, mat->DiffuseAlbedo.z);
+	return XMFLOAT3(mat->mDiffuseAlbedo.x, mat->mDiffuseAlbedo.y, mat->mDiffuseAlbedo.z);
 }
 
 void Cube::Update(const GameTimer& gt)
@@ -86,16 +89,23 @@ void Cube::Update(const GameTimer& gt)
 		auto mat = GetMaterial();
 
 		if (mTurnWhite) {
-			mat->LerpPara += gt.DeltaTime() * 3;
-			if (mat->LerpPara >= 1) {
+			mat->mLerpPara += gt.DeltaTime() * 3;
+			if (mat->mLerpPara >= 1) {
 				mTurnWhite = false;
 			}
 		}
 		else {
-			mat->LerpPara -= gt.DeltaTime() * 3;
-			if (mat->LerpPara <= 0) {
+			mat->mLerpPara -= gt.DeltaTime() * 3;
+			if (mat->mLerpPara <= 0) {
 				mTurnWhite = true;
 			}
 		}
+
+		SetMaterial(mat);
 	}
+}
+
+void Cube::Release()
+{
+	GameObject::Release();
 }

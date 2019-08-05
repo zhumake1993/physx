@@ -6,7 +6,7 @@ class Sky :
 	public GameObject
 {
 public:
-	Sky(const Transform& transform = Transform());
+	Sky(const Transform& transform = Transform(), const std::string& name = "");
 	~Sky();
 
 private:

@@ -1,14 +1,5 @@
 #include "D3D12App.h"
 
-#include "GameObject/Sky.h"
-#include "GameObject/Box.h"
-#include "GameObject/Skull.h"
-#include "GameObject/Globe.h"
-#include "GameObject/Grid.h"
-#include "GameObject/Cylinder.h"
-#include "GameObject/Sphere.h"
-#include "GameObject/BoxPx.h"
-
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
 

@@ -21,6 +21,7 @@ Skull::Skull(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mMeshName = "skull";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
 	mMeshRenderCPT->mReceiveShadow = true;
+	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
 }
 

@@ -1,9 +1,7 @@
 #include "RigidStaticCPT.h"
+#include "Manager/SceneManager.h"
 
 using namespace DirectX;
-
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
 
 #include "../physx/Main/PhysX.h"
 extern PhysX gPhysX;
@@ -60,7 +58,7 @@ void RigidStaticCPT::AddRigidStatic()
 
 	// ÃÌº”∏’ÃÂMeshRender
 	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(Transform(worldPos, worldQuat, XMFLOAT3(mScale.x * 2, mScale.y * 2, mScale.z * 2)));
-	mMeshRenderCPT->mMaterial = gSceneManager->GetCurrMaterialManager()->GetDefaultMaterial();
+	mMeshRenderCPT->mMaterial = GetCurrMaterialManager()->GetDefaultMaterial();
 	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
 	mMeshRenderCPT->mMeshName = "UnitBox";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Wireframe;

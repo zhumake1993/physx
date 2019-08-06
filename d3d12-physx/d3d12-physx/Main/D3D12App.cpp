@@ -19,7 +19,6 @@ extern std::unique_ptr<SceneManager> gSceneManager;
 
 #include "../physx/Main/PhysX.h"
 extern PhysX gPhysX;
-extern bool gDrawWireframe;
 
 D3D12App::D3D12App(HINSTANCE hInstance)
 	: D3DApp(hInstance)
@@ -145,32 +144,36 @@ void D3D12App::Draw(const GameTimer& gt)
 	//
 
 
-	if (mIsWireframe) {
+	if (GetCurrIsWireframe()) {
 		mWireframe->Draw(mRenderTarget->Rtv(), DepthStencilView());
 	} 
-	else if (mIsDepthComplexityUseStencil) {
+	else if (GetCurrIsDepthComplexityUseStencil()) {
 		mDepthComplexityUseStencil->Draw(mRenderTarget->Rtv(), DepthStencilView());
 	}
-	else if (mIsDepthComplexityUseBlend) {
+	else if (GetCurrIsDepthComplexityUseBlend()) {
 		mDepthComplexityUseBlend->Draw(mRenderTarget->Rtv(), DepthStencilView());
 		mInverseFilter->ExcuteInOut(mRenderTarget->Resource(), mRenderTarget->Resource());
 	}
 	else {
-		// 关闭平截头剔除
-		gSceneManager->GetCurrMainCamera()->mFrustumCullingEnabled = false;
 
-		mShadowMap->DrawSceneToShadowMap();
+		if (GetCurrIsShadowMap()) {
+			mShadowMap->DrawSceneToShadowMap();
+		}
 
-		mSsao->DrawNormalsAndDepth();
-		mSsao->ComputeSsao(3);
+		if (GetCurrIsSsao()) {
+			mSsao->DrawNormalsAndDepth();
+			mSsao->ComputeSsao(3);
+		}
 
-		mCubeMap->SetShadow(mShadowMap->GetSrvDescriptorHeapPtr(), mShadowMap->Srv());
-		// 这里直接使用该Ssao贴图是有问题的
-		// 因为该Ssao贴图的计算是基于主摄像机，而非cubemap的6个摄像机
-		// 正确的做法是基于cubemap的6个摄像机计算出6个不同的Ssao贴图
-		// 这里做近似处理，直接使用该Ssao贴图
-		mCubeMap->SetSsao(mSsao->GetSrvDescriptorHeapPtr(), mSsao->Srv());
-		mCubeMap->DrawSceneToCubeMap();
+		if (GetCurrIsCubeMap()) {
+			mCubeMap->SetShadow(mShadowMap->GetSrvDescriptorHeapPtr(), mShadowMap->Srv());
+			// 这里直接使用该Ssao贴图是有问题的
+			// 因为该Ssao贴图的计算是基于主摄像机，而非cubemap的6个摄像机
+			// 正确的做法是基于cubemap的6个摄像机计算出6个不同的Ssao贴图
+			// 这里做近似处理，直接使用该Ssao贴图
+			mCubeMap->SetSsao(mSsao->GetSrvDescriptorHeapPtr(), mSsao->Srv());
+			mCubeMap->DrawSceneToCubeMap();
+		}
 
 		mMainRender->SetShadow(mShadowMap->GetSrvDescriptorHeapPtr(), mShadowMap->Srv());
 		mMainRender->SetCubeMap(mCubeMap->GetSrvDescriptorHeapPtr(), mCubeMap->Srv());
@@ -182,11 +185,11 @@ void D3D12App::Draw(const GameTimer& gt)
 	// 后处理
 	//
 
-	if (mIsBlur) {
+	if (GetCurrIsBlur()) {
 		mBlurFilter->ExcuteInOut(mRenderTarget->Resource(), mRenderTarget->Resource(), 4);
 	}
 
-	if (mIsSobel) {
+	if (GetCurrIsSobel()) {
 		mSobelFilter->ExcuteInOut(mRenderTarget->Resource(), mShaderResourceTemp->Resource());
 		mInverseFilter->ExcuteInOut(mShaderResourceTemp->Resource(), mShaderResourceTemp->Resource());
 		mMultiplyFilter->ExcuteInOut(mRenderTarget->Resource(), mShaderResourceTemp->Resource(), mRenderTarget->Resource());
@@ -230,71 +233,37 @@ void D3D12App::OnMouseDown(WPARAM btnState, int x, int y)
 		SetCapture(mhMainWnd);
 	}
 
-	gSceneManager->GetCurrInputManager()->OnMouseDown(btnState, x, y);
+	GetCurrInputManager()->OnMouseDown(btnState, x, y);
 }
 
 void D3D12App::OnMouseUp(WPARAM btnState, int x, int y)
 {
 	ReleaseCapture();
 
-	gSceneManager->GetCurrInputManager()->OnMouseUp(btnState, x, y);
+	GetCurrInputManager()->OnMouseUp(btnState, x, y);
 }
 
 void D3D12App::OnMouseMove(WPARAM btnState, int x, int y)
 {
-	gSceneManager->GetCurrInputManager()->OnMouseMove(btnState, x, y);
+	GetCurrInputManager()->OnMouseMove(btnState, x, y);
 }
 
 void D3D12App::OnKeyDown(WPARAM vkCode)
 {
-	if (vkCode == '1') {
-		mIsWireframe = !mIsWireframe;
-		mIsDepthComplexityUseStencil = false;
-		mIsDepthComplexityUseBlend = false;
-	}
-
-	if (vkCode == '2') {
-		mIsDepthComplexityUseStencil = !mIsDepthComplexityUseStencil;
-		mIsWireframe = false;
-		mIsDepthComplexityUseBlend = false;
-	}
-
-	if (vkCode == '3') {
-		mIsDepthComplexityUseBlend = !mIsDepthComplexityUseBlend;
-		mIsWireframe = false;
-		mIsDepthComplexityUseStencil = false;
-	}
-
-	if (vkCode == '4') {
-		mIsBlur = !mIsBlur;
-	}
-
-	if (vkCode == '5') {
-		mIsSobel = !mIsSobel;
-	}
-
-	if (vkCode == '6') {
-		gSceneManager->GetCurrMainCamera()->mFrustumCullingEnabled = !gSceneManager->GetCurrMainCamera()->mFrustumCullingEnabled;
-	}
-
-	if (vkCode == 'M') {
-		gDrawWireframe = !gDrawWireframe;
-	}
-
-	gSceneManager->GetCurrInputManager()->OnKeyDown(vkCode);
+	GetCurrInputManager()->OnKeyDown(vkCode);
 }
 
 void D3D12App::OnKeyUp(WPARAM vkCode)
 {
-	gSceneManager->GetCurrInputManager()->OnKeyUp(vkCode);
+	GetCurrInputManager()->OnKeyUp(vkCode);
 }
 
 void D3D12App::UpdateFrameResource(const GameTimer& gt)
 {
 	PassConstants mainPassCB;
 
-	XMMATRIX view = gSceneManager->GetCurrMainCamera()->GetView();
-	XMMATRIX proj = gSceneManager->GetCurrMainCamera()->GetProj();
+	XMMATRIX view = GetCurrMainCamera()->GetView();
+	XMMATRIX proj = GetCurrMainCamera()->GetProj();
 
 	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
 	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
@@ -319,7 +288,7 @@ void D3D12App::UpdateFrameResource(const GameTimer& gt)
 	XMStoreFloat4x4(&mainPassCB.ViewProjTex, XMMatrixTranspose(viewProjTex));
 	XMStoreFloat4x4(&mainPassCB.ShadowTransform, XMMatrixTranspose(shadowTransform));
 
-	mainPassCB.EyePosW = gSceneManager->GetCurrMainCamera()->GetPosition3f();
+	mainPassCB.EyePosW = GetCurrMainCamera()->GetPosition3f();
 	mainPassCB.RenderTargetSize = XMFLOAT2((float)gSetting.ClientWidth, (float)gSetting.ClientHeight);
 	mainPassCB.InvRenderTargetSize = XMFLOAT2(1.0f / gSetting.ClientWidth, 1.0f / gSetting.ClientHeight);
 	mainPassCB.NearZ = 1.0f;
@@ -333,6 +302,9 @@ void D3D12App::UpdateFrameResource(const GameTimer& gt)
 	mainPassCB.Lights[1].Strength = { 0.4f, 0.4f, 0.4f };
 	mainPassCB.Lights[2].Direction = mRotatedLightDirections[2];
 	mainPassCB.Lights[2].Strength = { 0.2f, 0.2f, 0.2f };
+
+	mainPassCB.EnableShadow = GetCurrIsShadowMap();
+	mainPassCB.EnableSsao = GetCurrIsSsao();
 
 	gPassCB->Copy(0, mainPassCB);
 

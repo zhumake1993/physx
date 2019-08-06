@@ -7,3 +7,4 @@
 #include "Segment.h"
 #include "Inflection.h"
 #include "Fragment.h"
+#include "RenderAndFilter.h"

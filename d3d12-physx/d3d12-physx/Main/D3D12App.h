@@ -71,14 +71,8 @@ private:
 	std::unique_ptr<ShaderResource> mShaderResourceTemp = nullptr;
 
 	std::unique_ptr<Wireframe> mWireframe = nullptr;
-	bool mIsWireframe = false;
-
 	std::unique_ptr<DepthComplexityUseStencil> mDepthComplexityUseStencil = nullptr;
-	bool mIsDepthComplexityUseStencil = false;
-
 	std::unique_ptr<DepthComplexityUseBlend> mDepthComplexityUseBlend = nullptr;
-	bool mIsDepthComplexityUseBlend = false;
-
 	std::unique_ptr<CubeMap> mCubeMap = nullptr;
 	std::unique_ptr<ShadowMap> mShadowMap = nullptr;
 	std::unique_ptr<Ssao> mSsao = nullptr;
@@ -88,11 +82,7 @@ private:
 	//
 
 	std::unique_ptr<BlurFilter> mBlurFilter;
-	bool mIsBlur = false;
-
 	std::unique_ptr<SobelFilter> mSobelFilter;
-	bool mIsSobel = false;
-
 	std::unique_ptr<InverseFilter> mInverseFilter;
 	std::unique_ptr<MultiplyFilter> mMultiplyFilter;
 };

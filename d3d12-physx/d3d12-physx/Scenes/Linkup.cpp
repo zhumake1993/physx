@@ -18,6 +18,10 @@ void Linkup::Initialize()
 {
 	Scene::Initialize();
 
+	mIsCubeMap = false;
+	mIsShadowMap = false;
+	mIsSsao = false;
+
 	mMainCamera->SetPosition(0.0f, 2.0f, -15.0f);
 }
 
@@ -47,6 +51,11 @@ void Linkup::Update(const GameTimer& gt)
 		mLastMousePos.x = mInputManager->GetMouseX();
 		mLastMousePos.y = mInputManager->GetMouseY();
 	}
+}
+
+void Linkup::PostUpdate(const GameTimer& gt)
+{
+	Scene::PostUpdate(gt);
 }
 
 void Linkup::BuildManagers()
@@ -100,6 +109,9 @@ void Linkup::BuildGameObjects()
 {
 	auto logic = std::make_shared<Logic>(Transform(), "Logic");
 	mGameObjectManager->AddGameObject(logic);
+
+	auto renderAndFilter = std::make_shared<RenderAndFilter>(Transform(), "RenderAndFilter");
+	mGameObjectManager->AddGameObject(renderAndFilter);
 
 	auto sky = std::make_shared<Sky>(Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)), "Sky");
 	mGameObjectManager->AddGameObject(sky);

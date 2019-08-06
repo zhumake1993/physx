@@ -1,5 +1,5 @@
 #include "MeshRenderInstance.h"
-#include "Manager/CurrManagers.h"
+#include "Manager/SceneManager.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;

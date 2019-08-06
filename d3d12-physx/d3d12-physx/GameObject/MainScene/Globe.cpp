@@ -21,6 +21,7 @@ Globe::Globe(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mMeshName = "sphere";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::OpaqueDynamicReflectors;
 	mMeshRenderCPT->mReceiveShadow = true;
+	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
 }
 

@@ -161,6 +161,7 @@
     <ClCompile Include="GameObject\Linkup\Fragment.cpp" />
     <ClCompile Include="GameObject\Linkup\Inflection.cpp" />
     <ClCompile Include="GameObject\Linkup\Logic.cpp" />
+    <ClCompile Include="GameObject\Linkup\RenderAndFilter.cpp" />
     <ClCompile Include="GameObject\Linkup\Segment.cpp" />
     <ClCompile Include="GameObject\MainScene\Box.cpp" />
     <ClCompile Include="GameObject\MainScene\BoxPx.cpp" />
@@ -223,6 +224,7 @@
     <ClInclude Include="GameObject\Linkup\Inflection.h" />
     <ClInclude Include="GameObject\Linkup\LinkupGameObjects.h" />
     <ClInclude Include="GameObject\Linkup\Logic.h" />
+    <ClInclude Include="GameObject\Linkup\RenderAndFilter.h" />
     <ClInclude Include="GameObject\Linkup\Segment.h" />
     <ClInclude Include="GameObject\MainScene\Box.h" />
     <ClInclude Include="GameObject\MainScene\BoxPx.h" />
@@ -234,7 +236,6 @@
     <ClInclude Include="GameObject\MainScene\Sphere.h" />
     <ClInclude Include="GameObject\Sky.h" />
     <ClInclude Include="Main\D3D12App.h" />
-    <ClInclude Include="Manager\CurrManagers.h" />
     <ClInclude Include="Manager\GameObject.h" />
     <ClInclude Include="Manager\GameObjectManager.h" />
     <ClInclude Include="Manager\InputManager.h" />

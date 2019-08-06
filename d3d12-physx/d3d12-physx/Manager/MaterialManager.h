@@ -48,7 +48,7 @@ public:
 
 private:
 
-	UINT mMaterialDataCapacity = 128;
+	UINT mMaterialDataCapacity = 1024;
 	std::vector<UINT> mIndicesUnused;
 	UINT mMaterialCount = 0;
 

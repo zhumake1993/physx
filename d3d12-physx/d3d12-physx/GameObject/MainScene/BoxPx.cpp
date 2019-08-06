@@ -21,6 +21,7 @@ BoxPx::BoxPx(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mMeshName = "box";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
 	mMeshRenderCPT->mReceiveShadow = true;
+	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
 
 	// ¸ÕÌå

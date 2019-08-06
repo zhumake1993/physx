@@ -1,4 +1,5 @@
 #include "ShadowMap.h"
+#include "Manager/SceneManager.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
@@ -7,9 +8,6 @@ extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
-
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
 
 extern std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> gRootSignatures;
@@ -143,24 +141,24 @@ void ShadowMap::DrawSceneToShadowMap()
 	gCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
 
 	// 绑定所有材质。对于结构化缓冲，我们可以绕过堆，使用根描述符
-	auto matBuffer = gSceneManager->GetCurrMaterialManager()->CurrResource();
+	auto matBuffer = GetCurrMaterialManager()->CurrResource();
 	gCommandList->SetGraphicsRootShaderResourceView(2, matBuffer->GetGPUVirtualAddress());
 
 	// 绑定描述符堆
-	ID3D12DescriptorHeap* descriptorHeaps[] = { gSceneManager->GetCurrTextureManager()->GetSrvDescriptorHeapPtr() };
+	ID3D12DescriptorHeap* descriptorHeaps[] = { GetCurrTextureManager()->GetSrvDescriptorHeapPtr() };
 	gCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	// 绑定所有的纹理
-	gCommandList->SetGraphicsRootDescriptorTable(3, gSceneManager->GetCurrTextureManager()->GetGpuSrvTex());
+	gCommandList->SetGraphicsRootDescriptorTable(3, GetCurrTextureManager()->GetGpuSrvTex());
 
 	// 绑定天空球立方体贴图
-	gCommandList->SetGraphicsRootDescriptorTable(4, gSceneManager->GetCurrTextureManager()->GetGpuSrvCube());
+	gCommandList->SetGraphicsRootDescriptorTable(4, GetCurrTextureManager()->GetGpuSrvCube());
 
 	gCommandList->SetPipelineState(gPSOs["Shadow"].Get());
-	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
-	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::AlphaTested);
-	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Transparent);
-	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
+	GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
+	GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::AlphaTested);
+	GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Transparent);
+	GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
 
 	// 转换回GENERIC_READ，使得能够在着色器中读取该纹理
 	gCommandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(mShadowMap.Get(),

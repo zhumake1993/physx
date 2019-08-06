@@ -21,9 +21,10 @@ Inflection::Inflection(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mMeshName = "Inflection";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
 	mMeshRenderCPT->mReceiveShadow = false;
+	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
 
-	Destroy(1.0f);
+	Destroy(0.25f);
 }
 
 Inflection::~Inflection()

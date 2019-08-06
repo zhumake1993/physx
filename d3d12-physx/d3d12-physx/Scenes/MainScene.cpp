@@ -49,6 +49,11 @@ void MainScene::Update(const GameTimer& gt)
 	}
 }
 
+void MainScene::PostUpdate(const GameTimer& gt)
+{
+	Scene::PostUpdate(gt);
+}
+
 void MainScene::BuildManagers()
 {
 	mTextureManager->Initialize();

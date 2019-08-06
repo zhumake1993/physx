@@ -21,6 +21,7 @@ Sky::Sky(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mMeshName = "sphere";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Sky;
 	mMeshRenderCPT->mReceiveShadow = false;
+	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
 }
 

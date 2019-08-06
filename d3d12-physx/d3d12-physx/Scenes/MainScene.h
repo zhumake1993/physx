@@ -10,8 +10,8 @@ public:
 	~MainScene();
 
 	virtual void Initialize()override;
-
 	virtual void Update(const GameTimer& gt)override;
+	virtual void PostUpdate(const GameTimer& gt)override;
 
 private:
 
@@ -24,5 +24,6 @@ private:
 	void MoveCamera(const GameTimer& gt);
 
 private:
+
 	POINT mLastMousePos;
 };

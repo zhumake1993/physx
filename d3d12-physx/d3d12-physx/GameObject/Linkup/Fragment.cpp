@@ -23,6 +23,7 @@ Fragment::Fragment(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mMeshName = "box";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Transparent;
 	mMeshRenderCPT->mReceiveShadow = true;
+	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
 
 	// ¸ÕÌå

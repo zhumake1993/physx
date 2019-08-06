@@ -26,4 +26,5 @@ public:
 
 private:
 	std::unordered_map<std::string, std::shared_ptr<GameObject>> mGameObjects;
+	std::unordered_set<std::string> mToBeDeleted;
 };

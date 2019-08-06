@@ -1,4 +1,5 @@
 #include "MainRender.h"
+#include "Manager/SceneManager.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -7,9 +8,6 @@ extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
-
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
 
 #include "Common/FrameResource.h"
 extern std::unique_ptr<FrameResource<PassConstants>> gPassCB;
@@ -67,18 +65,18 @@ void MainRender::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_
 	gCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress());
 
 	// 绑定所有材质。对于结构化缓冲，我们可以绕过堆，使用根描述符
-	auto matBuffer = gSceneManager->GetCurrMaterialManager()->CurrResource();
+	auto matBuffer = GetCurrMaterialManager()->CurrResource();
 	gCommandList->SetGraphicsRootShaderResourceView(2, matBuffer->GetGPUVirtualAddress());
 
 	// 绑定描述符堆
-	ID3D12DescriptorHeap* descriptorHeaps[] = { gSceneManager->GetCurrTextureManager()->GetSrvDescriptorHeapPtr() };
+	ID3D12DescriptorHeap* descriptorHeaps[] = { GetCurrTextureManager()->GetSrvDescriptorHeapPtr() };
 	gCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	// 绑定所有的纹理
-	gCommandList->SetGraphicsRootDescriptorTable(3, gSceneManager->GetCurrTextureManager()->GetGpuSrvTex());
+	gCommandList->SetGraphicsRootDescriptorTable(3, GetCurrTextureManager()->GetGpuSrvTex());
 
 	// 绑定天空球立方体贴图
-	gCommandList->SetGraphicsRootDescriptorTable(4, gSceneManager->GetCurrTextureManager()->GetGpuSrvCube());
+	gCommandList->SetGraphicsRootDescriptorTable(4, GetCurrTextureManager()->GetGpuSrvCube());
 
 	// 绑定阴影贴图
 	ID3D12DescriptorHeap* descriptorHeapsShadow[] = { mShadowSrvDescriptorHeapPtr };
@@ -91,37 +89,40 @@ void MainRender::Draw(const CD3DX12_CPU_DESCRIPTOR_HANDLE& rtv, const D3D12_CPU_
 	gCommandList->SetGraphicsRootDescriptorTable(6, mSsaoSrv);
 
 	gCommandList->SetPipelineState(gPSOs["opaque"].Get());
-	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
+	GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
 
 	gCommandList->SetPipelineState(gPSOs["alphaTested"].Get());
-	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::AlphaTested);
+	GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::AlphaTested);
 
 	gCommandList->SetPipelineState(gPSOs["sky"].Get());
-	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Sky);
+	GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Sky);
 
 	gCommandList->SetPipelineState(gPSOs["transparent"].Get());
-	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Transparent);
+	GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Transparent);
 
-	// 使用动态立方体贴图绘制动态反射物体
-	// 绑定动态立方体贴图的描述符堆
-	ID3D12DescriptorHeap* descriptorHeapsCube[] = { mCubeMapSrvDescriptorHeapPtr };
-	gCommandList->SetDescriptorHeaps(_countof(descriptorHeapsCube), descriptorHeapsCube);
-	gCommandList->SetGraphicsRootDescriptorTable(4, mCubeMapSrv);
+	if (GetCurrIsCubeMap()) {
 
-	gCommandList->SetPipelineState(gPSOs["opaque"].Get());
-	gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
+		// 使用动态立方体贴图绘制动态反射物体
+		// 绑定动态立方体贴图的描述符堆
+		ID3D12DescriptorHeap* descriptorHeapsCube[] = { mCubeMapSrvDescriptorHeapPtr };
+		gCommandList->SetDescriptorHeaps(_countof(descriptorHeapsCube), descriptorHeapsCube);
+		gCommandList->SetGraphicsRootDescriptorTable(4, mCubeMapSrv);
+
+		gCommandList->SetPipelineState(gPSOs["opaque"].Get());
+		GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::OpaqueDynamicReflectors);
+	}
 
 	// 绘制线框物体
-	if (gDrawWireframe) {
+	if (GetCurrIsDrawRigidbody()) {
 		gCommandList->SetPipelineState(gPSOs["Wireframe"].Get());
-		gSceneManager->GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Wireframe);
+		GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Wireframe);
 	}
 }
 
 void MainRender::BuildRootSignature()
 {
 	CD3DX12_DESCRIPTOR_RANGE texTable;
-	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, gSceneManager->GetCurrTextureManager()->GetMaxNumTextures(), 3, 0);
+	texTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, GetCurrTextureManager()->GetMaxNumTextures(), 3, 0);
 
 	CD3DX12_DESCRIPTOR_RANGE texCubeMap;
 	texCubeMap.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);

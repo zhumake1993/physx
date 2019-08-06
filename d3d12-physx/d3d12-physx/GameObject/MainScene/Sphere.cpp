@@ -21,6 +21,7 @@ Sphere::Sphere(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mMeshName = "sphere";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
 	mMeshRenderCPT->mReceiveShadow = true;
+	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
 }
 

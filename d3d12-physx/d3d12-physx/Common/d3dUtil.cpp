@@ -26,13 +26,6 @@ std::unique_ptr<FrameResource<PassConstants>> gPassCB = std::make_unique<FrameRe
 // 场景
 #include "Manager/SceneManager.h"
 std::unique_ptr<SceneManager> gSceneManager = std::make_unique<SceneManager>();								// 场景管理器
-std::shared_ptr<Camera> GetCurrMainCamera() { return gSceneManager->GetCurrMainCamera(); }
-std::shared_ptr<GameObjectManager> GetCurrGameObjectManager() { return gSceneManager->GetCurrGameObjectManager(); }
-std::shared_ptr<MeshRenderInstanceManager> GetCurrMeshRenderInstanceManager() { return gSceneManager->GetCurrMeshRenderInstanceManager(); }
-std::shared_ptr<TextureManager> GetCurrTextureManager() { return gSceneManager->GetCurrTextureManager(); }
-std::shared_ptr<MaterialManager> GetCurrMaterialManager() { return gSceneManager->GetCurrMaterialManager(); }
-std::shared_ptr<MeshManager> GetCurrMeshManager() { return gSceneManager->GetCurrMeshManager(); }
-std::shared_ptr<InputManager> GetCurrInputManager() { return gSceneManager->GetCurrInputManager(); }
 
 // 渲染
 std::vector<D3D12_INPUT_ELEMENT_DESC> gInputLayout =														// 输入布局
@@ -49,7 +42,6 @@ std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> gPSOs;											//
 // PhysX物理引擎
 #include "../physx/Main/PhysX.h"
 PhysX gPhysX;						// PhysX物理引擎
-bool gDrawWireframe = false;		// 是否绘制碰撞体
 
 //===========================================================
 //===========================================================

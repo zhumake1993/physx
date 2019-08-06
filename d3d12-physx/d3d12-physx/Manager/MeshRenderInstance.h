@@ -55,7 +55,7 @@ private:
 
 	std::shared_ptr<Mesh> mMesh = nullptr;
 
-	UINT mCapacity = 500;
+	UINT mCapacity = 1024;
 	UINT mCount = 0;
 	std::unique_ptr<FrameResource<MeshRenderData>> mFrameResource; // ึกืสิด
 

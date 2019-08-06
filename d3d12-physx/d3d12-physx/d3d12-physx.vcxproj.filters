@@ -204,6 +204,9 @@
     <ClCompile Include="GameObject\Sky.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject\Linkup\RenderAndFilter.cpp">
+      <Filter>GameObject\Linkup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h">
@@ -353,9 +356,6 @@
     <ClInclude Include="Component\RigidStaticCPT.h">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="Manager\CurrManagers.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject\MainScene\Box.h">
       <Filter>GameObject\MainScene</Filter>
     </ClInclude>
@@ -388,6 +388,9 @@
     </ClInclude>
     <ClInclude Include="GameObject\Sky.h">
       <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Linkup\RenderAndFilter.h">
+      <Filter>GameObject\Linkup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

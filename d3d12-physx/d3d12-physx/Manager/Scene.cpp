@@ -36,41 +36,6 @@ void Scene::Initialize()
 	BuildGameObjects();
 }
 
-std::shared_ptr<GameObjectManager> Scene::GetGameObjectManager()
-{
-	return mGameObjectManager;
-}
-
-std::shared_ptr<MeshRenderInstanceManager> Scene::GetMeshRenderInstanceManager()
-{
-	return mMeshRenderInstanceManager;
-}
-
-std::shared_ptr<TextureManager> Scene::GetTextureManager()
-{
-	return mTextureManager;
-}
-
-std::shared_ptr<MaterialManager> Scene::GetMaterialManager()
-{
-	return mMaterialManager;
-}
-
-std::shared_ptr<MeshManager> Scene::GetMeshManager()
-{
-	return mMeshManager;
-}
-
-std::shared_ptr<InputManager> Scene::GetInputManager()
-{
-	return mInputManager;
-}
-
-std::shared_ptr<Camera> Scene::GetMainCamera()
-{
-	return mMainCamera;
-}
-
 void Scene::Update(const GameTimer& gt)
 {
 	gPhysX.Update(gt.DeltaTime());

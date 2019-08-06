@@ -1,4 +1,5 @@
-#include "Manager/CurrManagers.h"
+#include "Manager/MeshRenderInstanceManager.h"
+#include "Manager/SceneManager.h"
 
 using namespace DirectX;
 

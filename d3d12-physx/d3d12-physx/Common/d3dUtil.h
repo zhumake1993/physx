@@ -8,6 +8,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <unordered_set>
 #include <unordered_map>
 #include <array>
 #include <iostream>
@@ -131,6 +132,10 @@ struct PassConstants
 	float gFogStart = 5.0f;
 	float gFogRange = 150.0f;
 	DirectX::XMFLOAT2 cbPerObjectPad2;
+
+	int EnableShadow = 0;
+	int EnableSsao = 0;
+	DirectX::XMFLOAT2 Pad2;
 
 	// 索引 [0, NUM_DIR_LIGHTS) 是平行光
 	// 索引 [NUM_DIR_LIGHTS, NUM_DIR_LIGHTS+NUM_POINT_LIGHTS) 是点光

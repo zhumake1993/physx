@@ -2,6 +2,7 @@
 
 #include "Common/d3dUtil.h"
 #include "Common/GameTimer.h"
+#include "Common/Camera.h"
 
 #include "Component/MeshRenderCPT.h"
 #include "Component/RigidDynamicCPT.h"
@@ -44,8 +45,32 @@ protected:
 	// 场景
 	void SwitchScene(std::string name);
 
+	// 摄像机
+	std::shared_ptr<Camera> GetMainCamera();
+
 	// 定时删除
 	void Destroy(float time);
+
+	// 渲染和过滤
+	bool GetIsWireframe();
+	bool GetIsDepthComplexityUseStencil();
+	bool GetIsDepthComplexityUseBlend();
+	bool GetIsCubeMap();
+	bool GetIsShadowMap();
+	bool GetIsSsao();
+	bool GetIsBlur();
+	bool GetIsSobel();
+	bool GetIsDrawRigidbody();
+
+	void SetIsWireframe(bool st);
+	void SetIsDepthComplexityUseStencil(bool st);
+	void SetIsDepthComplexityUseBlend(bool st);
+	void SetIsCubeMap(bool st);
+	void SetIsShadowMap(bool st);
+	void SetIsSsao(bool st);
+	void SetIsBlur(bool st);
+	void SetIsSobel(bool st);
+	void SetIsDrawRigidbody(bool st);
 
 public:
 	std::string mName;
@@ -61,5 +86,5 @@ public:
 
 private:
 
-	bool mToBeDeleted = false;
+	//
 };

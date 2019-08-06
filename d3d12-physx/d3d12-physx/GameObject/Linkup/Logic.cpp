@@ -34,9 +34,9 @@ Logic::Logic(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
 	// 至少有一个必须是偶数
-	mMapX = 4;
-	mMapY = 4;
-	mMapZ = 4;
+	mMapX = 8;
+	mMapY = 8;
+	mMapZ = 8;
 	mNumOfLeft = mMapX * mMapY * mMapZ;
 	mLastPick = Int3(0, 0, 0);
 

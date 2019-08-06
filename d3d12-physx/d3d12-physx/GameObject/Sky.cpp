@@ -2,17 +2,27 @@
 
 using namespace DirectX;
 
-Sky::Sky(const Transform& transform)
-	:GameObject(transform)
+Sky::Sky(const Transform& transform, const std::string& name)
+	:GameObject(transform, name)
 {
+	// Material
+	mMaterial = std::make_shared<Material>();
+	mMaterial->mDiffuseMapIndex = 0;
+	mMaterial->mNormalMapIndex = -1;
+	mMaterial->mDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mMaterial->mFresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
+	mMaterial->mRoughness = 0.1f;
+	AddMaterial();
+
 	// MeshRender
-	mMeshRender = std::make_unique<MeshRender>(transform);
-	mMeshRender->mMatName = "sky";
-	XMStoreFloat4x4(&mMeshRender->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	mMeshRender->mMeshName = "sphere";
-	mMeshRender->mRenderLayer = (int)RenderLayer::Sky;
-	mMeshRender->mReceiveShadow = false;
-	mMeshRender->AddMeshRender();
+	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
+	mMeshRenderCPT->mMaterial = mMaterial;
+	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
+	mMeshRenderCPT->mMeshName = "sphere";
+	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Sky;
+	mMeshRenderCPT->mReceiveShadow = false;
+	mMeshRenderCPT->mParent = mName;
+	mMeshRenderCPT->AddMeshRender();
 }
 
 Sky::~Sky()

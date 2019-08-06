@@ -52,9 +52,11 @@ void PS(VertexOut pin)
 	MaterialData matData = gMaterialData[pin.MatIndex];
 	float4 diffuseAlbedo = matData.DiffuseAlbedo;
     uint diffuseMapIndex = matData.DiffuseMapIndex;
-	
-	// 动态查找纹理
-	diffuseAlbedo *= gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+
+	// 在数组中动态查找纹理
+	if (diffuseMapIndex != -1) {
+		diffuseAlbedo *= gTextureMaps[diffuseMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
+	}
 
 #ifdef ALPHA_TEST
     clip(diffuseAlbedo.a - 0.1f);

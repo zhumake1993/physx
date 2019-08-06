@@ -10,8 +10,8 @@ public:
 	~Linkup();
 
 	virtual void Initialize()override;
-
 	virtual void Update(const GameTimer& gt)override;
+	virtual void PostUpdate(const GameTimer& gt)override;
 
 private:
 

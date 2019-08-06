@@ -95,29 +95,32 @@ float4 PS(VertexOut pin) : SV_Target
 	// 插值法向量会造成非单位法向量，因此需要规整
 	pin.NormalW = normalize(pin.NormalW);
 
+	// 采样法向量贴图
 	float4 normalMapSample = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	float3 bumpedNormalW = pin.NormalW;
-
 	if (normalMapIndex != -1) {
 		normalMapSample = gTextureMaps[normalMapIndex].Sample(gsamAnisotropicWrap, pin.TexC);
 		bumpedNormalW = NormalSampleToWorldSpace(normalMapSample.rgb, pin.NormalW, pin.TangentW);
 	}
 
+	// 计算视向量和视距离
 	float3 toEyeW = gEyePosW - pin.PosW;
 	float distToEye = length(toEyeW);
 	toEyeW /= distToEye; // 单位化
 
 	// 完成纹理投影并采样ssao贴图
-	pin.SsaoPosH /= pin.SsaoPosH.w;
-	float ambientAccess = gSsaoMap.Sample(gsamLinearClamp, pin.SsaoPosH.xy, 0.0f).r;
+	float ambientAccess = 1.0f;
+	if (gEnableSsao == 1) {
+		pin.SsaoPosH /= pin.SsaoPosH.w;
+		ambientAccess = gSsaoMap.Sample(gsamLinearClamp, pin.SsaoPosH.xy, 0.0f).r;
+	}
 
 	// 环境光
     float4 ambient = ambientAccess * gAmbientLight* diffuseAlbedo;
 
-	// 只有第一个光源产生阴影
+	// 计算阴影（只有第一个光源产生阴影）
 	float3 shadowFactor = float3(1.0f, 1.0f, 1.0f);
-
-	if (pin.ReceiveShadow == 1) {
+	if (pin.ReceiveShadow == 1 && gEnableShadow == 1) {
 		shadowFactor[0] = CalcShadowFactor(pin.ShadowPosH);
 	}
 

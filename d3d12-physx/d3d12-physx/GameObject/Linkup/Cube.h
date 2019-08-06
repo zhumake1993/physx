@@ -6,7 +6,7 @@ class Cube :
 	public GameObject
 {
 public:
-	Cube(const Transform& transform = Transform());
+	Cube(const Transform& transform = Transform(), const std::string& name = "");
 	~Cube();
 
 	virtual void GetPicked(float dst, DirectX::XMFLOAT3 hitPoint)override;
@@ -18,6 +18,7 @@ public:
 
 private:
 	virtual void Update(const GameTimer& gt)override;
+	virtual void Release()override;
 
 public:
 

@@ -61,37 +61,33 @@ std::shared_ptr<Scene> SceneManager::GetCurrScene()
 	return mCurrScene;
 }
 
-std::shared_ptr<GameObjectManager> SceneManager::GetCurrGameObjectManager()
-{
-	return mCurrScene->GetGameObjectManager();
-}
+//===========================================================
+//===========================================================
+// ·½±ãº¯Êı
+//===========================================================
+//===========================================================
 
-std::shared_ptr<InstanceManager> SceneManager::GetCurrInstanceManager()
-{
-	return mCurrScene->GetInstanceManager();
-}
+extern std::unique_ptr<SceneManager> gSceneManager;
 
-std::shared_ptr<TextureManager> SceneManager::GetCurrTextureManager()
-{
-	return mCurrScene->GetTextureManager();
-}
+void SwitchCurrScene(std::string name) { gSceneManager->SwitchScene(name); }
 
-std::shared_ptr<MaterialManager> SceneManager::GetCurrMaterialManager()
-{
-	return mCurrScene->GetMaterialManager();
-}
+std::shared_ptr<Camera> GetCurrMainCamera() { return gSceneManager->GetCurrScene()->mMainCamera; }
 
-std::shared_ptr<MeshManager> SceneManager::GetCurrMeshManager()
-{
-	return mCurrScene->GetMeshManager();
-}
+std::shared_ptr<GameObjectManager> GetCurrGameObjectManager() { return gSceneManager->GetCurrScene()->mGameObjectManager; }
+std::shared_ptr<MeshRenderInstanceManager> GetCurrMeshRenderInstanceManager() { return gSceneManager->GetCurrScene()->mMeshRenderInstanceManager; }
+std::shared_ptr<TextureManager> GetCurrTextureManager() { return gSceneManager->GetCurrScene()->mTextureManager; }
+std::shared_ptr<MaterialManager> GetCurrMaterialManager() { return gSceneManager->GetCurrScene()->mMaterialManager; }
+std::shared_ptr<MeshManager> GetCurrMeshManager() { return gSceneManager->GetCurrScene()->mMeshManager; }
+std::shared_ptr<InputManager> GetCurrInputManager() { return gSceneManager->GetCurrScene()->mInputManager; }
 
-std::shared_ptr<InputManager> SceneManager::GetCurrInputManager()
-{
-	return mCurrScene->GetInputManager();
-}
+bool& GetCurrIsWireframe() { return gSceneManager->GetCurrScene()->mIsWireframe; }
+bool& GetCurrIsDepthComplexityUseStencil() { return gSceneManager->GetCurrScene()->mIsDepthComplexityUseStencil; }
+bool& GetCurrIsDepthComplexityUseBlend() { return gSceneManager->GetCurrScene()->mIsDepthComplexityUseBlend; }
+bool& GetCurrIsCubeMap() { return gSceneManager->GetCurrScene()->mIsCubeMap; }
+bool& GetCurrIsShadowMap() { return gSceneManager->GetCurrScene()->mIsShadowMap; }
+bool& GetCurrIsSsao() { return gSceneManager->GetCurrScene()->mIsSsao; }
 
-std::shared_ptr<Camera> SceneManager::GetCurrMainCamera()
-{
-	return mCurrScene->GetMainCamera();
-}
+bool& GetCurrIsBlur() { return gSceneManager->GetCurrScene()->mIsBlur; }
+bool& GetCurrIsSobel() { return gSceneManager->GetCurrScene()->mIsSobel; }
+
+bool& GetCurrIsDrawRigidbody() { return gSceneManager->GetCurrScene()->mIsDrawRigidbody; }

@@ -2,7 +2,7 @@
 
 #include "Common/Camera.h"
 #include "Manager/GameObjectManager.h"
-#include "Manager/InstanceManager.h"
+#include "Manager/MeshRenderInstanceManager.h"
 #include "Manager/TextureManager.h"
 #include "Manager/MaterialManager.h"
 #include "Manager/MeshManager.h"
@@ -16,16 +16,6 @@ public:
 	virtual ~Scene();
 
 	virtual void Initialize();
-
-	std::shared_ptr<GameObjectManager> GetGameObjectManager();
-	std::shared_ptr<InstanceManager> GetInstanceManager();
-	std::shared_ptr<TextureManager> GetTextureManager();
-	std::shared_ptr<MaterialManager> GetMaterialManager();
-	std::shared_ptr<MeshManager> GetMeshManager();
-	std::shared_ptr<InputManager> GetInputManager();
-
-	std::shared_ptr<Camera> GetMainCamera();
-
 	virtual void Update(const GameTimer& gt);
 	virtual void PostUpdate(const GameTimer& gt);
 
@@ -39,14 +29,31 @@ protected:
 
 	void Pick(int sx, int sy);
 
-protected:
-	
-	std::shared_ptr<GameObjectManager> mGameObjectManager;				// 游戏物体管理器
-	std::shared_ptr<InstanceManager> mInstanceManager;					// 渲染实例管理器
-	std::shared_ptr<TextureManager> mTextureManager;					// 纹理管理器
-	std::shared_ptr<MaterialManager> mMaterialManager;					// 材质管理器
-	std::shared_ptr<MeshManager> mMeshManager;							// 网格管理器
-	std::shared_ptr<InputManager> mInputManager;						// 输入管理器
+public:
 
-	std::shared_ptr<Camera> mMainCamera;								// 主摄像机
+	// Camera
+	std::shared_ptr<Camera> mMainCamera;									// 主摄像机
+	
+	// Manager
+	std::shared_ptr<GameObjectManager> mGameObjectManager;					// 游戏物体管理器
+	std::shared_ptr<MeshRenderInstanceManager> mMeshRenderInstanceManager;	// 渲染实例管理器
+	std::shared_ptr<TextureManager> mTextureManager;						// 纹理管理器
+	std::shared_ptr<MaterialManager> mMaterialManager;						// 材质管理器
+	std::shared_ptr<MeshManager> mMeshManager;								// 网格管理器
+	std::shared_ptr<InputManager> mInputManager;							// 输入管理器
+
+	// Render
+	bool mIsWireframe = false;
+	bool mIsDepthComplexityUseStencil = false;
+	bool mIsDepthComplexityUseBlend = false;
+	bool mIsCubeMap = true;
+	bool mIsShadowMap = true;
+	bool mIsSsao = true;
+
+	// Filter
+	bool mIsBlur = false;
+	bool mIsSobel = false;
+
+	// 是否绘制碰撞体线框
+	bool mIsDrawRigidbody = false;
 };

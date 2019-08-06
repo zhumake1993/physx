@@ -42,7 +42,6 @@ std::unordered_map<std::string, ComPtr<ID3D12PipelineState>> gPSOs;											//
 // PhysX物理引擎
 #include "../physx/Main/PhysX.h"
 PhysX gPhysX;						// PhysX物理引擎
-bool gDrawWireframe = false;		// 是否绘制碰撞体
 
 //===========================================================
 //===========================================================

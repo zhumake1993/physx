@@ -92,6 +92,10 @@ cbuffer cbPass : register(b1)
 	float gFogRange;
 	float2 cbPerObjectPad2;
 
+	int gEnableShadow;
+	int gEnableSsao;
+	float2 gPad2;
+
 	// 索引 [0, NUM_DIR_LIGHTS) 是平行光
 	// 索引 [NUM_DIR_LIGHTS, NUM_DIR_LIGHTS+NUM_POINT_LIGHTS) 是点光
 	// 索引 [NUM_DIR_LIGHTS+NUM_POINT_LIGHTS, NUM_DIR_LIGHTS+NUM_POINT_LIGHT+NUM_SPOT_LIGHTS) 是聚光

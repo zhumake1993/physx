@@ -1,4 +1,5 @@
 #include "CubeMap.h"
+#include "Manager/SceneManager.h"
 
 using namespace DirectX;
 using Microsoft::WRL::ComPtr;
@@ -7,9 +8,6 @@ extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
 extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
-
-#include "Manager/SceneManager.h"
-extern std::unique_ptr<SceneManager> gSceneManager;
 
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> gRootSignatures;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
@@ -140,18 +138,18 @@ void CubeMap::DrawSceneToCubeMap()
 		gCommandList->SetGraphicsRootConstantBufferView(1, passCB->GetGPUVirtualAddress() + i * passCBByteSize);
 
 		// 绑定所有材质。对于结构化缓冲，我们可以绕过堆，使用根描述符
-		auto matBuffer = gSceneManager->GetCurrMaterialManager()->CurrResource();
+		auto matBuffer = GetCurrMaterialManager()->CurrResource();
 		gCommandList->SetGraphicsRootShaderResourceView(2, matBuffer->GetGPUVirtualAddress());
 
 		// 绑定描述符堆
-		ID3D12DescriptorHeap* descriptorHeaps[] = { gSceneManager->GetCurrTextureManager()->GetSrvDescriptorHeapPtr() };
+		ID3D12DescriptorHeap* descriptorHeaps[] = { GetCurrTextureManager()->GetSrvDescriptorHeapPtr() };
 		gCommandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 		// 绑定所有的纹理
-		gCommandList->SetGraphicsRootDescriptorTable(3, gSceneManager->GetCurrTextureManager()->GetGpuSrvTex());
+		gCommandList->SetGraphicsRootDescriptorTable(3, GetCurrTextureManager()->GetGpuSrvTex());
 
 		// 绑定天空球立方体贴图
-		gCommandList->SetGraphicsRootDescriptorTable(4, gSceneManager->GetCurrTextureManager()->GetGpuSrvCube());
+		gCommandList->SetGraphicsRootDescriptorTable(4, GetCurrTextureManager()->GetGpuSrvCube());
 
 		// 绑定阴影贴图
 		ID3D12DescriptorHeap* descriptorHeapsShadow[] = { mShadowSrvDescriptorHeapPtr };
@@ -164,16 +162,16 @@ void CubeMap::DrawSceneToCubeMap()
 		gCommandList->SetGraphicsRootDescriptorTable(6, mSsaoSrv);
 
 		gCommandList->SetPipelineState(gPSOs["opaque"].Get());
-		gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Opaque);
+		GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Opaque);
 
 		gCommandList->SetPipelineState(gPSOs["alphaTested"].Get());
-		gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::AlphaTested);
+		GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::AlphaTested);
 
 		gCommandList->SetPipelineState(gPSOs["transparent"].Get());
-		gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Transparent);
+		GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Transparent);
 
 		gCommandList->SetPipelineState(gPSOs["sky"].Get());
-		gSceneManager->GetCurrInstanceManager()->Draw((int)RenderLayer::Sky);
+		GetCurrMeshRenderInstanceManager()->Draw((int)RenderLayer::Sky);
 	}
 
 	// 将资源状态改回GENERIC_READ，使得能够在着色器中读取纹理

@@ -11,7 +11,7 @@ extern PhysX gPhysX;
 Scene::Scene()
 {
 	mGameObjectManager = std::make_shared<GameObjectManager>();
-	mInstanceManager = std::make_shared<InstanceManager>();
+	mMeshRenderInstanceManager = std::make_shared<MeshRenderInstanceManager>();
 	mTextureManager = std::make_shared<TextureManager>();
 	mMaterialManager = std::make_shared<MaterialManager>();
 	mMeshManager = std::make_shared<MeshManager>();
@@ -36,41 +36,6 @@ void Scene::Initialize()
 	BuildGameObjects();
 }
 
-std::shared_ptr<GameObjectManager> Scene::GetGameObjectManager()
-{
-	return mGameObjectManager;
-}
-
-std::shared_ptr<InstanceManager> Scene::GetInstanceManager()
-{
-	return mInstanceManager;
-}
-
-std::shared_ptr<TextureManager> Scene::GetTextureManager()
-{
-	return mTextureManager;
-}
-
-std::shared_ptr<MaterialManager> Scene::GetMaterialManager()
-{
-	return mMaterialManager;
-}
-
-std::shared_ptr<MeshManager> Scene::GetMeshManager()
-{
-	return mMeshManager;
-}
-
-std::shared_ptr<InputManager> Scene::GetInputManager()
-{
-	return mInputManager;
-}
-
-std::shared_ptr<Camera> Scene::GetMainCamera()
-{
-	return mMainCamera;
-}
-
 void Scene::Update(const GameTimer& gt)
 {
 	gPhysX.Update(gt.DeltaTime());
@@ -87,7 +52,7 @@ void Scene::PostUpdate(const GameTimer& gt)
 	mMaterialManager->UpdateMaterialData();
 
 	// 由于游戏逻辑可能修改了渲染实例，因此渲染实例的更新要放在游戏逻辑的更新的后面
-	mInstanceManager->UploadInstanceData();
+	mMeshRenderInstanceManager->UploadMeshRender();
 
 	// 注意，输入管理器的更新函数要放在最后，否则GetKeyDown之类的函数会失效
 	mInputManager->Update(gt);
@@ -112,5 +77,5 @@ void Scene::Pick(int sx, int sy)
 	XMVECTOR rayOriginW = XMVector3TransformCoord(rayOrigin, invView);
 	XMVECTOR rayDirW = XMVector3TransformNormal(rayDir, invView);
 
-	mInstanceManager->Pick(rayOriginW, rayDirW);
+	mMeshRenderInstanceManager->Pick(rayOriginW, rayDirW);
 }

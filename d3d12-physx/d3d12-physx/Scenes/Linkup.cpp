@@ -1,7 +1,6 @@
 #include "Linkup.h"
 
 #include "GameObject/Linkup/LinkupGameObjects.h"
-#include "GameObject/Sky.h"
 
 using Microsoft::WRL::ComPtr;
 using namespace DirectX;
@@ -18,6 +17,10 @@ Linkup::~Linkup()
 void Linkup::Initialize()
 {
 	Scene::Initialize();
+
+	mIsCubeMap = false;
+	mIsShadowMap = false;
+	mIsSsao = false;
 
 	mMainCamera->SetPosition(0.0f, 2.0f, -15.0f);
 }
@@ -50,12 +53,17 @@ void Linkup::Update(const GameTimer& gt)
 	}
 }
 
+void Linkup::PostUpdate(const GameTimer& gt)
+{
+	Scene::PostUpdate(gt);
+}
+
 void Linkup::BuildManagers()
 {
 	mTextureManager->Initialize();
 	mMaterialManager->Initialize();
 	mMeshManager->Initialize();
-	mInstanceManager->Initialize();
+	mMeshRenderInstanceManager->Initialize();
 	mGameObjectManager->Initialize();
 	mInputManager->Initialize();
 }
@@ -82,37 +90,6 @@ void Linkup::BuildTextures()
 
 void Linkup::BuildMaterials()
 {
-	auto sky = std::make_shared<MaterialData>();
-	sky->DiffuseMapIndex = mTextureManager->GetCubeIndex();
-	sky->NormalMapIndex = -1;
-	sky->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	sky->FresnelR0 = XMFLOAT3(0.1f, 0.1f, 0.1f);
-	sky->Roughness = 1.0f;
-	mMaterialManager->AddMaterial("sky", sky);
-
-	auto bricks = std::make_shared<MaterialData>();
-	bricks->DiffuseMapIndex = mTextureManager->GetIndex("bricks");
-	bricks->NormalMapIndex = mTextureManager->GetIndex("bricks_nmap");
-	bricks->DiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	bricks->FresnelR0 = XMFLOAT3(0.02f, 0.02f, 0.02f);
-	bricks->Roughness = 0.3f;
-	mMaterialManager->AddMaterial("bricks", bricks);
-
-	auto tile = std::make_shared<MaterialData>();
-	tile->DiffuseMapIndex = mTextureManager->GetIndex("tile");
-	tile->NormalMapIndex = mTextureManager->GetIndex("tile_nmap");
-	tile->DiffuseAlbedo = XMFLOAT4(0.9f, 0.9f, 0.9f, 1.0f);
-	tile->FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
-	tile->Roughness = 0.1f;
-	mMaterialManager->AddMaterial("tile", tile);
-
-	auto segment = std::make_shared<MaterialData>();
-	segment->DiffuseMapIndex = -1;
-	segment->NormalMapIndex = -1;
-	segment->DiffuseAlbedo = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
-	segment->FresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
-	segment->Roughness = 0.1f;
-	mMaterialManager->AddMaterial("Line", segment);
 }
 
 void Linkup::BuildMeshes()
@@ -130,14 +107,17 @@ void Linkup::BuildMeshes()
 
 void Linkup::BuildGameObjects()
 {
-	auto logic = std::make_shared<Logic>();
-	mGameObjectManager->AddGameObject("Logic", logic);
+	auto logic = std::make_shared<Logic>(Transform(), "Logic");
+	mGameObjectManager->AddGameObject(logic);
 
-	auto sky = std::make_shared<Sky>(Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)));
-	mGameObjectManager->AddGameObject("Sky", sky);
+	auto renderAndFilter = std::make_shared<RenderAndFilter>(Transform(), "RenderAndFilter");
+	mGameObjectManager->AddGameObject(renderAndFilter);
 
-	auto floor = std::make_shared<Floor>();
-	mGameObjectManager->AddGameObject("Floor", floor);
+	auto sky = std::make_shared<Sky>(Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)), "Sky");
+	mGameObjectManager->AddGameObject(sky);
+
+	auto floor = std::make_shared<Floor>(Transform(), "Floor");
+	mGameObjectManager->AddGameObject(floor);
 }
 
 void Linkup::MoveCamera(const GameTimer& gt)

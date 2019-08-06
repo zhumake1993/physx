@@ -6,7 +6,7 @@ class Floor :
 	public GameObject
 {
 public:
-	Floor(const Transform& transform = Transform());
+	Floor(const Transform& transform = Transform(), const std::string& name = "");
 	~Floor();
 
 private:

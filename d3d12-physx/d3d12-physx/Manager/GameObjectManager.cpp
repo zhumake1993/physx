@@ -17,11 +17,6 @@ bool GameObjectManager::HasGameObject(std::string name)
 	return mGameObjects.find(name) != mGameObjects.end();
 }
 
-bool GameObjectManager::HasGameObject(std::shared_ptr<GameObject> gameObject)
-{
-	return mGameObjects.find(gameObject->mName) != mGameObjects.end();
-}
-
 std::shared_ptr<GameObject> GameObjectManager::GetGameObject(std::string name)
 {
 	if (!HasGameObject(name)) {
@@ -31,34 +26,18 @@ std::shared_ptr<GameObject> GameObjectManager::GetGameObject(std::string name)
 	return mGameObjects[name];
 }
 
-void GameObjectManager::AddGameObject(std::shared_ptr<GameObject> gameObject)
+std::string GameObjectManager::NewGameObjectName()
 {
 	auto name = MathHelper::RandStr();
 	while (mGameObjects.find(name) != mGameObjects.end()) {
 		name = MathHelper::RandStr();
 	}
 
-	gameObject->mName = name;
-
-	if (gameObject->mMeshRender) {
-		gameObject->mMeshRender->SetParent(gameObject->mName);
-	}
-	
-	mGameObjects[gameObject->mName] = gameObject;
+	return name;
 }
 
-void GameObjectManager::AddGameObject(std::string name, std::shared_ptr<GameObject> gameObject)
+void GameObjectManager::AddGameObject(std::shared_ptr<GameObject> gameObject)
 {
-	if (HasGameObject(name)) {
-		ThrowMyEx("GameObject already exists!")
-	}
-
-	gameObject->mName = name;
-
-	if (gameObject->mMeshRender) {
-		gameObject->mMeshRender->SetParent(gameObject->mName);
-	}
-
 	mGameObjects[gameObject->mName] = gameObject;
 }
 
@@ -68,25 +47,20 @@ void GameObjectManager::DeleteGameObject(std::string name)
 		ThrowMyEx("GameObject does not exist!")
 	}
 
-	mGameObjects[name]->mToBeDeleted = true;
-}
-
-void GameObjectManager::DeleteGameObject(std::shared_ptr<GameObject> gameObject)
-{
-	if (!HasGameObject(gameObject->mName)) {
-		ThrowMyEx("GameObject does not exist!")
-	}
-
-	gameObject->mToBeDeleted = true;
+	mToBeDeleted.insert(name);
 }
 
 void GameObjectManager::Update(const GameTimer& gt)
 {
-	for (auto it = mGameObjects.begin(); it != mGameObjects.end();) {
+	for (auto it = mGameObjects.begin(); it != mGameObjects.end(); ++it) {
 		it->second->Update(gt);
+	}
 
-		if (it->second->mToBeDeleted) {
+	for (auto it = mGameObjects.begin(); it != mGameObjects.end();) {
+
+		if (mToBeDeleted.find(it->first) != mToBeDeleted.end()) {
 			it->second->Release();
+			mToBeDeleted.erase(it->first);
 			it = mGameObjects.erase(it);
 		}
 		else {

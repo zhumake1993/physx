@@ -31,6 +31,12 @@
     <Filter Include="GameObject\Linkup">
       <UniqueIdentifier>{76bbb6f3-fafd-400d-9d9e-f03e7c0952c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Component">
+      <UniqueIdentifier>{7b71a3a7-9b30-4cb7-a38b-98ed0edbd974}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\MainScene">
+      <UniqueIdentifier>{d6a3a1e6-cf11-4df3-8fce-4c0bbff294d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Common\Camera.cpp">
@@ -93,12 +99,6 @@
     <ClCompile Include="Manager\InputManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\Instance.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager\InstanceManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\MaterialManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -114,27 +114,6 @@
     <ClCompile Include="Main\TheMain.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject\Box.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\Cylinder.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\Globe.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\Grid.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\Skull.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\Sky.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\Sphere.cpp">
-      <Filter>GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="Filter\BlurFilter.cpp">
       <Filter>Filter</Filter>
     </ClCompile>
@@ -146,9 +125,6 @@
     </ClCompile>
     <ClCompile Include="Filter\SobelFilter.cpp">
       <Filter>Filter</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject\BoxPx.cpp">
-      <Filter>GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Manager\GameObject.cpp">
       <Filter>Manager</Filter>
@@ -171,15 +147,6 @@
     <ClCompile Include="GameObject\Linkup\Floor.cpp">
       <Filter>GameObject\Linkup</Filter>
     </ClCompile>
-    <ClCompile Include="Manager\MeshRender.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager\RigidStatic.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager\RigidDynamic.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject\Linkup\Logic.cpp">
       <Filter>GameObject\Linkup</Filter>
     </ClCompile>
@@ -194,6 +161,51 @@
     </ClCompile>
     <ClCompile Include="Common\Log.cpp">
       <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\Material.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\MeshRenderCPT.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\RigidDynamicCPT.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\RigidStaticCPT.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\MainScene\Box.cpp">
+      <Filter>GameObject\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\MainScene\BoxPx.cpp">
+      <Filter>GameObject\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\MainScene\Cylinder.cpp">
+      <Filter>GameObject\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\MainScene\Globe.cpp">
+      <Filter>GameObject\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\MainScene\Grid.cpp">
+      <Filter>GameObject\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\MainScene\Skull.cpp">
+      <Filter>GameObject\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\MainScene\Sphere.cpp">
+      <Filter>GameObject\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\MeshRenderInstanceManager.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\MeshRenderInstance.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\Sky.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\Linkup\RenderAndFilter.cpp">
+      <Filter>GameObject\Linkup</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -263,12 +275,6 @@
     <ClInclude Include="Manager\InputManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Manager\Instance.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\InstanceManager.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
     <ClInclude Include="Manager\MaterialManager.h">
       <Filter>Manager</Filter>
     </ClInclude>
@@ -281,27 +287,6 @@
     <ClInclude Include="Main\D3D12App.h">
       <Filter>Main</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject\Box.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Cylinder.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Globe.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Grid.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Skull.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Sky.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\Sphere.h">
-      <Filter>GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="Filter\BlurFilter.h">
       <Filter>Filter</Filter>
     </ClInclude>
@@ -313,9 +298,6 @@
     </ClInclude>
     <ClInclude Include="Filter\SobelFilter.h">
       <Filter>Filter</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject\BoxPx.h">
-      <Filter>GameObject</Filter>
     </ClInclude>
     <ClInclude Include="Manager\GameObject.h">
       <Filter>Manager</Filter>
@@ -337,15 +319,6 @@
     </ClInclude>
     <ClInclude Include="GameObject\Linkup\Floor.h">
       <Filter>GameObject\Linkup</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\MeshRender.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\RigidStatic.h">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\RigidDynamic.h">
-      <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="GameObject\Linkup\Logic.h">
       <Filter>GameObject\Linkup</Filter>
@@ -370,6 +343,54 @@
     </ClInclude>
     <ClInclude Include="Common\Log.h">
       <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\Material.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\MeshRenderCPT.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\RigidDynamicCPT.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\RigidStaticCPT.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\MainScene\Box.h">
+      <Filter>GameObject\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\MainScene\BoxPx.h">
+      <Filter>GameObject\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\MainScene\Cylinder.h">
+      <Filter>GameObject\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\MainScene\Globe.h">
+      <Filter>GameObject\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\MainScene\Grid.h">
+      <Filter>GameObject\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\MainScene\Skull.h">
+      <Filter>GameObject\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\MainScene\Sphere.h">
+      <Filter>GameObject\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\MainScene\MainSceneGameObjects.h">
+      <Filter>GameObject\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\MeshRenderInstanceManager.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\MeshRenderInstance.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Sky.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Linkup\RenderAndFilter.h">
+      <Filter>GameObject\Linkup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

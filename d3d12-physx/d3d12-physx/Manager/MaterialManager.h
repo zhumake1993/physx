@@ -2,6 +2,7 @@
 
 #include "Common/d3dUtil.h"
 #include "Common/FrameResource.h"
+#include "Manager/Material.h"
 
 struct MaterialData
 {
@@ -30,10 +31,10 @@ public:
 	void Initialize();
 
 	bool HasMaterial(std::string name);
-	std::shared_ptr<MaterialData> GetMaterial(const std::string name);
-	UINT GetIndex(const std::string& name);
-	void AddMaterial(const std::string& name, std::shared_ptr<MaterialData> materialData);
-	std::string AddMaterial(std::shared_ptr<MaterialData> materialData);
+	std::shared_ptr<Material> GetDefaultMaterial();
+	void AddMaterial(std::shared_ptr<Material> material);
+	void SetMaterial(std::shared_ptr<Material> material);
+	void DeleteMaterial(const std::string& name);
 
 	void UpdateMaterialData();
 
@@ -47,12 +48,12 @@ public:
 
 private:
 
-	const UINT mMaterialDataCapacity = 500;
+	UINT mMaterialDataCapacity = 1024;
+	std::vector<UINT> mIndicesUnused;
 	UINT mMaterialCount = 0;
 
 	std::unique_ptr<FrameResource<MaterialData>> mFrameResource; // 帧资源
 
-	std::unordered_map<std::string, std::shared_ptr<MaterialData>> mMaterials;
-	std::unordered_map<std::string, UINT> mIndices;
+	std::unordered_map<std::string, std::shared_ptr<Material>> mMaterials;
 	std::unordered_map<std::string, int> mNumFramesDirties; // 指示对象数据发生变化
 };

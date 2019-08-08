@@ -149,6 +149,7 @@
     <ClCompile Include="Common\GeometryGenerator.cpp" />
     <ClCompile Include="Common\Log.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
+    <ClCompile Include="Component\CameraCPT.cpp" />
     <ClCompile Include="Component\MeshRenderCPT.cpp" />
     <ClCompile Include="Component\RigidDynamicCPT.cpp" />
     <ClCompile Include="Component\RigidStaticCPT.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="Common\MathHelper.h" />
     <ClInclude Include="Common\MyException.h" />
     <ClInclude Include="Common\UploadBuffer.h" />
+    <ClInclude Include="Component\CameraCPT.h" />
     <ClInclude Include="Component\MeshRenderCPT.h" />
     <ClInclude Include="Component\RigidDynamicCPT.h" />
     <ClInclude Include="Component\RigidStaticCPT.h" />

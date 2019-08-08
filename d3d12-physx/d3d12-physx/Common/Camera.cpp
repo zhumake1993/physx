@@ -191,20 +191,10 @@ void Camera::Walk(float d)
 	UpdateViewMatrix();
 }
 
-void Camera::FlyUp(float d)
+void Camera::Fly(float d)
 {
 	XMVECTOR s = XMVectorReplicate(d);
 	XMVECTOR u = XMLoadFloat3(&mUp);
-	XMVECTOR p = XMLoadFloat3(&mPosition);
-	XMStoreFloat3(&mPosition, XMVectorMultiplyAdd(s, u, p));
-
-	UpdateViewMatrix();
-}
-
-void Camera::FlyDown(float d)
-{
-	XMVECTOR s = XMVectorReplicate(d);
-	XMVECTOR u = -XMLoadFloat3(&mUp);
 	XMVECTOR p = XMLoadFloat3(&mPosition);
 	XMStoreFloat3(&mPosition, XMVectorMultiplyAdd(s, u, p));
 

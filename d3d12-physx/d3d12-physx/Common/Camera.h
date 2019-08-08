@@ -53,10 +53,7 @@ public:
 	// 平移
 	void Strafe(float d);
 	void Walk(float d);
-
-	// 上下
-	void FlyUp(float d);
-	void FlyDown(float d);
+	void Fly(float d);
 
 	// 旋转
 	void Pitch(float angle);

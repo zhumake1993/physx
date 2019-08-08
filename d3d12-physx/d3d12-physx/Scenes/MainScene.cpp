@@ -201,8 +201,8 @@ void MainScene::MoveCamera(const GameTimer& gt)
 		mMainCamera->Strafe(10.0f * dt);
 
 	if (GetAsyncKeyState('Q') & 0x8000)
-		mMainCamera->FlyUp(10.0f * dt);
+		mMainCamera->Fly(10.0f * dt);
 
 	if (GetAsyncKeyState('E') & 0x8000)
-		mMainCamera->FlyDown(10.0f * dt);
+		mMainCamera->Fly(10.0f * dt);
 }

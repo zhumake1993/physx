@@ -7,6 +7,7 @@
 #include "Component/MeshRenderCPT.h"
 #include "Component/RigidDynamicCPT.h"
 #include "Component/RigidStaticCPT.h"
+#include "Component/CameraCPT.h"
 
 class GameObject
 {
@@ -27,6 +28,11 @@ protected:
 	bool GetKeyDown(int key);
 	bool GetKeyPress(int key);
 	bool GetKeyUp(int key);
+	bool GetMouseDown(int key);
+	bool GetMousePress(int key);
+	bool GetMouseUp(int key);
+	int GetMouseX();
+	int GetMouseY();
 
 	// ”Œœ∑ŒÔÃÂ
 	bool HasGameObject(std::string name);
@@ -77,9 +83,11 @@ public:
 	Transform mTransform;
 
 	std::shared_ptr<Material> mMaterial = nullptr;
+
 	std::shared_ptr<MeshRenderCPT> mMeshRenderCPT = nullptr;
 	std::shared_ptr<RigidDynamicCPT> mRigidDynamicCPT = nullptr;
 	std::shared_ptr<RigidStaticCPT> mRigidStaticCPT = nullptr;
+	std::shared_ptr<CameraCPT> mCameraCPT = nullptr;
 
 	std::shared_ptr<GameTimer> mGameTimer = nullptr;
 	float mLifeTime = 0.0f;

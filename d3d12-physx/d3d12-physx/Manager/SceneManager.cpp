@@ -72,6 +72,7 @@ extern std::unique_ptr<SceneManager> gSceneManager;
 void SwitchCurrScene(std::string name) { gSceneManager->SwitchScene(name); }
 
 std::shared_ptr<Camera> GetCurrMainCamera() { return gSceneManager->GetCurrScene()->mMainCamera; }
+void SetCurrMainCamera(std::shared_ptr<Camera> camera) { gSceneManager->GetCurrScene()->mMainCamera = camera; }
 
 std::shared_ptr<GameObjectManager> GetCurrGameObjectManager() { return gSceneManager->GetCurrScene()->mGameObjectManager; }
 std::shared_ptr<MeshRenderInstanceManager> GetCurrMeshRenderInstanceManager() { return gSceneManager->GetCurrScene()->mMeshRenderInstanceManager; }

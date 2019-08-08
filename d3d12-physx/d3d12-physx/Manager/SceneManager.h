@@ -36,6 +36,7 @@ private:
 extern void SwitchCurrScene(std::string name);
 
 extern std::shared_ptr<Camera> GetCurrMainCamera();
+extern void SetCurrMainCamera(std::shared_ptr<Camera> camera);
 
 extern std::shared_ptr<GameObjectManager> GetCurrGameObjectManager();
 extern std::shared_ptr<MeshRenderInstanceManager> GetCurrMeshRenderInstanceManager();

@@ -207,6 +207,9 @@
     <ClCompile Include="GameObject\Linkup\RenderAndFilter.cpp">
       <Filter>GameObject\Linkup</Filter>
     </ClCompile>
+    <ClCompile Include="Component\CameraCPT.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h">
@@ -391,6 +394,9 @@
     </ClInclude>
     <ClInclude Include="GameObject\Linkup\RenderAndFilter.h">
       <Filter>GameObject\Linkup</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\CameraCPT.h">
+      <Filter>Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

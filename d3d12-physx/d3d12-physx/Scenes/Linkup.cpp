@@ -21,35 +21,14 @@ void Linkup::Initialize()
 	mIsCubeMap = false;
 	mIsShadowMap = false;
 	mIsSsao = false;
-
-	mMainCamera->SetPosition(0.0f, 2.0f, -15.0f);
 }
 
 void Linkup::Update(const GameTimer& gt)
 {
 	Scene::Update(gt);
 
-	MoveCamera(gt);
-
 	if (mInputManager->GetMouseDown(0)) {
 		Pick(mInputManager->GetMouseX(), mInputManager->GetMouseY());
-	}
-
-	if (mInputManager->GetMouseDown(1)) {
-		mLastMousePos.x = mInputManager->GetMouseX();
-		mLastMousePos.y = mInputManager->GetMouseY();
-	}
-
-	if (mInputManager->GetMousePress(1)) {
-		// 每像素对应0.25度
-		float dx = XMConvertToRadians(0.25f * static_cast<float>(mInputManager->GetMouseX() - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f * static_cast<float>(mInputManager->GetMouseY() - mLastMousePos.y));
-
-		mMainCamera->Pitch(dy);
-		mMainCamera->RotateY(dx);
-
-		mLastMousePos.x = mInputManager->GetMouseX();
-		mLastMousePos.y = mInputManager->GetMouseY();
 	}
 }
 
@@ -110,7 +89,7 @@ void Linkup::BuildMeshes()
 
 void Linkup::BuildGameObjects()
 {
-	auto logic = std::make_shared<Logic>(Transform(), "Logic");
+	auto logic = std::make_shared<Logic>(Transform(XMFLOAT3(0.0f, 2.0f, -15.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Logic");
 	mGameObjectManager->AddGameObject(logic);
 
 	auto renderAndFilter = std::make_shared<RenderAndFilter>(Transform(), "RenderAndFilter");
@@ -121,27 +100,4 @@ void Linkup::BuildGameObjects()
 
 	auto floor = std::make_shared<Floor>(Transform(), "Floor");
 	mGameObjectManager->AddGameObject(floor);
-}
-
-void Linkup::MoveCamera(const GameTimer& gt)
-{
-	const float dt = gt.DeltaTime();
-
-	if (GetAsyncKeyState('W') & 0x8000)
-		mMainCamera->Walk(10.0f * dt);
-
-	if (GetAsyncKeyState('S') & 0x8000)
-		mMainCamera->Walk(-10.0f * dt);
-
-	if (GetAsyncKeyState('A') & 0x8000)
-		mMainCamera->Strafe(-10.0f * dt);
-
-	if (GetAsyncKeyState('D') & 0x8000)
-		mMainCamera->Strafe(10.0f * dt);
-
-	if (GetAsyncKeyState('Q') & 0x8000)
-		mMainCamera->FlyUp(10.0f * dt);
-
-	if (GetAsyncKeyState('E') & 0x8000)
-		mMainCamera->FlyDown(10.0f * dt);
 }

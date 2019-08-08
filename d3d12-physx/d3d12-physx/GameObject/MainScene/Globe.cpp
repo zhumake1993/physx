@@ -23,6 +23,8 @@ Globe::Globe(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mReceiveShadow = true;
 	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
+
+	mIsStatic = true;
 }
 
 Globe::~Globe()

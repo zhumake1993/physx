@@ -84,7 +84,7 @@ public:
 	std::shared_ptr<GameTimer> mGameTimer = nullptr;
 	float mLifeTime = 0.0f;
 
-private:
+protected:
 
-	//
+	bool mIsStatic = false;
 };

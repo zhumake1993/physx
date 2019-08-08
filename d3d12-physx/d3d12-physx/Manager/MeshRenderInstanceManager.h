@@ -12,9 +12,9 @@ public:
 	void Initialize();
 
 	std::string NewMeshRenderName();
-	void AddMeshRender(std::shared_ptr<MeshRender> meshRender);
-	void DeleteMeshRender(std::shared_ptr<MeshRender> meshRender);
-	void UpdateMeshRender(std::shared_ptr<MeshRender> meshRender);
+	void AddMeshRender(MeshRenderCPT* meshRenderCPT);
+	void DeleteMeshRender(MeshRenderCPT* meshRenderCPT);
+	void UpdateMeshRender(MeshRenderCPT* meshRenderCPT);
 
 	void UploadMeshRender();
 

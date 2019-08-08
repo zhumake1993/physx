@@ -6,7 +6,6 @@ using Microsoft::WRL::ComPtr;
 extern Setting gSetting;
 
 extern ComPtr<ID3D12Device> gD3D12Device;
-extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 
 extern const int gNumFrameResources;
 
@@ -95,7 +94,7 @@ void MaterialManager::DeleteMaterial(const std::string& name)
 	--mMaterialCount;
 }
 
-void MaterialManager::UpdateMaterialData()
+void MaterialManager::UploadMaterial()
 {
 	for (auto& p : mMaterials) {
 		if (mNumFramesDirties[p.first] > 0) {

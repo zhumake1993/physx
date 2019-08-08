@@ -24,6 +24,8 @@ Segment::Segment(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
 
+	mIsStatic = true;
+
 	Destroy(0.25f);
 }
 

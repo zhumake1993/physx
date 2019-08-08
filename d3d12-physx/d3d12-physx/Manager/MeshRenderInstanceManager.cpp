@@ -25,87 +25,67 @@ std::string MeshRenderInstanceManager::NewMeshRenderName()
 	return name;
 }
 
-void MeshRenderInstanceManager::AddMeshRender(std::shared_ptr<MeshRender> meshRender)
+void MeshRenderInstanceManager::AddMeshRender(MeshRenderCPT* meshRenderCPT)
 {
-	auto name = meshRender->Name;
-	auto world = meshRender->World;
-	auto matIndex = meshRender->MaterialIndex;
-	auto texTransform = meshRender->TexTransform;
-	auto meshName = meshRender->MeshName;
-	auto randerLayer = meshRender->RenderLayer;
-	auto receiveShadow = meshRender->ReceiveShadow;
-
-	if (randerLayer < 0 || randerLayer >= (int)RenderLayer::Count) {
+	if (meshRenderCPT->mRenderLayer < 0 || meshRenderCPT->mRenderLayer >= (int)RenderLayer::Count) {
 		ThrowMyEx("RenderLayer illegel!");
 	}
 
-	auto& meshRenderInstanceMap = mMeshRenderInstanceLayers[randerLayer];
+	auto& meshRenderInstanceMap = mMeshRenderInstanceLayers[meshRenderCPT->mRenderLayer];
 
-	if (meshRenderInstanceMap.find(meshName) != meshRenderInstanceMap.end()) {
-		meshRenderInstanceMap[meshName]->AddMeshRender(name, world, matIndex, texTransform, receiveShadow);
+	if (meshRenderInstanceMap.find(meshRenderCPT->mMeshName) != meshRenderInstanceMap.end()) {
+		meshRenderInstanceMap[meshRenderCPT->mMeshName]->AddMeshRender(meshRenderCPT->mName, meshRenderCPT->GetWorld(), meshRenderCPT->mMaterial->mIndex, meshRenderCPT->mTexTransform, meshRenderCPT->mReceiveShadow);
 	}
 	else {
 		auto meshRenderInstance = std::make_unique<MeshRenderInstance>();
-		meshRenderInstance->mMeshName = meshName;
-		meshRenderInstance->mMesh = GetCurrMeshManager()->GetMesh(meshName);
+		meshRenderInstance->mMeshName = meshRenderCPT->mMeshName;
+		meshRenderInstance->mMesh = GetCurrMeshManager()->GetMesh(meshRenderCPT->mMeshName);
 		meshRenderInstance->CalculateBoundingBox();
 
-		meshRenderInstance->AddMeshRender(name, world, matIndex, texTransform, receiveShadow);
+		meshRenderInstance->AddMeshRender(meshRenderCPT->mName, meshRenderCPT->GetWorld(), meshRenderCPT->mMaterial->mIndex, meshRenderCPT->mTexTransform, meshRenderCPT->mReceiveShadow);
 
-		meshRenderInstanceMap[meshName] = std::move(meshRenderInstance);
+		meshRenderInstanceMap[meshRenderCPT->mMeshName] = std::move(meshRenderInstance);
 	}
 
-	mMeshRenderToParent[name] = meshRender->Parent;
+	mMeshRenderToParent[meshRenderCPT->mName] = meshRenderCPT->mParent;
 }
 
-void MeshRenderInstanceManager::DeleteMeshRender(std::shared_ptr<MeshRender> meshRender)
+void MeshRenderInstanceManager::DeleteMeshRender(MeshRenderCPT* meshRenderCPT)
 {
-	auto name = meshRender->Name;
-	auto meshName = meshRender->MeshName;
-	auto randerLayer = meshRender->RenderLayer;
-
-	if (mMeshRenderToParent.find(name) == mMeshRenderToParent.end()) {
+	if (mMeshRenderToParent.find(meshRenderCPT->mName) == mMeshRenderToParent.end()) {
 		ThrowMyEx("meshRender not exist!");
 	}
 
-	if (randerLayer < 0 || randerLayer >= (int)RenderLayer::Count) {
+	if (meshRenderCPT->mRenderLayer < 0 || meshRenderCPT->mRenderLayer >= (int)RenderLayer::Count) {
 		ThrowMyEx("RenderLayer illegel!");
 	}
 
-	auto& meshRenderInstanceMap = mMeshRenderInstanceLayers[randerLayer];
+	auto& meshRenderInstanceMap = mMeshRenderInstanceLayers[meshRenderCPT->mRenderLayer];
 
-	if (meshRenderInstanceMap.find(meshName) == meshRenderInstanceMap.end()) {
+	if (meshRenderInstanceMap.find(meshRenderCPT->mMeshName) == meshRenderInstanceMap.end()) {
 		ThrowMyEx("meshName illegel!");
 	}
 
-	meshRenderInstanceMap[meshName]->DeleteMeshRender(name);
+	meshRenderInstanceMap[meshRenderCPT->mMeshName]->DeleteMeshRender(meshRenderCPT->mName);
 }
 
-void MeshRenderInstanceManager::UpdateMeshRender(std::shared_ptr<MeshRender> meshRender)
+void MeshRenderInstanceManager::UpdateMeshRender(MeshRenderCPT* meshRenderCPT)
 {
-	auto name = meshRender->Name;
-	auto world = meshRender->World;
-	auto matIndex = meshRender->MaterialIndex;
-	auto texTransform = meshRender->TexTransform;
-	auto meshName = meshRender->MeshName;
-	auto randerLayer = meshRender->RenderLayer;
-	auto receiveShadow = meshRender->ReceiveShadow;
-
-	if (mMeshRenderToParent.find(name) == mMeshRenderToParent.end()) {
+	if (mMeshRenderToParent.find(meshRenderCPT->mName) == mMeshRenderToParent.end()) {
 		ThrowMyEx("meshRender not exist!");
 	}
 
-	if (randerLayer < 0 || randerLayer >= (int)RenderLayer::Count) {
+	if (meshRenderCPT->mRenderLayer < 0 || meshRenderCPT->mRenderLayer >= (int)RenderLayer::Count) {
 		ThrowMyEx("RenderLayer illegel!");
 	}
 
-	auto& meshRenderInstanceMap = mMeshRenderInstanceLayers[randerLayer];
+	auto& meshRenderInstanceMap = mMeshRenderInstanceLayers[meshRenderCPT->mRenderLayer];
 
-	if (meshRenderInstanceMap.find(meshName) == meshRenderInstanceMap.end()) {
+	if (meshRenderInstanceMap.find(meshRenderCPT->mMeshName) == meshRenderInstanceMap.end()) {
 		ThrowMyEx("meshName illegel!");
 	}
 
-	meshRenderInstanceMap[meshName]->UpdateMeshRender(name, world, matIndex, texTransform, receiveShadow);
+	meshRenderInstanceMap[meshRenderCPT->mMeshName]->UpdateMeshRender(meshRenderCPT->mName, meshRenderCPT->GetWorld(), meshRenderCPT->mMaterial->mIndex, meshRenderCPT->mTexTransform, meshRenderCPT->mReceiveShadow);
 }
 
 void MeshRenderInstanceManager::UploadMeshRender()

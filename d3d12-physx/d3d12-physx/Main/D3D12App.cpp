@@ -91,6 +91,8 @@ void D3D12App::Update(const GameTimer& gt)
 
 	if (gSceneManager->ChangingScene()) {
 
+		mTimer.Stop();
+
 		// 等待指令完成
 		// 因为指令队列中可能残留有引用上一个场景资源的指令
 		// 因此必须先清空指令队列
@@ -108,7 +110,6 @@ void D3D12App::Update(const GameTimer& gt)
 		ThrowIfFailed(gCommandList->Reset(cmdListAlloc.Get(), nullptr));
 
 		gSceneManager->ChangeScene();
-		mTimer.Reset();
 
 		//关闭指令列表
 		ThrowIfFailed(gCommandList->Close());
@@ -119,9 +120,13 @@ void D3D12App::Update(const GameTimer& gt)
 
 		// 等待指令完成
 		FlushCommandQueue();
+
+		mTimer.Start();
 	}
 
-	mShadowMap->Update(mRotatedLightDirections[0]);
+	if (GetCurrIsShadowMap()) {
+		mShadowMap->Update(mRotatedLightDirections[0]);
+	}
 
 	UpdateFrameResource(gt);
 }

@@ -26,6 +26,8 @@ Cube::Cube(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
 
+	mIsStatic = true;
+
 	// Rigidbody
 	Transform rigidStaticLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	mRigidStaticCPT = std::make_shared<RigidStaticCPT>(transform, rigidStaticLocal);

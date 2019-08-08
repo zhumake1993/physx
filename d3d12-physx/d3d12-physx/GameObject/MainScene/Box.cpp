@@ -23,6 +23,8 @@ Box::Box(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mReceiveShadow = true;
 	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
+
+	mIsStatic = true;
 }
 
 Box::~Box()

@@ -29,16 +29,19 @@ void GameObject::Update(const GameTimer& gt)
 		}
 	}
 
-	if (mRigidDynamicCPT) {
-		mRigidDynamicCPT->Update();
-		mTransform.Translation = mRigidDynamicCPT->mParentTransform.Translation;
-		mTransform.Quaternion = mRigidDynamicCPT->mParentTransform.Quaternion;
-	}
+	if (!mIsStatic) {
 
-	if (mMeshRenderCPT) {
-		mMeshRenderCPT->mTransform.Translation = mTransform.Translation;
-		mMeshRenderCPT->mTransform.Quaternion = mTransform.Quaternion;
-		mMeshRenderCPT->Update();
+		if (mRigidDynamicCPT) {
+			mRigidDynamicCPT->Update();
+			mTransform.Translation = mRigidDynamicCPT->mParentTransform.Translation;
+			mTransform.Quaternion = mRigidDynamicCPT->mParentTransform.Quaternion;
+		}
+
+		if (mMeshRenderCPT) {
+			mMeshRenderCPT->mTransform.Translation = mTransform.Translation;
+			mMeshRenderCPT->mTransform.Quaternion = mTransform.Quaternion;
+			mMeshRenderCPT->Update();
+		}
 	}
 }
 

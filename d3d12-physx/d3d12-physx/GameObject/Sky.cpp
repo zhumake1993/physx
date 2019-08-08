@@ -23,6 +23,8 @@ Sky::Sky(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mReceiveShadow = false;
 	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
+
+	mIsStatic = true;
 }
 
 Sky::~Sky()

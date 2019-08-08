@@ -36,7 +36,7 @@ public:
 	void SetMaterial(std::shared_ptr<Material> material);
 	void DeleteMaterial(const std::string& name);
 
-	void UpdateMaterialData();
+	void UploadMaterial();
 
 	ID3D12Resource* CurrResource()const;
 

@@ -74,6 +74,9 @@ void Linkup::BuildTextures()
 	{
 		L"Textures/bricks.dds",
 		L"Textures/bricks_nmap.dds",
+		L"Textures/bricks2.dds",
+		L"Textures/bricks2_nmap.dds",
+		L"Textures/checkboard.dds",
 		L"Textures/tile.dds",
 		L"Textures/tile_nmap.dds"
 	};

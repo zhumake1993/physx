@@ -6,8 +6,7 @@ using namespace DirectX;
 CameraCPT::CameraCPT(const Transform& transform)
 {
 	mCamera = std::make_shared<Camera>();
-	SetPosition(transform.Translation);
-	SetQuaterion(transform.Quaternion);
+	Update(transform);
 }
 
 CameraCPT::~CameraCPT()
@@ -19,26 +18,24 @@ void CameraCPT::SetMainCamera()
 	SetCurrMainCamera(mCamera);
 }
 
-void CameraCPT::SetPosition(float x, float y, float z)
+void CameraCPT::SetTranslation(float x, float y, float z)
 {
-	mCamera->SetPosition(x, y, z);
+	mCamera->SetTranslation(x, y, z);
 }
 
-void CameraCPT::SetPosition(const DirectX::XMFLOAT3& v)
+void CameraCPT::SetTranslation(const DirectX::XMFLOAT3& v)
 {
-	mCamera->SetPosition(v);
+	mCamera->SetTranslation(v);
+}
+
+void CameraCPT::SetQuaterion(float x, float y, float z, float w)
+{
+	mCamera->SetQuaternion(x, y, z, w);
 }
 
 void CameraCPT::SetQuaterion(const DirectX::XMFLOAT4& q)
 {
-	XMVECTOR quat = XMLoadFloat4(&q);
-	auto mat = XMMatrixRotationQuaternion(quat);
-
-	XMVECTOR pos = mCamera->GetPosition();
-	XMVECTOR target = pos + mat.r[2];
-	XMVECTOR worldUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-	mCamera->LookAt(pos, target, worldUp);
+	mCamera->SetQuaternion(q);
 }
 
 void CameraCPT::SetLens(float fovY, float aspect, float zn, float zf)
@@ -48,9 +45,11 @@ void CameraCPT::SetLens(float fovY, float aspect, float zn, float zf)
 
 void CameraCPT::SetFrustumCulling(bool st)
 {
-	mCamera->mFrustumCullingEnabled = st;
+	mCamera->SetFrustumCulling(st);
 }
 
-void CameraCPT::Update()
+void CameraCPT::Update(const Transform& transform)
 {
+	SetTranslation(transform.Translation);
+	SetQuaterion(transform.Quaternion);
 }

@@ -42,7 +42,7 @@ void RenderAndFilter::Update(const GameTimer& gt)
 	}
 
 	if (GetKeyDown('6')) {
-		GetMainCamera()->mFrustumCullingEnabled = !GetMainCamera()->mFrustumCullingEnabled;
+		GetMainCamera()->SetFrustumCulling(GetMainCamera()->GetFrustumCulling());
 	}
 
 	if (GetKeyDown('7')) {

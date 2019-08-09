@@ -10,13 +10,15 @@ public:
 	CameraCPT(const Transform& transform);
 	virtual ~CameraCPT();
 
+	// 设置为主摄像机
 	void SetMainCamera();
 
 	// 设置世界坐标
-	void SetPosition(float x, float y, float z);
-	void SetPosition(const DirectX::XMFLOAT3& v);
+	void SetTranslation(float x, float y, float z);
+	void SetTranslation(const DirectX::XMFLOAT3& v);
 
 	// 设置四元数
+	void SetQuaterion(float x, float y, float z, float w);
 	void SetQuaterion(const DirectX::XMFLOAT4& q);
 
 	// 设置平截头
@@ -25,7 +27,7 @@ public:
 	// 设置平截头截取
 	void SetFrustumCulling(bool st);
 
-	void Update();
+	void Update(const Transform& transform);
 
 private:
 	

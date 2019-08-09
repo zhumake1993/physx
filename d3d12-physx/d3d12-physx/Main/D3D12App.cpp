@@ -293,7 +293,7 @@ void D3D12App::UpdateFrameResource(const GameTimer& gt)
 	XMStoreFloat4x4(&mainPassCB.ViewProjTex, XMMatrixTranspose(viewProjTex));
 	XMStoreFloat4x4(&mainPassCB.ShadowTransform, XMMatrixTranspose(shadowTransform));
 
-	mainPassCB.EyePosW = GetCurrMainCamera()->GetPosition3f();
+	mainPassCB.EyePosW = GetCurrMainCamera()->GetTranslation3f();
 	mainPassCB.RenderTargetSize = XMFLOAT2((float)gSetting.ClientWidth, (float)gSetting.ClientHeight);
 	mainPassCB.InvRenderTargetSize = XMFLOAT2(1.0f / gSetting.ClientWidth, 1.0f / gSetting.ClientHeight);
 	mainPassCB.NearZ = 1.0f;

@@ -19,7 +19,7 @@ Scene::Scene()
 
 	mMainCamera = std::make_shared<Camera>();
 	mMainCamera->SetLens(0.25f * MathHelper::Pi, static_cast<float>(gSetting.ClientWidth) / gSetting.ClientHeight, 1.0f, 1000.0f);
-	mMainCamera->SetPosition(0.0f, 2.0f, -15.0f);
+	mMainCamera->SetTranslation(0.0f, 2.0f, -15.0f);
 }
 
 Scene::~Scene()

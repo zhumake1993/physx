@@ -74,7 +74,7 @@ void MeshRenderInstance::UploadMeshRender()
 
 	// 将平截头从视坐标空间转换到世界坐标空间
 	BoundingFrustum worldSpaceFrustum;
-	GetCurrMainCamera()->mCamFrustum.Transform(worldSpaceFrustum, invView);
+	GetCurrMainCamera()->GetCamFrustum().Transform(worldSpaceFrustum, invView);
 
 	mVisibleCount = 0;
 	for (auto& p : mMeshRenders) {
@@ -94,7 +94,7 @@ void MeshRenderInstance::UploadMeshRender()
 		mBounds.Transform(boundingBoxW, world);
 
 		// 平截头剔除
-		if ((worldSpaceFrustum.Contains(boundingBoxW) != DirectX::DISJOINT) || (GetCurrMainCamera()->mFrustumCullingEnabled == false)) {
+		if ((worldSpaceFrustum.Contains(boundingBoxW) != DirectX::DISJOINT) || (GetCurrMainCamera()->GetFrustumCulling() == false)) {
 
 			XMMATRIX world = XMLoadFloat4x4(&p.second.World);
 			XMMATRIX inverseTransposeWorld = XMLoadFloat4x4(&p.second.InverseTransposeWorld);
@@ -192,7 +192,7 @@ bool MeshRenderInstance::Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW, std::stri
 				XMVECTOR pointW = XMVector3TransformCoord(pointL, W);
 
 				// 由于scale矩阵的存在，tminL不是实际的距离，因此需要使用两点间距离公式来计算实际距离
-				float tminW = XMVectorGetX(XMVector3Length(GetCurrMainCamera()->GetPosition() - pointW));
+				float tminW = XMVectorGetX(XMVector3Length(GetCurrMainCamera()->GetTranslation() - pointW));
 
 				if (tminW < tmin) {
 					result = true;

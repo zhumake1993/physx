@@ -49,6 +49,8 @@ Logic::Logic(const Transform& transform, const std::string& name)
 	mLastPick = Int3(0, 0, 0);
 
 	CreateCubes();
+
+	mIsStatic = true;
 }
 
 Logic::~Logic()
@@ -145,8 +147,10 @@ void Logic::Move(const GameTimer& gt)
 
 void Logic::Pitch(float angle)
 {
-	auto R = XMQuaternionRotationAxis(XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), angle);
 	XMVECTOR quat = XMLoadFloat4(&mTransform.Quaternion);
+	auto mat = XMMatrixRotationQuaternion(quat);
+
+	auto R = XMQuaternionRotationAxis(mat.r[0], angle);
 	XMStoreFloat4(&mTransform.Quaternion, XMQuaternionMultiply(quat, R));
 }
 
@@ -180,13 +184,6 @@ void Logic::Walk(float d)
 void Logic::Fly(float d)
 {
 	mTransform.Translation.y += d;
-
-	//XMVECTOR quat = XMLoadFloat4(&mTransform.Quaternion);
-	//auto mat = XMMatrixRotationQuaternion(quat);
-
-	//XMVECTOR s = XMVectorReplicate(d);
-	//XMVECTOR p = XMLoadFloat3(&mTransform.Translation);
-	//XMStoreFloat3(&mTransform.Translation, XMVectorMultiplyAdd(s, mat.r[1], p));
 }
 
 void Logic::CreateCubes()

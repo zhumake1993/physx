@@ -45,8 +45,7 @@ void GameObject::Update(const GameTimer& gt)
 	}
 
 	if (mCameraCPT) {
-		mCameraCPT->SetPosition(mTransform.Translation);
-		mCameraCPT->SetQuaterion(mTransform.Quaternion);
+		mCameraCPT->Update(mTransform);
 	}
 }
 

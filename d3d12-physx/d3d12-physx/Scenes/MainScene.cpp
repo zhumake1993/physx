@@ -18,34 +18,15 @@ void MainScene::Initialize()
 {
 	Scene::Initialize();
 
-	mMainCamera->SetPosition(0.0f, 2.0f, -15.0f);
+	mMainCamera->SetTranslation(0.0f, 2.0f, -15.0f);
 }
 
 void MainScene::Update(const GameTimer& gt)
 {
 	Scene::Update(gt);
 
-	MoveCamera(gt);
-
 	if (mInputManager->GetMouseDown(0)) {
 		Pick(mInputManager->GetMouseX(), mInputManager->GetMouseY());
-	}
-
-	if (mInputManager->GetMouseDown(1)) {
-		mLastMousePos.x = mInputManager->GetMouseX();
-		mLastMousePos.y = mInputManager->GetMouseY();
-	}
-
-	if (mInputManager->GetMousePress(1)) {
-		// 每像素对应0.25度
-		float dx = XMConvertToRadians(0.25f * static_cast<float>(mInputManager->GetMouseX() - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f * static_cast<float>(mInputManager->GetMouseY() - mLastMousePos.y));
-
-		mMainCamera->Pitch(dy);
-		mMainCamera->RotateY(dx);
-
-		mLastMousePos.x = mInputManager->GetMouseX();
-		mLastMousePos.y = mInputManager->GetMouseY();
 	}
 }
 
@@ -151,6 +132,9 @@ void MainScene::BuildMeshes()
 
 void MainScene::BuildGameObjects()
 {
+	auto player = std::make_shared<Player>(Transform(XMFLOAT3(0.0f, 2.0f, -15.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Player");
+	mGameObjectManager->AddGameObject(player);
+
 	auto sky = std::make_shared<Sky>(Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)), "Sky");
 	mGameObjectManager->AddGameObject(sky);
 
@@ -182,27 +166,4 @@ void MainScene::BuildGameObjects()
 
 	auto boxPx = std::make_shared<BoxPx>(Transform(XMFLOAT3(0.0f, 10.0f, -10.0f)), "BoxPx");
 	mGameObjectManager->AddGameObject(boxPx);
-}
-
-void MainScene::MoveCamera(const GameTimer& gt)
-{
-	const float dt = gt.DeltaTime();
-
-	if (GetAsyncKeyState('W') & 0x8000)
-		mMainCamera->Walk(10.0f * dt);
-
-	if (GetAsyncKeyState('S') & 0x8000)
-		mMainCamera->Walk(-10.0f * dt);
-
-	if (GetAsyncKeyState('A') & 0x8000)
-		mMainCamera->Strafe(-10.0f * dt);
-
-	if (GetAsyncKeyState('D') & 0x8000)
-		mMainCamera->Strafe(10.0f * dt);
-
-	if (GetAsyncKeyState('Q') & 0x8000)
-		mMainCamera->Fly(10.0f * dt);
-
-	if (GetAsyncKeyState('E') & 0x8000)
-		mMainCamera->Fly(10.0f * dt);
 }

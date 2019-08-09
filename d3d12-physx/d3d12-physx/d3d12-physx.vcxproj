@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Common\Camera.cpp" />
+    <ClCompile Include="Common\CameraOld.cpp" />
     <ClCompile Include="Common\D3DApp.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
@@ -169,6 +170,7 @@
     <ClCompile Include="GameObject\MainScene\Cylinder.cpp" />
     <ClCompile Include="GameObject\MainScene\Globe.cpp" />
     <ClCompile Include="GameObject\MainScene\Grid.cpp" />
+    <ClCompile Include="GameObject\MainScene\Player.cpp" />
     <ClCompile Include="GameObject\MainScene\Skull.cpp" />
     <ClCompile Include="GameObject\MainScene\Sphere.cpp" />
     <ClCompile Include="GameObject\Sky.cpp" />
@@ -200,6 +202,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h" />
+    <ClInclude Include="Common\CameraOld.h" />
     <ClInclude Include="Common\D3DApp.h" />
     <ClInclude Include="Common\d3dUtil.h" />
     <ClInclude Include="Common\d3dx12.h" />
@@ -234,6 +237,7 @@
     <ClInclude Include="GameObject\MainScene\Globe.h" />
     <ClInclude Include="GameObject\MainScene\Grid.h" />
     <ClInclude Include="GameObject\MainScene\MainSceneGameObjects.h" />
+    <ClInclude Include="GameObject\MainScene\Player.h" />
     <ClInclude Include="GameObject\MainScene\Skull.h" />
     <ClInclude Include="GameObject\MainScene\Sphere.h" />
     <ClInclude Include="GameObject\Sky.h" />

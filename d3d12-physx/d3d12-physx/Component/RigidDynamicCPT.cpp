@@ -102,6 +102,16 @@ void RigidDynamicCPT::Release()
 	mMeshRenderCPT->Release();
 }
 
+void RigidDynamicCPT::AddForce(DirectX::XMFLOAT3 force)
+{
+	gPhysX.AddForce(mName, PxFloat3(force.x, force.y, force.z));
+}
+
+void RigidDynamicCPT::SetRigidDynamicLockFlag(int axis, bool st)
+{
+	gPhysX.SetRigidDynamicLockFlag(mName, axis, st);
+}
+
 void RigidDynamicCPT::SetAngularDamping(float ad)
 {
 	gPhysX.SetAngularDamping(mName, ad);

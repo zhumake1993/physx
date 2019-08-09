@@ -18,11 +18,6 @@ private:
 	void Pitch(float angle);
 	void RotateY(float angle);
 
-	// Æ½ÒÆ
-	void Strafe(float d);
-	void Walk(float d);
-	void Fly(float d);
-
 public:
 
 

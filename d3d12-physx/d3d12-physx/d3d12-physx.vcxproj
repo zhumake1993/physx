@@ -166,6 +166,7 @@
     <ClCompile Include="GameObject\Linkup\Player.cpp" />
     <ClCompile Include="GameObject\Linkup\RenderAndFilter.cpp" />
     <ClCompile Include="GameObject\Linkup\Segment.cpp" />
+    <ClCompile Include="GameObject\Linkup\Test.cpp" />
     <ClCompile Include="GameObject\MainScene\Box.cpp" />
     <ClCompile Include="GameObject\MainScene\BoxPx.cpp" />
     <ClCompile Include="GameObject\MainScene\Cylinder.cpp" />
@@ -233,6 +234,7 @@
     <ClInclude Include="GameObject\Linkup\Player.h" />
     <ClInclude Include="GameObject\Linkup\RenderAndFilter.h" />
     <ClInclude Include="GameObject\Linkup\Segment.h" />
+    <ClInclude Include="GameObject\Linkup\Test.h" />
     <ClInclude Include="GameObject\MainScene\Box.h" />
     <ClInclude Include="GameObject\MainScene\BoxPx.h" />
     <ClInclude Include="GameObject\MainScene\Cylinder.h" />

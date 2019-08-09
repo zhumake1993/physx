@@ -167,10 +167,37 @@ std::string PhysX::CreatePxRigidDynamic(void* pdesc)
 
 	// Ìí¼Óactor
 	gScene->addActor(*actor);
-
+	
 	gPxRigidDynamicMap[name] = actor;
 
 	return name;
+}
+
+void PhysX::AddForce(std::string name, PxFloat3 v)
+{
+	if (!HasPxRigidDynamic(name)) {
+		ThrowPxEx("PxRigidDynamic does not exist!");
+	}
+
+	PxVec3 force = PxVec3(v.x, v.y, v.z);
+	gPxRigidDynamicMap[name]->addForce(force);
+}
+
+void PhysX::SetRigidDynamicLockFlag(std::string name, int axis, bool st)
+{
+	if (!HasPxRigidDynamic(name)) {
+		ThrowPxEx("PxRigidDynamic does not exist!");
+	}
+
+	switch (axis) {
+		case 0:gPxRigidDynamicMap[name]->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_X, st); break;
+		case 1:gPxRigidDynamicMap[name]->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Y, st); break;
+		case 2:gPxRigidDynamicMap[name]->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_LINEAR_Z, st); break;
+		case 3:gPxRigidDynamicMap[name]->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, st); break;
+		case 4:gPxRigidDynamicMap[name]->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, st); break;
+		case 5:gPxRigidDynamicMap[name]->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, st); break;
+		default:ThrowPxEx("Wrong axis!");
+	}
 }
 
 void PhysX::SetAngularDamping(std::string name, float ad)

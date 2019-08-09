@@ -219,6 +219,9 @@
     <ClCompile Include="GameObject\MainScene\PlayerCamera.cpp">
       <Filter>GameObject\MainScene</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject\Linkup\Test.cpp">
+      <Filter>GameObject\Linkup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h">
@@ -415,6 +418,9 @@
     </ClInclude>
     <ClInclude Include="GameObject\MainScene\PlayerCamera.h">
       <Filter>GameObject\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Linkup\Test.h">
+      <Filter>GameObject\Linkup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

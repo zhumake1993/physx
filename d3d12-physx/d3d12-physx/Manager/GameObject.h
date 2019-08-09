@@ -78,6 +78,15 @@ protected:
 	void SetIsSobel(bool st);
 	void SetIsDrawRigidbody(bool st);
 
+	// 物理
+	void AddForce(DirectX::XMFLOAT3 force);
+	void SetRigidDynamicLockFlag(int axis, bool st);
+
+	// 方位
+	DirectX::XMFLOAT3 GetForward();
+	DirectX::XMFLOAT3 GetRight();
+	DirectX::XMFLOAT3 GetUp();
+
 public:
 	std::string mName;
 	Transform mTransform;

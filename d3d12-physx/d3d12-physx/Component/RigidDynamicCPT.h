@@ -16,6 +16,8 @@ public:
 
 	void Release();
 
+	void AddForce(DirectX::XMFLOAT3 force);
+	void SetRigidDynamicLockFlag(int axis, bool st);
 	void SetAngularDamping(float ad);
 	void SetLinearVelocity(DirectX::XMFLOAT3 v);
 

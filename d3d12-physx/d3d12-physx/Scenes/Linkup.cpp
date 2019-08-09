@@ -92,6 +92,9 @@ void Linkup::BuildGameObjects()
 	auto player = std::make_shared<Player>(Transform(XMFLOAT3(0.0f, 2.0f, -10.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Player");
 	mGameObjectManager->AddGameObject(player);
 
+	auto test = std::make_shared<Test>(Transform(XMFLOAT3(0.0f, 2.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.95f, 0.95f, 0.95f)), "Test");
+	mGameObjectManager->AddGameObject(test);
+
 	auto logic = std::make_shared<Logic>(Transform(XMFLOAT3(0.0f, 2.0f, -15.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Logic");
 	mGameObjectManager->AddGameObject(logic);
 

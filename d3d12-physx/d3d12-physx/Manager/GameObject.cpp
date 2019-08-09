@@ -144,3 +144,47 @@ void GameObject::SetIsSsao(bool st) { GetCurrIsSsao() = st; }
 void GameObject::SetIsBlur(bool st) { GetCurrIsBlur() = st; }
 void GameObject::SetIsSobel(bool st) { GetCurrIsSobel() = st; }
 void GameObject::SetIsDrawRigidbody(bool st) { GetCurrIsDrawRigidbody() = st; }
+
+void GameObject::AddForce(DirectX::XMFLOAT3 force)
+{
+	if (mRigidDynamicCPT) {
+		mRigidDynamicCPT->AddForce(force);
+	}
+}
+
+void GameObject::SetRigidDynamicLockFlag(int axis, bool st)
+{
+	if (mRigidDynamicCPT) {
+		mRigidDynamicCPT->SetRigidDynamicLockFlag(axis, st);
+	}
+}
+
+XMFLOAT3 GameObject::GetForward()
+{
+	XMVECTOR quat = XMLoadFloat4(&mTransform.Quaternion);
+	auto mat = XMMatrixRotationQuaternion(quat);
+	XMFLOAT3 forward;
+	XMStoreFloat3(&forward, mat.r[2]);
+
+	return forward;
+}
+
+XMFLOAT3 GameObject::GetRight()
+{
+	XMVECTOR quat = XMLoadFloat4(&mTransform.Quaternion);
+	auto mat = XMMatrixRotationQuaternion(quat);
+	XMFLOAT3 right;
+	XMStoreFloat3(&right, mat.r[0]);
+
+	return right;
+}
+
+XMFLOAT3 GameObject::GetUp()
+{
+	XMVECTOR quat = XMLoadFloat4(&mTransform.Quaternion);
+	auto mat = XMMatrixRotationQuaternion(quat);
+	XMFLOAT3 up;
+	XMStoreFloat3(&up, mat.r[1]);
+
+	return up;
+}

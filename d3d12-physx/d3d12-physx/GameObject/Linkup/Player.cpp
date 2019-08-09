@@ -17,11 +17,14 @@ Player::Player(const Transform& transform, const std::string& name)
 	Transform rigidDynamicLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
 	mRigidDynamicCPT = std::make_shared<RigidDynamicCPT>(transform, rigidDynamicLocal);
 	mRigidDynamicCPT->mScale = XMFLOAT4(1.48f, 1.48f, 1.48f, 0.48f);
-	mRigidDynamicCPT->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
+	mRigidDynamicCPT->mPxMaterial = XMFLOAT3(3.4e+38F, 3.4e+38F, 0.0f);
 	mRigidDynamicCPT->mPxGeometry = PxBoxEnum;
-	mRigidDynamicCPT->mDensity = 10.0f;
-	mRigidDynamicCPT->isKinematic = true;
+	mRigidDynamicCPT->mDensity = 1.0f;
+	mRigidDynamicCPT->isKinematic = false;
 	mRigidDynamicCPT->AddRigidDynamic();
+
+	SetRigidDynamicLockFlag(3, true);
+	SetRigidDynamicLockFlag(5, true);
 }
 
 Player::~Player()
@@ -32,12 +35,13 @@ void Player::Update(const GameTimer& gt)
 {
 	GameObject::Update(gt);
 
-	Move(gt);
+	//Move(gt);
 }
 
 void Player::Move(const GameTimer& gt)
 {
 	const float dt = gt.DeltaTime();
+	const float forcePara = 1000.0f;
 
 	if (GetMouseDown(1)) {
 		mLastMousePos.x = GetMouseX();
@@ -56,12 +60,49 @@ void Player::Move(const GameTimer& gt)
 		mLastMousePos.y = GetMouseY();
 	}
 
-	if (GetKeyPress('W'))Walk(10.0f * dt);
-	if (GetKeyPress('S'))Walk(-10.0f * dt);
-	if (GetKeyPress('A'))Strafe(-10.0f * dt);
-	if (GetKeyPress('D'))Strafe(10.0f * dt);
-	if (GetKeyPress('Q'))Fly(10.0f * dt);
-	if (GetKeyPress('E'))Fly(-10.0f * dt);
+	if (GetKeyPress('W')) {
+		auto dir = GetForward();
+		dir.y = 0.0f;
+		XMVECTOR dirV = XMLoadFloat3(&dir);
+		dirV = XMVector3Normalize(dirV) * forcePara;
+		XMStoreFloat3(&dir, dirV);
+		AddForce(dir);
+	}
+
+	if (GetKeyPress('S')) {
+		auto dir = GetForward();
+		dir.y = 0.0f;
+		XMVECTOR dirV = XMLoadFloat3(&dir);
+		dirV = -XMVector3Normalize(dirV) * forcePara;
+		XMStoreFloat3(&dir, dirV);
+		AddForce(dir);
+	}
+
+	if (GetKeyPress('A')) {
+		auto dir = GetRight();
+		dir.y = 0.0f;
+		XMVECTOR dirV = XMLoadFloat3(&dir);
+		dirV = -XMVector3Normalize(dirV) * forcePara;
+		XMStoreFloat3(&dir, dirV);
+		AddForce(dir);
+	}
+
+	if (GetKeyPress('D')) {
+		auto dir = GetRight();
+		dir.y = 0.0f;
+		XMVECTOR dirV = XMLoadFloat3(&dir);
+		dirV = XMVector3Normalize(dirV) * forcePara;
+		XMStoreFloat3(&dir, dirV);
+		AddForce(dir);
+	}
+
+	if (GetKeyPress(VK_SPACE)) {
+		auto dir = GetUp();
+		XMVECTOR dirV = XMLoadFloat3(&dir);
+		dirV = XMVector3Normalize(dirV) * forcePara;
+		XMStoreFloat3(&dir, dirV);
+		AddForce(dir);
+	}
 }
 
 void Player::Pitch(float angle)
@@ -78,29 +119,4 @@ void Player::RotateY(float angle)
 	auto R = XMQuaternionRotationAxis(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), angle);
 	XMVECTOR quat = XMLoadFloat4(&mTransform.Quaternion);
 	XMStoreFloat4(&mTransform.Quaternion, XMQuaternionMultiply(quat, R));
-}
-
-void Player::Strafe(float d)
-{
-	XMVECTOR quat = XMLoadFloat4(&mTransform.Quaternion);
-	auto mat = XMMatrixRotationQuaternion(quat);
-
-	XMVECTOR s = XMVectorReplicate(d);
-	XMVECTOR p = XMLoadFloat3(&mTransform.Translation);
-	XMStoreFloat3(&mTransform.Translation, XMVectorMultiplyAdd(s, mat.r[0], p));
-}
-
-void Player::Walk(float d)
-{
-	XMVECTOR quat = XMLoadFloat4(&mTransform.Quaternion);
-	auto mat = XMMatrixRotationQuaternion(quat);
-
-	XMVECTOR s = XMVectorReplicate(d);
-	XMVECTOR p = XMLoadFloat3(&mTransform.Translation);
-	XMStoreFloat3(&mTransform.Translation, XMVectorMultiplyAdd(s, mat.r[2], p));
-}
-
-void Player::Fly(float d)
-{
-	mTransform.Translation.y += d;
 }

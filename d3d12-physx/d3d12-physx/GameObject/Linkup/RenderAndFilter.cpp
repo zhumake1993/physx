@@ -5,6 +5,7 @@ using namespace DirectX;
 RenderAndFilter::RenderAndFilter(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
+	mIsStatic = true;
 }
 
 RenderAndFilter::~RenderAndFilter()

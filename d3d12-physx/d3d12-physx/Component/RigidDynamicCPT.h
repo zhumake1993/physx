@@ -12,7 +12,7 @@ public:
 
 	void AddRigidDynamic();
 
-	void Update();
+	void Update(Transform& parentTransform);
 
 	void Release();
 
@@ -20,7 +20,9 @@ public:
 	void SetLinearVelocity(DirectX::XMFLOAT3 v);
 
 private:
-	//
+	
+	void PushTransform(const Transform& parentTransform);
+	void PullTransform();
 
 public:
 	
@@ -33,7 +35,10 @@ public:
 	PxGeometryEnum mPxGeometry;
 	float mDensity;
 
+	bool isKinematic = false;
+
 private:
 	Transform mLocalTransformReverse;
 	std::shared_ptr<MeshRenderCPT> mMeshRenderCPT = nullptr;
+	Transform mWorldTransform; // 缓存刚体的世界坐标
 };

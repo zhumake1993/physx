@@ -5,6 +5,8 @@ using namespace DirectX;
 Floor::Floor(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
+	mIsStatic = true;
+
 	// Material
 	mMaterial = std::make_shared<Material>();
 	mMaterial->mDiffuseMapIndex = GetTextureIndex("tile");
@@ -23,8 +25,6 @@ Floor::Floor(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mReceiveShadow = true;
 	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
-
-	mIsStatic = true;
 
 	// Rigidbody
 	Transform rigidStaticLocal = Transform(XMFLOAT3(0.0f, -0.5f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));

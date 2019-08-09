@@ -5,6 +5,8 @@ using namespace DirectX;
 Box::Box(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
+	mIsStatic = true;
+
 	// Material
 	mMaterial = std::make_shared<Material>();
 	mMaterial->mDiffuseMapIndex = GetTextureIndex("bricks2");
@@ -23,8 +25,6 @@ Box::Box(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mReceiveShadow = true;
 	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
-
-	mIsStatic = true;
 }
 
 Box::~Box()

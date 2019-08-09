@@ -132,8 +132,8 @@ void MainScene::BuildMeshes()
 
 void MainScene::BuildGameObjects()
 {
-	auto player = std::make_shared<Player>(Transform(XMFLOAT3(0.0f, 2.0f, -15.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Player");
-	mGameObjectManager->AddGameObject(player);
+	auto playerCamera = std::make_shared<PlayerCamera>(Transform(XMFLOAT3(0.0f, 2.0f, -15.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "PlayerCamera");
+	mGameObjectManager->AddGameObject(playerCamera);
 
 	auto sky = std::make_shared<Sky>(Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)), "Sky");
 	mGameObjectManager->AddGameObject(sky);

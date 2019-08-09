@@ -5,6 +5,8 @@ using namespace DirectX;
 Inflection::Inflection(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
+	mIsStatic = true;
+
 	// Material
 	mMaterial = std::make_shared<Material>();
 	mMaterial->mDiffuseMapIndex = -1;
@@ -23,8 +25,6 @@ Inflection::Inflection(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mReceiveShadow = false;
 	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
-
-	mIsStatic = true;
 
 	Destroy(0.25f);
 }

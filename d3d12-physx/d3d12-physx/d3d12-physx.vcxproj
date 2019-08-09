@@ -163,6 +163,7 @@
     <ClCompile Include="GameObject\Linkup\Fragment.cpp" />
     <ClCompile Include="GameObject\Linkup\Inflection.cpp" />
     <ClCompile Include="GameObject\Linkup\Logic.cpp" />
+    <ClCompile Include="GameObject\Linkup\Player.cpp" />
     <ClCompile Include="GameObject\Linkup\RenderAndFilter.cpp" />
     <ClCompile Include="GameObject\Linkup\Segment.cpp" />
     <ClCompile Include="GameObject\MainScene\Box.cpp" />
@@ -170,7 +171,7 @@
     <ClCompile Include="GameObject\MainScene\Cylinder.cpp" />
     <ClCompile Include="GameObject\MainScene\Globe.cpp" />
     <ClCompile Include="GameObject\MainScene\Grid.cpp" />
-    <ClCompile Include="GameObject\MainScene\Player.cpp" />
+    <ClCompile Include="GameObject\MainScene\PlayerCamera.cpp" />
     <ClCompile Include="GameObject\MainScene\Skull.cpp" />
     <ClCompile Include="GameObject\MainScene\Sphere.cpp" />
     <ClCompile Include="GameObject\Sky.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="GameObject\Linkup\Inflection.h" />
     <ClInclude Include="GameObject\Linkup\LinkupGameObjects.h" />
     <ClInclude Include="GameObject\Linkup\Logic.h" />
+    <ClInclude Include="GameObject\Linkup\Player.h" />
     <ClInclude Include="GameObject\Linkup\RenderAndFilter.h" />
     <ClInclude Include="GameObject\Linkup\Segment.h" />
     <ClInclude Include="GameObject\MainScene\Box.h" />
@@ -237,7 +239,7 @@
     <ClInclude Include="GameObject\MainScene\Globe.h" />
     <ClInclude Include="GameObject\MainScene\Grid.h" />
     <ClInclude Include="GameObject\MainScene\MainSceneGameObjects.h" />
-    <ClInclude Include="GameObject\MainScene\Player.h" />
+    <ClInclude Include="GameObject\MainScene\PlayerCamera.h" />
     <ClInclude Include="GameObject\MainScene\Skull.h" />
     <ClInclude Include="GameObject\MainScene\Sphere.h" />
     <ClInclude Include="GameObject\Sky.h" />

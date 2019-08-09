@@ -14,17 +14,6 @@ public:
 private:
 	virtual void Update(const GameTimer& gt)override;
 
-	void Move(const GameTimer& gt);
-	
-	// Ðý×ª
-	void Pitch(float angle);
-	void RotateY(float angle);
-
-	// Æ½ÒÆ
-	void Strafe(float d);
-	void Walk(float d);
-	void Fly(float d);
-
 	void CreateCubes();
 	void CreateSegments(const Int3& end);
 	std::vector<DirectX::XMFLOAT3> CalRandColor();
@@ -50,6 +39,4 @@ private:
 	std::unordered_map<Int3, bool, Int3_Hash, Int3_Cmp> mMarked;
 	std::unordered_map<Int3, Int3, Int3_Hash, Int3_Cmp> mEdgeTo;
 	std::unordered_map<Int3, int, Int3_Hash, Int3_Cmp> mTurns;
-
-	POINT mLastMousePos;
 };

@@ -5,6 +5,8 @@ using namespace DirectX;
 Globe::Globe(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
+	mIsStatic = true;
+
 	// Material
 	mMaterial = std::make_shared<Material>();
 	mMaterial->mDiffuseMapIndex = GetTextureIndex("white1x1");
@@ -23,8 +25,6 @@ Globe::Globe(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mReceiveShadow = true;
 	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
-
-	mIsStatic = true;
 }
 
 Globe::~Globe()

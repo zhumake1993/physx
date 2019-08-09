@@ -213,7 +213,10 @@
     <ClCompile Include="Common\CameraOld.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject\MainScene\Player.cpp">
+    <ClCompile Include="GameObject\Linkup\Player.cpp">
+      <Filter>GameObject\Linkup</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\MainScene\PlayerCamera.cpp">
       <Filter>GameObject\MainScene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -407,7 +410,10 @@
     <ClInclude Include="Common\CameraOld.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject\MainScene\Player.h">
+    <ClInclude Include="GameObject\Linkup\Player.h">
+      <Filter>GameObject\Linkup</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\MainScene\PlayerCamera.h">
       <Filter>GameObject\MainScene</Filter>
     </ClInclude>
   </ItemGroup>

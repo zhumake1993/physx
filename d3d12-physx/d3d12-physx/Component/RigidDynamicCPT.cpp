@@ -13,6 +13,17 @@ RigidDynamicCPT::RigidDynamicCPT(const Transform& parent, const Transform& local
 	mParentTransform = parent;
 	mLocalTransform = local;
 
+	// 计算刚体的世界坐标
+	auto localMatrix = TransformToMatrix(mLocalTransform);
+	auto worldMatrix = localMatrix * TransformToMatrix(mParentTransform);
+	XMVECTOR worldPosV;
+	XMVECTOR worldQuatV;
+	XMVECTOR worldScaleV;
+	XMMatrixDecompose(&worldScaleV, &worldQuatV, &worldPosV, worldMatrix);
+
+	XMStoreFloat3(&mWorldTransform.Translation, worldPosV);
+	XMStoreFloat4(&mWorldTransform.Quaternion, worldQuatV);
+
 	// 主体相对于刚体的局部坐标
 	Transform mLocalTransformReverse;
 	mLocalTransformReverse.Translation = XMFLOAT3(-mLocalTransform.Translation.x,
@@ -33,27 +44,14 @@ void RigidDynamicCPT::AddRigidDynamic()
 {
 	PxRigidDynamicDesc desc;
 
-	// 计算刚体的世界坐标
-	auto local = TransformToMatrix(mLocalTransform);
-	auto world = local * TransformToMatrix(mParentTransform);
-	XMVECTOR worldPosV;
-	XMVECTOR worldQuatV;
-	XMVECTOR worldScaleV;
-	XMMatrixDecompose(&worldScaleV, &worldQuatV, &worldPosV, world);
+	desc.pos.x = mWorldTransform.Translation.x;
+	desc.pos.y = mWorldTransform.Translation.y;
+	desc.pos.z = mWorldTransform.Translation.z;
 
-	XMFLOAT3 worldPos;
-	XMFLOAT4 worldQuat;
-	XMStoreFloat3(&worldPos, worldPosV);
-	XMStoreFloat4(&worldQuat, worldQuatV);
-
-	desc.pos.x = worldPos.x;
-	desc.pos.y = worldPos.y;
-	desc.pos.z = worldPos.z;
-
-	desc.quat.x = worldQuat.x;
-	desc.quat.y = worldQuat.y;
-	desc.quat.z = worldQuat.z;
-	desc.quat.w = worldQuat.w;
+	desc.quat.x = mWorldTransform.Quaternion.x;
+	desc.quat.y = mWorldTransform.Quaternion.y;
+	desc.quat.z = mWorldTransform.Quaternion.z;
+	desc.quat.w = mWorldTransform.Quaternion.w;
 
 	desc.material.x = mPxMaterial.x;
 	desc.material.y = mPxMaterial.y;
@@ -68,9 +66,10 @@ void RigidDynamicCPT::AddRigidDynamic()
 	desc.density = mDensity;
 
 	mName = gPhysX.CreatePxRigidDynamic(&desc);
+	gPhysX.SetKinematicFlag(mName, isKinematic);
 
 	// 添加刚体MeshRender
-	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(Transform(worldPos, worldQuat,XMFLOAT3(mScale.x * 2, mScale.y * 2, mScale.z * 2)));
+	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(Transform(mWorldTransform.Translation, mWorldTransform.Quaternion, XMFLOAT3(mScale.x * 2, mScale.y * 2, mScale.z * 2)));
 	mMeshRenderCPT->mMaterial = GetCurrMaterialManager()->GetDefaultMaterial();
 	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
 	mMeshRenderCPT->mMeshName = "UnitBox";
@@ -79,35 +78,22 @@ void RigidDynamicCPT::AddRigidDynamic()
 	mMeshRenderCPT->AddMeshRender();
 }
 
-void RigidDynamicCPT::Update()
+void RigidDynamicCPT::Update(Transform& parentTransform)
 {
-	PxFloat3 pos;
-	PxFloat4 quat;
-	gPhysX.GetPxRigidDynamicTransform(mName, pos, quat);
+	if (isKinematic) {
 
-	// 刚体的世界坐标
-	Transform rigidBodyWorld;
-	rigidBodyWorld.Translation = XMFLOAT3(pos.x, pos.y, pos.z);
-	rigidBodyWorld.Quaternion = XMFLOAT4(quat.x, quat.y, quat.z, quat.w);
-	rigidBodyWorld.Scale = XMFLOAT3(1.0f, 1.0f, 1.0f); // 此项不用
+		PushTransform(parentTransform);
+	}
+	else {
 
-	// 计算主体的世界坐标矩阵
-	auto newWorld = TransformToMatrix(mLocalTransformReverse) * TransformToMatrix(rigidBodyWorld);
-
-	// 将主体的世界坐标矩阵分解为Transform的形式
-	XMVECTOR newWorldPosV;
-	XMVECTOR newWorldQuatV;
-	XMVECTOR newWorldScaleV;
-	XMMatrixDecompose(&newWorldScaleV, &newWorldQuatV, &newWorldPosV, newWorld);
-
-	// 更新主体的世界坐标
-	XMStoreFloat3(&mParentTransform.Translation, newWorldPosV);
-	XMStoreFloat4(&mParentTransform.Quaternion, newWorldQuatV);
+		PullTransform();
+		
+		parentTransform.Translation = mParentTransform.Translation;
+		parentTransform.Quaternion = mParentTransform.Quaternion;
+	}
 
 	// 更新刚体MeshRender的世界坐标
-	mMeshRenderCPT->mTransform.Translation = rigidBodyWorld.Translation;
-	mMeshRenderCPT->mTransform.Quaternion = rigidBodyWorld.Quaternion;
-	mMeshRenderCPT->Update();
+	mMeshRenderCPT->Update(mWorldTransform);
 }
 
 void RigidDynamicCPT::Release()
@@ -124,4 +110,48 @@ void RigidDynamicCPT::SetAngularDamping(float ad)
 void RigidDynamicCPT::SetLinearVelocity(DirectX::XMFLOAT3 v)
 {
 	gPhysX.SetLinearVelocity(mName, PxFloat3(v.x, v.y, v.z));
+}
+
+void RigidDynamicCPT::PushTransform(const Transform& parentTransform)
+{
+	mParentTransform = parentTransform;
+
+	// 计算刚体的世界坐标
+	auto localMatrix = TransformToMatrix(mLocalTransform);
+	auto worldMatrix = localMatrix * TransformToMatrix(mParentTransform);
+	XMVECTOR worldPosV;
+	XMVECTOR worldQuatV;
+	XMVECTOR worldScaleV;
+	XMMatrixDecompose(&worldScaleV, &worldQuatV, &worldPosV, worldMatrix);
+
+	XMStoreFloat3(&mWorldTransform.Translation, worldPosV);
+	XMStoreFloat4(&mWorldTransform.Quaternion, worldQuatV);
+
+	PxFloat3 pos = PxFloat3(mWorldTransform.Translation.x, mWorldTransform.Translation.y, mWorldTransform.Translation.z);
+	PxFloat4 quat = PxFloat4(mWorldTransform.Quaternion.x, mWorldTransform.Quaternion.y, mWorldTransform.Quaternion.z, mWorldTransform.Quaternion.w);
+	gPhysX.SetKinematicTarget(mName, pos, quat);
+}
+
+void RigidDynamicCPT::PullTransform()
+{
+	PxFloat3 pos;
+	PxFloat4 quat;
+	gPhysX.GetPxRigidDynamicTransform(mName, pos, quat);
+
+	// 刚体的世界坐标
+	mWorldTransform.Translation = XMFLOAT3(pos.x, pos.y, pos.z);
+	mWorldTransform.Quaternion = XMFLOAT4(quat.x, quat.y, quat.z, quat.w);
+
+	// 计算主体的世界坐标矩阵
+	auto newWorld = TransformToMatrix(mLocalTransformReverse) * TransformToMatrix(mWorldTransform);
+
+	// 将主体的世界坐标矩阵分解为Transform的形式
+	XMVECTOR newWorldPosV;
+	XMVECTOR newWorldQuatV;
+	XMVECTOR newWorldScaleV;
+	XMMatrixDecompose(&newWorldScaleV, &newWorldQuatV, &newWorldPosV, newWorld);
+
+	// 更新主体的世界坐标
+	XMStoreFloat3(&mParentTransform.Translation, newWorldPosV);
+	XMStoreFloat4(&mParentTransform.Quaternion, newWorldQuatV);
 }

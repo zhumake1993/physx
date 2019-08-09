@@ -5,6 +5,8 @@ using namespace DirectX;
 Cylinder::Cylinder(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
+	mIsStatic = true;
+
 	// Material
 	mMaterial = std::make_shared<Material>();
 	mMaterial->mDiffuseMapIndex = GetTextureIndex("bricks");
@@ -23,8 +25,6 @@ Cylinder::Cylinder(const Transform& transform, const std::string& name)
 	mMeshRenderCPT->mReceiveShadow = true;
 	mMeshRenderCPT->mParent = mName;
 	mMeshRenderCPT->AddMeshRender();
-
-	mIsStatic = true;
 }
 
 Cylinder::~Cylinder()

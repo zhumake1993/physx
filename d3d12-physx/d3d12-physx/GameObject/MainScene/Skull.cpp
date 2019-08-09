@@ -5,6 +5,8 @@ using namespace DirectX;
 Skull::Skull(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
+	mIsStatic = false;
+
 	// Material
 	mMaterial = std::make_shared<Material>();
 	mMaterial->mDiffuseMapIndex = GetTextureIndex("white1x1");

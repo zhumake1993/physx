@@ -28,8 +28,11 @@ void MeshRenderCPT::AddMeshRender()
 	GetCurrMeshRenderInstanceManager()->AddMeshRender(this);
 }
 
-void MeshRenderCPT::Update()
+void MeshRenderCPT::Update(const Transform& transform)
 {
+	mTransform.Translation = transform.Translation;
+	mTransform.Quaternion = transform.Quaternion;
+
 	GetCurrMeshRenderInstanceManager()->UpdateMeshRender(this);
 }
 

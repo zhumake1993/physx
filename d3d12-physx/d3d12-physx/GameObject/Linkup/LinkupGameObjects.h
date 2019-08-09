@@ -8,3 +8,4 @@
 #include "Inflection.h"
 #include "Fragment.h"
 #include "RenderAndFilter.h"
+#include "Player.h"

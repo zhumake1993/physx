@@ -13,7 +13,7 @@ public:
 	DirectX::XMFLOAT4X4 GetWorld();
 
 	void AddMeshRender();
-	void Update();
+	void Update(const Transform& transform);
 	void Release();
 
 private:

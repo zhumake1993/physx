@@ -175,13 +175,40 @@ std::string PhysX::CreatePxRigidDynamic(void* pdesc)
 
 void PhysX::SetAngularDamping(std::string name, float ad)
 {
+	if (!HasPxRigidDynamic(name)) {
+		ThrowPxEx("PxRigidDynamic does not exist!");
+	}
+
 	gPxRigidDynamicMap[name]->setAngularDamping(ad);
 }
 
 void PhysX::SetLinearVelocity(std::string name, PxFloat3 v)
 {
+	if (!HasPxRigidDynamic(name)) {
+		ThrowPxEx("PxRigidDynamic does not exist!");
+	}
+
 	PxVec3 velocity = PxVec3(v.x, v.y, v.z);
 	gPxRigidDynamicMap[name]->setLinearVelocity(velocity);
+}
+
+void PhysX::SetKinematicFlag(std::string name, bool st)
+{
+	if (!HasPxRigidDynamic(name)) {
+		ThrowPxEx("PxRigidDynamic does not exist!");
+	}
+
+	gPxRigidDynamicMap[name]->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, st);
+}
+
+void PhysX::SetKinematicTarget(std::string name, PxFloat3& pos, PxFloat4& quat)
+{
+	if (!HasPxRigidDynamic(name)) {
+		ThrowPxEx("PxRigidDynamic does not exist!");
+	}
+
+	auto target = PxTransform(PxVec3(pos.x, pos.y, pos.z), PxQuat(quat.x, quat.y, quat.z, quat.w));
+	gPxRigidDynamicMap[name]->setKinematicTarget(target);
 }
 
 void PhysX::DeletePxRigidDynamic(std::string name)

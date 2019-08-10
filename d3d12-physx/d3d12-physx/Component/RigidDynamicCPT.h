@@ -7,7 +7,7 @@ class RigidDynamicCPT
 {
 public:
 
-	RigidDynamicCPT(const Transform& parent, const Transform& local);
+	RigidDynamicCPT(const std::string& parentName, const Transform& parent, const Transform& local);
 	virtual ~RigidDynamicCPT();
 
 	void AddRigidDynamic();
@@ -29,6 +29,7 @@ private:
 public:
 	
 	std::string mName = "";
+	std::string mParentName = "";
 	Transform mParentTransform;
 	Transform mLocalTransform;
 
@@ -40,7 +41,7 @@ public:
 	bool isKinematic = false;
 
 private:
-	Transform mLocalTransformReverse;
+	DirectX::XMFLOAT4X4 mLocalMatrixReverse;
 	std::shared_ptr<MeshRenderCPT> mMeshRenderCPT = nullptr;
 	Transform mWorldTransform; // 缓存刚体的世界坐标
 };

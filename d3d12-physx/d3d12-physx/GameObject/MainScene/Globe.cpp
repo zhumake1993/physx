@@ -20,7 +20,7 @@ Globe::Globe(const Transform& transform, const std::string& name)
 	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
 	mMeshRenderCPT->mMaterial = mMaterial;
 	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	mMeshRenderCPT->mMeshName = "sphere";
+	mMeshRenderCPT->mMeshName = "UnitSphere";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::OpaqueDynamicReflectors;
 	mMeshRenderCPT->mReceiveShadow = true;
 	mMeshRenderCPT->mParent = mName;

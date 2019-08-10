@@ -164,6 +164,7 @@
     <ClCompile Include="GameObject\Linkup\Inflection.cpp" />
     <ClCompile Include="GameObject\Linkup\Logic.cpp" />
     <ClCompile Include="GameObject\Linkup\Player.cpp" />
+    <ClCompile Include="GameObject\Linkup\Obverser.cpp" />
     <ClCompile Include="GameObject\Linkup\RenderAndFilter.cpp" />
     <ClCompile Include="GameObject\Linkup\Segment.cpp" />
     <ClCompile Include="GameObject\Linkup\Test.cpp" />
@@ -232,6 +233,7 @@
     <ClInclude Include="GameObject\Linkup\LinkupGameObjects.h" />
     <ClInclude Include="GameObject\Linkup\Logic.h" />
     <ClInclude Include="GameObject\Linkup\Player.h" />
+    <ClInclude Include="GameObject\Linkup\Obverser.h" />
     <ClInclude Include="GameObject\Linkup\RenderAndFilter.h" />
     <ClInclude Include="GameObject\Linkup\Segment.h" />
     <ClInclude Include="GameObject\Linkup\Test.h" />

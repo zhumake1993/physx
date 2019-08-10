@@ -7,7 +7,7 @@ class RigidStaticCPT
 {
 public:
 
-	RigidStaticCPT(const Transform& parent, const Transform& local);
+	RigidStaticCPT(const std::string& parentName, const Transform& parent, const Transform& local);
 	virtual ~RigidStaticCPT();
 
 	void AddRigidStatic();
@@ -20,6 +20,7 @@ private:
 public:
 	
 	std::string mName = "";
+	std::string mParentName = "";
 	Transform mParentTransform;
 	Transform mLocalTransform;
 
@@ -29,4 +30,5 @@ public:
 
 private:
 	std::shared_ptr<MeshRenderCPT> mMeshRenderCPT = nullptr;
+	Transform mWorldTransform; // 缓存刚体的世界坐标
 };

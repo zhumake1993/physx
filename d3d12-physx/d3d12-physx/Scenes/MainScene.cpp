@@ -121,13 +121,13 @@ void MainScene::BuildMaterials()
 void MainScene::BuildMeshes()
 {
 	GeometryGenerator geoGen;
-	mMeshManager->AddMesh("box", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 3));
-	mMeshManager->AddMesh("grid", geoGen.CreateGrid(20.0f, 30.0f, 60, 40));
-	mMeshManager->AddMesh("sphere", geoGen.CreateSphere(0.5f, 20, 20));
-	mMeshManager->AddMesh("cylinder", geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20));
-	mMeshManager->AddMesh("box2", geoGen.CreateBox(8.0f, 8.0f, 8.0f, 3));
 
 	mMeshManager->AddMesh("UnitBox", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 0));
+	mMeshManager->AddMesh("UnitSphere", geoGen.CreateSphere(0.5f, 20, 20));
+	mMeshManager->AddMesh("UnitCylinder", geoGen.CreateCylinder(0.5f, 0.5f, 1.0f, 20, 20));
+
+	mMeshManager->AddMesh("Cylinder", geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20));
+	mMeshManager->AddMesh("Grid", geoGen.CreateGrid(20.0f, 30.0f, 60, 40));
 }
 
 void MainScene::BuildGameObjects()

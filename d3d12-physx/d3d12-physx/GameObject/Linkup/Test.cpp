@@ -7,36 +7,36 @@ Test::Test(const Transform& transform, const std::string& name)
 {
 	mIsStatic = false;
 
-	//// Material
-	//mMaterial = std::make_shared<Material>();
-	//mMaterial->mDiffuseMapIndex = -1;
-	//mMaterial->mNormalMapIndex = GetTextureIndex("tile_nmap");
-	//mMaterial->mDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	//mMaterial->mFresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
-	//mMaterial->mRoughness = 0.1f;
-	//mMaterial->mLerpDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	//mMaterial->mLerpPara = 0.0f;
-	//AddMaterial();
+	// Material
+	mMaterial = std::make_shared<Material>();
+	mMaterial->mDiffuseMapIndex = -1;
+	mMaterial->mNormalMapIndex = -1;
+	mMaterial->mDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mMaterial->mFresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
+	mMaterial->mRoughness = 0.1f;
+	mMaterial->mLerpDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	mMaterial->mLerpPara = 0.0f;
+	AddMaterial();
 
-	//// MeshRender
-	//mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
-	//mMeshRenderCPT->mMaterial = mMaterial;
-	//XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	//mMeshRenderCPT->mMeshName = "box";
-	//mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
-	//mMeshRenderCPT->mReceiveShadow = true;
-	//mMeshRenderCPT->mParent = mName;
-	//mMeshRenderCPT->AddMeshRender();
+	// MeshRender
+	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
+	mMeshRenderCPT->mMaterial = mMaterial;
+	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
+	mMeshRenderCPT->mMeshName = "Test";
+	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
+	mMeshRenderCPT->mReceiveShadow = true;
+	mMeshRenderCPT->mParent = mName;
+	mMeshRenderCPT->AddMeshRender();
 
 	// ∏’ÃÂ
 	auto rotation = XMQuaternionRotationAxis(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), XM_PIDIV2);
 	XMFLOAT4 quat;
 	XMStoreFloat4(&quat, rotation);
 	Transform rigidDynamicLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), quat);
-	mRigidDynamicCPT = std::make_shared<RigidDynamicCPT>(transform, rigidDynamicLocal);
-	mRigidDynamicCPT->mScale = XMFLOAT4(0.48f, 0.48f, 0.48f, 0.48f);
+	mRigidDynamicCPT = std::make_shared<RigidDynamicCPT>(mName, transform, rigidDynamicLocal);
+	mRigidDynamicCPT->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
 	mRigidDynamicCPT->mPxMaterial = XMFLOAT3(3.4e+38F, 0, 0.0f);
-	mRigidDynamicCPT->mPxGeometry = PxCapsuleEnum; // PxCapsuleEnum PxBoxEnum
+	mRigidDynamicCPT->mPxGeometry = PxCapsuleEnum;
 	mRigidDynamicCPT->mDensity = 1.0f;
 	mRigidDynamicCPT->isKinematic = false;
 	mRigidDynamicCPT->AddRigidDynamic();
@@ -78,8 +78,8 @@ void Test::Move(const GameTimer& gt)
 		mLastMousePos.y = GetMouseY();
 	}
 
-	if (GetKeyPress('W')) {
-		auto dir = GetForward();
+	if (GetKeyPress(VK_UP)) {
+		auto dir = mTransform.GetForward();
 		dir.y = 0.0f;
 		XMVECTOR dirV = XMLoadFloat3(&dir);
 		dirV = XMVector3Normalize(dirV) * forcePara;
@@ -87,8 +87,8 @@ void Test::Move(const GameTimer& gt)
 		AddForce(dir);
 	}
 
-	if (GetKeyPress('S')) {
-		auto dir = GetForward();
+	if (GetKeyPress(VK_DOWN)) {
+		auto dir = mTransform.GetForward();
 		dir.y = 0.0f;
 		XMVECTOR dirV = XMLoadFloat3(&dir);
 		dirV = -XMVector3Normalize(dirV) * forcePara;
@@ -96,8 +96,8 @@ void Test::Move(const GameTimer& gt)
 		AddForce(dir);
 	}
 
-	if (GetKeyPress('A')) {
-		auto dir = GetRight();
+	if (GetKeyPress(VK_LEFT)) {
+		auto dir = mTransform.GetRight();
 		dir.y = 0.0f;
 		XMVECTOR dirV = XMLoadFloat3(&dir);
 		dirV = -XMVector3Normalize(dirV) * forcePara;
@@ -105,8 +105,8 @@ void Test::Move(const GameTimer& gt)
 		AddForce(dir);
 	}
 
-	if (GetKeyPress('D')) {
-		auto dir = GetRight();
+	if (GetKeyPress(VK_RIGHT)) {
+		auto dir = mTransform.GetRight();
 		dir.y = 0.0f;
 		XMVECTOR dirV = XMLoadFloat3(&dir);
 		dirV = XMVector3Normalize(dirV) * forcePara;
@@ -115,7 +115,7 @@ void Test::Move(const GameTimer& gt)
 	}
 
 	if (GetKeyPress(VK_SPACE)) {
-		auto dir = GetUp();
+		auto dir = mTransform.GetUp();
 		XMVECTOR dirV = XMLoadFloat3(&dir);
 		dirV = XMVector3Normalize(dirV) * forcePara;
 		XMStoreFloat3(&dir, dirV);

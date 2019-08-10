@@ -15,7 +15,7 @@ Player::Player(const Transform& transform, const std::string& name)
 
 	// ∏’ÃÂ
 	Transform rigidDynamicLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-	mRigidDynamicCPT = std::make_shared<RigidDynamicCPT>(transform, rigidDynamicLocal);
+	mRigidDynamicCPT = std::make_shared<RigidDynamicCPT>(mName, transform, rigidDynamicLocal);
 	mRigidDynamicCPT->mScale = XMFLOAT4(1.48f, 1.48f, 1.48f, 0.48f);
 	mRigidDynamicCPT->mPxMaterial = XMFLOAT3(3.4e+38F, 3.4e+38F, 0.0f);
 	mRigidDynamicCPT->mPxGeometry = PxBoxEnum;
@@ -61,7 +61,7 @@ void Player::Move(const GameTimer& gt)
 	}
 
 	if (GetKeyPress('W')) {
-		auto dir = GetForward();
+		auto dir = mTransform.GetForward();
 		dir.y = 0.0f;
 		XMVECTOR dirV = XMLoadFloat3(&dir);
 		dirV = XMVector3Normalize(dirV) * forcePara;
@@ -70,7 +70,7 @@ void Player::Move(const GameTimer& gt)
 	}
 
 	if (GetKeyPress('S')) {
-		auto dir = GetForward();
+		auto dir = mTransform.GetForward();
 		dir.y = 0.0f;
 		XMVECTOR dirV = XMLoadFloat3(&dir);
 		dirV = -XMVector3Normalize(dirV) * forcePara;
@@ -79,7 +79,7 @@ void Player::Move(const GameTimer& gt)
 	}
 
 	if (GetKeyPress('A')) {
-		auto dir = GetRight();
+		auto dir = mTransform.GetRight();
 		dir.y = 0.0f;
 		XMVECTOR dirV = XMLoadFloat3(&dir);
 		dirV = -XMVector3Normalize(dirV) * forcePara;
@@ -88,7 +88,7 @@ void Player::Move(const GameTimer& gt)
 	}
 
 	if (GetKeyPress('D')) {
-		auto dir = GetRight();
+		auto dir = mTransform.GetRight();
 		dir.y = 0.0f;
 		XMVECTOR dirV = XMLoadFloat3(&dir);
 		dirV = XMVector3Normalize(dirV) * forcePara;
@@ -97,7 +97,7 @@ void Player::Move(const GameTimer& gt)
 	}
 
 	if (GetKeyPress(VK_SPACE)) {
-		auto dir = GetUp();
+		auto dir = mTransform.GetUp();
 		XMVECTOR dirV = XMLoadFloat3(&dir);
 		dirV = XMVector3Normalize(dirV) * forcePara;
 		XMStoreFloat3(&dir, dirV);

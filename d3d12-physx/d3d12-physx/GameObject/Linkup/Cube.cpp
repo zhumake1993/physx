@@ -22,7 +22,7 @@ Cube::Cube(const Transform& transform, const std::string& name)
 	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
 	mMeshRenderCPT->mMaterial = mMaterial;
 	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	mMeshRenderCPT->mMeshName = "box";
+	mMeshRenderCPT->mMeshName = "UnitBox";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
 	mMeshRenderCPT->mReceiveShadow = true;
 	mMeshRenderCPT->mParent = mName;
@@ -30,7 +30,7 @@ Cube::Cube(const Transform& transform, const std::string& name)
 
 	// Rigidbody
 	Transform rigidStaticLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-	mRigidStaticCPT = std::make_shared<RigidStaticCPT>(transform, rigidStaticLocal);
+	mRigidStaticCPT = std::make_shared<RigidStaticCPT>(mName, transform, rigidStaticLocal);
 	mRigidStaticCPT->mScale = XMFLOAT4(0.48f, 0.48f, 0.48f, 0.48f);
 	mRigidStaticCPT->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
 	mRigidStaticCPT->mPxGeometry = PxBoxEnum;

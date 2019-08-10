@@ -20,7 +20,7 @@ Cylinder::Cylinder(const Transform& transform, const std::string& name)
 	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
 	mMeshRenderCPT->mMaterial = mMaterial;
 	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.5f, 2.0f, 1.0f));
-	mMeshRenderCPT->mMeshName = "cylinder";
+	mMeshRenderCPT->mMeshName = "Cylinder";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
 	mMeshRenderCPT->mReceiveShadow = true;
 	mMeshRenderCPT->mParent = mName;

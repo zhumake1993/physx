@@ -3,8 +3,6 @@
 
 using namespace DirectX;
 
-extern XMMATRIX TransformToMatrix(Transform& transform);
-
 MeshRenderCPT::MeshRenderCPT(const Transform& transform)
 {
 	mTransform = transform;

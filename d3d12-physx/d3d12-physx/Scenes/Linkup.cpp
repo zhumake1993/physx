@@ -77,14 +77,15 @@ void Linkup::BuildMaterials()
 void Linkup::BuildMeshes()
 {
 	GeometryGenerator geoGen;
-	mMeshManager->AddMesh("box", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 3));
-	mMeshManager->AddMesh("grid", geoGen.CreateGrid(20.0f, 30.0f, 60, 40));
-	mMeshManager->AddMesh("sphere", geoGen.CreateSphere(0.5f, 20, 20));
 
 	mMeshManager->AddMesh("UnitBox", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 0));
+	mMeshManager->AddMesh("UnitSphere", geoGen.CreateSphere(0.5f, 20, 20));
+	mMeshManager->AddMesh("UnitCylinder", geoGen.CreateCylinder(0.5f, 0.5f, 1.0f, 20, 20));
 
-	mMeshManager->AddMesh("Segment", geoGen.CreateCylinder(1.0f, 1.0f, 1.0f, 20, 20));
+	mMeshManager->AddMesh("Floor", geoGen.CreateGrid(20.0f, 30.0f, 60, 40));
 	mMeshManager->AddMesh("Inflection", geoGen.CreateSphere(1.0f, 20, 20));
+	mMeshManager->AddMesh("Segment", geoGen.CreateCylinder(1.0f, 1.0f, 1.0f, 20, 20));
+	mMeshManager->AddMesh("Test", geoGen.CreateCapsule(0.5f, 1.0f, 20, 5, 5));
 }
 
 void Linkup::BuildGameObjects()
@@ -92,7 +93,10 @@ void Linkup::BuildGameObjects()
 	auto player = std::make_shared<Player>(Transform(XMFLOAT3(0.0f, 2.0f, -10.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Player");
 	mGameObjectManager->AddGameObject(player);
 
-	auto test = std::make_shared<Test>(Transform(XMFLOAT3(0.0f, 2.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.95f, 0.95f, 0.95f)), "Test");
+	auto obverser = std::make_shared<Obverser>(Transform(XMFLOAT3(0.0f, 2.0f, -10.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Obverser");
+	mGameObjectManager->AddGameObject(obverser);
+
+	auto test = std::make_shared<Test>(Transform(XMFLOAT3(0.0f, 2.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Test");
 	mGameObjectManager->AddGameObject(test);
 
 	auto logic = std::make_shared<Logic>(Transform(XMFLOAT3(0.0f, 2.0f, -15.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Logic");

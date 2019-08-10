@@ -82,17 +82,11 @@ protected:
 	void AddForce(DirectX::XMFLOAT3 force);
 	void SetRigidDynamicLockFlag(int axis, bool st);
 
-	// ·½Î»
-	DirectX::XMFLOAT3 GetForward();
-	DirectX::XMFLOAT3 GetRight();
-	DirectX::XMFLOAT3 GetUp();
-
 public:
 	std::string mName;
 	Transform mTransform;
 
 	std::shared_ptr<Material> mMaterial = nullptr;
-
 	std::shared_ptr<MeshRenderCPT> mMeshRenderCPT = nullptr;
 	std::shared_ptr<RigidDynamicCPT> mRigidDynamicCPT = nullptr;
 	std::shared_ptr<RigidStaticCPT> mRigidStaticCPT = nullptr;

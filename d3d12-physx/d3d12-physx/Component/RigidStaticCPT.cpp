@@ -12,6 +12,10 @@ RigidStaticCPT::RigidStaticCPT(const std::string& parentName, const Transform& p
 	mParentTransform = parent;
 	mLocalTransform = local;
 
+	// 去除scale分量
+	mParentTransform.Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	mLocalTransform.Scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+
 	// 计算刚体的世界坐标
 	auto localMatrix = TransformToMatrix(mLocalTransform);
 	auto worldMatrix = localMatrix * TransformToMatrix(mParentTransform);

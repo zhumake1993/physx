@@ -34,15 +34,15 @@ Test::Test(const Transform& transform, const std::string& name)
 	XMStoreFloat4(&quat, rotation);
 	Transform rigidDynamicLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), quat);
 	mRigidDynamicCPT = std::make_shared<RigidDynamicCPT>(mName, transform, rigidDynamicLocal);
-	mRigidDynamicCPT->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
-	mRigidDynamicCPT->mPxMaterial = XMFLOAT3(3.4e+38F, 0, 0.0f);
+	mRigidDynamicCPT->mScale = XMFLOAT4(0.51f, 0.51f, 0.5f, 0.5f);
+	mRigidDynamicCPT->mPxMaterial = XMFLOAT3(3.4e+38F, 3.4e+38F, 0.0f);
 	mRigidDynamicCPT->mPxGeometry = PxCapsuleEnum;
 	mRigidDynamicCPT->mDensity = 1.0f;
 	mRigidDynamicCPT->isKinematic = false;
 	mRigidDynamicCPT->AddRigidDynamic();
 
-	//SetRigidDynamicLockFlag(3, true);
-	//SetRigidDynamicLockFlag(5, true);
+	SetRigidDynamicLockFlag(3, true);
+	SetRigidDynamicLockFlag(5, true);
 }
 
 Test::~Test()
@@ -115,11 +115,7 @@ void Test::Move(const GameTimer& gt)
 	}
 
 	if (GetKeyPress(VK_SPACE)) {
-		auto dir = mTransform.GetUp();
-		XMVECTOR dirV = XMLoadFloat3(&dir);
-		dirV = XMVector3Normalize(dirV) * forcePara;
-		XMStoreFloat3(&dir, dirV);
-		AddForce(dir);
+		AddForce(XMFLOAT3(0.0f, forcePara, 0.0f));
 	}
 }
 

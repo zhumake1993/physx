@@ -7,6 +7,7 @@
 #include "Component/MeshRenderCPT.h"
 #include "Component/RigidDynamicCPT.h"
 #include "Component/RigidStaticCPT.h"
+#include "Component/CameraCPT.h"
 
 class GameObject
 {
@@ -27,6 +28,11 @@ protected:
 	bool GetKeyDown(int key);
 	bool GetKeyPress(int key);
 	bool GetKeyUp(int key);
+	bool GetMouseDown(int key);
+	bool GetMousePress(int key);
+	bool GetMouseUp(int key);
+	int GetMouseX();
+	int GetMouseY();
 
 	// 游戏物体
 	bool HasGameObject(std::string name);
@@ -72,6 +78,10 @@ protected:
 	void SetIsSobel(bool st);
 	void SetIsDrawRigidbody(bool st);
 
+	// 物理
+	void AddForce(DirectX::XMFLOAT3 force);
+	void SetRigidDynamicLockFlag(int axis, bool st);
+
 public:
 	std::string mName;
 	Transform mTransform;
@@ -80,11 +90,12 @@ public:
 	std::shared_ptr<MeshRenderCPT> mMeshRenderCPT = nullptr;
 	std::shared_ptr<RigidDynamicCPT> mRigidDynamicCPT = nullptr;
 	std::shared_ptr<RigidStaticCPT> mRigidStaticCPT = nullptr;
+	std::shared_ptr<CameraCPT> mCameraCPT = nullptr;
 
 	std::shared_ptr<GameTimer> mGameTimer = nullptr;
 	float mLifeTime = 0.0f;
 
-private:
+protected:
 
-	//
+	bool mIsStatic = false;
 };

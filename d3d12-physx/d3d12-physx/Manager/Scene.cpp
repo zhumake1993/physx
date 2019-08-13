@@ -19,6 +19,7 @@ Scene::Scene()
 
 	mMainCamera = std::make_shared<Camera>();
 	mMainCamera->SetLens(0.25f * MathHelper::Pi, static_cast<float>(gSetting.ClientWidth) / gSetting.ClientHeight, 1.0f, 1000.0f);
+	mMainCamera->SetTranslation(0.0f, 2.0f, -15.0f);
 }
 
 Scene::~Scene()
@@ -49,7 +50,7 @@ void Scene::Update(const GameTimer& gt)
 void Scene::PostUpdate(const GameTimer& gt)
 {
 	// 由于游戏逻辑可能修改了材质，因此材质的更新要放在游戏逻辑的更新的后面
-	mMaterialManager->UpdateMaterialData();
+	mMaterialManager->UploadMaterial();
 
 	// 由于游戏逻辑可能修改了渲染实例，因此渲染实例的更新要放在游戏逻辑的更新的后面
 	mMeshRenderInstanceManager->UploadMeshRender();

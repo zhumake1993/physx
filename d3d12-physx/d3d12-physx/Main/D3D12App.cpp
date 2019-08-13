@@ -87,9 +87,36 @@ void D3D12App::Update(const GameTimer& gt)
 		XMStoreFloat3(&mRotatedLightDirections[i], lightDir);
 	}
 
+	// 获取当前的指令分配器
+	auto cmdListAlloc = gMainFrameResource->GetCurrCmdListAlloc();
+
+	//重置指令分配器以重用相关联的内存
+	//必须在GPU执行完关联的指令列表后才能进行该操作
+	ThrowIfFailed(cmdListAlloc->Reset());
+
+	//重置指令列表以重用内存
+	//必须在使用ExecuteCommandList将指令列表添加进指令队列后才能执行该操作
+	ThrowIfFailed(gCommandList->Reset(cmdListAlloc.Get(), nullptr));
+
 	gSceneManager->Update(gt);
 
 	if (gSceneManager->ChangingScene()) {
+
+		mTimer.Stop();
+
+		//关闭指令列表
+		ThrowIfFailed(gCommandList->Close());
+
+		//将指令列表添加进指令队列，供GPU执行
+		ID3D12CommandList* cmdsLists1[] = { gCommandList.Get() };
+		mCommandQueue->ExecuteCommandLists(_countof(cmdsLists1), cmdsLists1);
+
+		// 标记指令到达该fence点
+		gMainFrameResource->GetCurrFence() = ++mCurrentFence;
+
+		// 指令同步
+		mCommandQueue->Signal(mFence.Get(), mCurrentFence);
+
 
 		// 等待指令完成
 		// 因为指令队列中可能残留有引用上一个场景资源的指令
@@ -108,42 +135,41 @@ void D3D12App::Update(const GameTimer& gt)
 		ThrowIfFailed(gCommandList->Reset(cmdListAlloc.Get(), nullptr));
 
 		gSceneManager->ChangeScene();
-		mTimer.Reset();
 
 		//关闭指令列表
 		ThrowIfFailed(gCommandList->Close());
 
 		//将指令列表添加进指令队列，供GPU执行
-		ID3D12CommandList* cmdsLists[] = { gCommandList.Get() };
-		mCommandQueue->ExecuteCommandLists(_countof(cmdsLists), cmdsLists);
+		ID3D12CommandList* cmdsLists2[] = { gCommandList.Get() };
+		mCommandQueue->ExecuteCommandLists(_countof(cmdsLists2), cmdsLists2);
 
 		// 等待指令完成
 		FlushCommandQueue();
+
+
+		// 获取当前的指令分配器
+		cmdListAlloc = gMainFrameResource->GetCurrCmdListAlloc();
+
+		//重置指令分配器以重用相关联的内存
+		//必须在GPU执行完关联的指令列表后才能进行该操作
+		ThrowIfFailed(cmdListAlloc->Reset());
+
+		//重置指令列表以重用内存
+		//必须在使用ExecuteCommandList将指令列表添加进指令队列后才能执行该操作
+		ThrowIfFailed(gCommandList->Reset(cmdListAlloc.Get(), nullptr));
+
+		mTimer.Start();
 	}
 
-	mShadowMap->Update(mRotatedLightDirections[0]);
+	if (GetCurrIsShadowMap()) {
+		mShadowMap->Update(mRotatedLightDirections[0]);
+	}
 
 	UpdateFrameResource(gt);
 }
 
 void D3D12App::Draw(const GameTimer& gt)
 {
-	// 获取当前的指令分配器
-	auto cmdListAlloc = gMainFrameResource->GetCurrCmdListAlloc();
-
-	//重置指令分配器以重用相关联的内存
-	//必须在GPU执行完关联的指令列表后才能进行该操作
-	ThrowIfFailed(cmdListAlloc->Reset());
-
-	//重置指令列表以重用内存
-	//必须在使用ExecuteCommandList将指令列表添加进指令队列后才能执行该操作
-	ThrowIfFailed(gCommandList->Reset(cmdListAlloc.Get(), nullptr));
-
-	//
-	// 主绘制
-	//
-
-
 	if (GetCurrIsWireframe()) {
 		mWireframe->Draw(mRenderTarget->Rtv(), DepthStencilView());
 	} 
@@ -288,7 +314,7 @@ void D3D12App::UpdateFrameResource(const GameTimer& gt)
 	XMStoreFloat4x4(&mainPassCB.ViewProjTex, XMMatrixTranspose(viewProjTex));
 	XMStoreFloat4x4(&mainPassCB.ShadowTransform, XMMatrixTranspose(shadowTransform));
 
-	mainPassCB.EyePosW = GetCurrMainCamera()->GetPosition3f();
+	mainPassCB.EyePosW = GetCurrMainCamera()->GetTranslation3f();
 	mainPassCB.RenderTargetSize = XMFLOAT2((float)gSetting.ClientWidth, (float)gSetting.ClientHeight);
 	mainPassCB.InvRenderTargetSize = XMFLOAT2(1.0f / gSetting.ClientWidth, 1.0f / gSetting.ClientHeight);
 	mainPassCB.NearZ = 1.0f;

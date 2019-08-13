@@ -207,6 +207,24 @@
     <ClCompile Include="GameObject\Linkup\RenderAndFilter.cpp">
       <Filter>GameObject\Linkup</Filter>
     </ClCompile>
+    <ClCompile Include="Component\CameraCPT.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\CameraOld.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\Linkup\Player.cpp">
+      <Filter>GameObject\Linkup</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\MainScene\PlayerCamera.cpp">
+      <Filter>GameObject\MainScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\Linkup\Test.cpp">
+      <Filter>GameObject\Linkup</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject\Linkup\Obverser.cpp">
+      <Filter>GameObject\Linkup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h">
@@ -390,6 +408,24 @@
       <Filter>GameObject</Filter>
     </ClInclude>
     <ClInclude Include="GameObject\Linkup\RenderAndFilter.h">
+      <Filter>GameObject\Linkup</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\CameraCPT.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\CameraOld.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Linkup\Player.h">
+      <Filter>GameObject\Linkup</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\MainScene\PlayerCamera.h">
+      <Filter>GameObject\MainScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Linkup\Test.h">
+      <Filter>GameObject\Linkup</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Linkup\Obverser.h">
       <Filter>GameObject\Linkup</Filter>
     </ClInclude>
   </ItemGroup>

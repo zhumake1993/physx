@@ -21,9 +21,7 @@ private:
 	virtual void BuildMeshes()override;
 	virtual void BuildGameObjects()override;
 
-	void MoveCamera(const GameTimer& gt);
-
 private:
 
-	POINT mLastMousePos;
+	//
 };

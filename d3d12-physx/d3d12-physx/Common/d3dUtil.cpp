@@ -49,8 +49,7 @@ PhysX gPhysX;						// PhysX物理引擎
 //===========================================================
 //===========================================================
 
-// 将一个Transform转换成矩阵形式
-XMMATRIX TransformToMatrix(Transform& transform)
+XMMATRIX TransformToMatrix(const Transform& transform)
 {
 	XMVECTOR S = XMLoadFloat3(&transform.Scale);
 	XMVECTOR P = XMLoadFloat3(&transform.Translation);
@@ -61,7 +60,26 @@ XMMATRIX TransformToMatrix(Transform& transform)
 	return XMMatrixAffineTransformation(S, zero, Q, P);
 }
 
-// 根据视点，目标点和上方向构造四元数（左手坐标系）
+Transform RotateTransformLocal(const Transform transform, XMFLOAT3 axis, float angle)
+{
+	Transform result = transform;
+
+	XMMATRIX mat = TransformToMatrix(transform);
+	mat.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+
+	auto rotation = XMMatrixRotationAxis(XMLoadFloat3(&axis), angle);
+	auto resultMat = mat * rotation;
+
+	XMVECTOR meshWorldPosV;
+	XMVECTOR meshWorldQuatV;
+	XMVECTOR meshWorldScaleV;
+	XMMatrixDecompose(&meshWorldScaleV, &meshWorldQuatV, &meshWorldPosV, resultMat);
+
+	XMStoreFloat4(&result.Quaternion, meshWorldQuatV);
+
+	return result;
+}
+
 XMVECTOR QuaterionLookAtLH(FXMVECTOR EyePosition, FXMVECTOR FocusPosition, FXMVECTOR UpDirection)
 {
 	// 构造视矩阵

@@ -22,8 +22,12 @@ public:
 
 	// 动态刚体
 	std::string CreatePxRigidDynamic(void* pdesc);
+	void AddForce(std::string name, PxFloat3 v);
+	void SetRigidDynamicLockFlag(std::string name, int axis, bool st);
 	void SetAngularDamping(std::string name, float ad);
 	void SetLinearVelocity(std::string name, PxFloat3 v);
+	void SetKinematicFlag(std::string name, bool st);
+	void SetKinematicTarget(std::string name, PxFloat3& pos, PxFloat4& quat);
 
 	// 刚体通用方法
 	void DeletePxRigidDynamic(std::string name);

@@ -75,9 +75,14 @@ public:
 	MeshData CreateGrid(float width, float depth, uint32 m, uint32 n);
 	MeshData CreateQuad(float x, float y, float w, float h, float depth);
 
+	MeshData CreateCapsule(float radius, float height, uint32 sliceCount, uint32 sphereStackCount, uint32 cylinderStackCount);
+
 private:
 	void Subdivide(MeshData& meshData);
 	Vertex MidPoint(const Vertex& v0, const Vertex& v1);
 	void BuildCylinderTopCap(float bottomRadius, float topRadius, float height, uint32 sliceCount, uint32 stackCount, MeshData& meshData);
 	void BuildCylinderBottomCap(float bottomRadius, float topRadius, float height, uint32 sliceCount, uint32 stackCount, MeshData& meshData);
+
+	void BuildCapsuleTopHalfSphere(float radius, float height, uint32 sliceCount, uint32 sphereStackCount, MeshData& meshData);
+	void BuildCapsuleBottomHalfSphere(float radius, float height, uint32 sliceCount, uint32 sphereStackCount, MeshData& meshData);
 };

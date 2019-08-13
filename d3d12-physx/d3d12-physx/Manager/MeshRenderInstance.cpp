@@ -72,28 +72,29 @@ void MeshRenderInstance::UploadMeshRender()
 	XMMATRIX view = GetCurrMainCamera()->GetView();
 	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(view), view);
 
+	// 将平截头从视坐标空间转换到世界坐标空间
+	BoundingFrustum worldSpaceFrustum;
+	GetCurrMainCamera()->GetCamFrustum().Transform(worldSpaceFrustum, invView);
+
 	mVisibleCount = 0;
 	for (auto& p : mMeshRenders) {
 		XMMATRIX world = XMLoadFloat4x4(&p.second.World);
-		XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(world), world);
-		XMMATRIX viewToLocal = XMMatrixMultiply(invView, invWorld);
+		//XMMATRIX invWorld = XMMatrixInverse(&XMMatrixDeterminant(world), world);
+		//XMMATRIX viewToLocal = XMMatrixMultiply(invView, invWorld);
 
 		// 将平截头从视坐标空间转换到物体的局部坐标空间，然后可以在局部坐标空间作相交性检测
 		// 但是实际测试发现，如果物体的世界矩阵含有Scale分量，结果会出错
 		// 所以这里采用在世界坐标空间内进行相交性检测
+		// 注意，由于转换的是包围盒，因此物体的实际网格复杂度不会影响效率
 		//BoundingFrustum localSpaceFrustum;
 		//camera->mCamFrustum.Transform(localSpaceFrustum, viewToLocal);
-
-		// 将平截头从视坐标空间转换到世界坐标空间
-		BoundingFrustum worldSpaceFrustum;
-		GetCurrMainCamera()->mCamFrustum.Transform(worldSpaceFrustum, invView);
 
 		// 将包围盒从局部坐标空间转换到世界坐标空间
 		BoundingBox boundingBoxW;
 		mBounds.Transform(boundingBoxW, world);
 
 		// 平截头剔除
-		if ((worldSpaceFrustum.Contains(boundingBoxW) != DirectX::DISJOINT) || (GetCurrMainCamera()->mFrustumCullingEnabled == false)) {
+		if ((worldSpaceFrustum.Contains(boundingBoxW) != DirectX::DISJOINT) || (GetCurrMainCamera()->GetFrustumCulling() == false)) {
 
 			XMMATRIX world = XMLoadFloat4x4(&p.second.World);
 			XMMATRIX inverseTransposeWorld = XMLoadFloat4x4(&p.second.InverseTransposeWorld);
@@ -191,7 +192,7 @@ bool MeshRenderInstance::Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW, std::stri
 				XMVECTOR pointW = XMVector3TransformCoord(pointL, W);
 
 				// 由于scale矩阵的存在，tminL不是实际的距离，因此需要使用两点间距离公式来计算实际距离
-				float tminW = XMVectorGetX(XMVector3Length(GetCurrMainCamera()->GetPosition() - pointW));
+				float tminW = XMVectorGetX(XMVector3Length(GetCurrMainCamera()->GetTranslation() - pointW));
 
 				if (tminW < tmin) {
 					result = true;

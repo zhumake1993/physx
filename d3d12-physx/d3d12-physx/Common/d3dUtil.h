@@ -59,6 +59,37 @@ struct Transform
 		Translation(t),
 		Quaternion(q),
 		Scale(s) {}
+
+	DirectX::XMFLOAT3 GetForward()
+	{
+		DirectX::XMVECTOR quat = XMLoadFloat4(&Quaternion);
+		auto mat = DirectX::XMMatrixRotationQuaternion(quat);
+		DirectX::XMFLOAT3 forward;
+		XMStoreFloat3(&forward, mat.r[2]);
+
+		return forward;
+	}
+
+	DirectX::XMFLOAT3 GetRight()
+	{
+		DirectX::XMVECTOR quat = XMLoadFloat4(&Quaternion);
+		auto mat = DirectX::XMMatrixRotationQuaternion(quat);
+		DirectX::XMFLOAT3 right;
+		XMStoreFloat3(&right, mat.r[0]);
+
+		return right;
+	}
+
+	DirectX::XMFLOAT3 GetUp()
+	{
+		DirectX::XMVECTOR quat = XMLoadFloat4(&Quaternion);
+		auto mat = DirectX::XMMatrixRotationQuaternion(quat);
+		DirectX::XMFLOAT3 up;
+		XMStoreFloat3(&up, mat.r[1]);
+
+		return up;
+	}
+
 	DirectX::XMFLOAT3 Translation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 	DirectX::XMFLOAT4 Quaternion = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 	DirectX::XMFLOAT3 Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
@@ -161,6 +192,16 @@ enum class RenderLayer : int
 
 	Count
 };
+
+//===========================================================
+//===========================================================
+// 辅助函数
+//===========================================================
+//===========================================================
+
+extern DirectX::XMMATRIX TransformToMatrix(const Transform& transform); // 将一个Transform转换成矩阵形式
+extern Transform RotateTransformLocal(const Transform transform, DirectX::XMFLOAT3 axis, float angle); // 旋转一个transform
+DirectX::XMVECTOR QuaterionLookAtLH(DirectX::FXMVECTOR EyePosition, DirectX::FXMVECTOR FocusPosition, DirectX::FXMVECTOR UpDirection); // 根据视点，目标点和上方向构造四元数（左手坐标系）
 
 //===========================================================
 //===========================================================

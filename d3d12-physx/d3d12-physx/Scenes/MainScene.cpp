@@ -18,34 +18,15 @@ void MainScene::Initialize()
 {
 	Scene::Initialize();
 
-	mMainCamera->SetPosition(0.0f, 2.0f, -15.0f);
+	mMainCamera->SetTranslation(0.0f, 2.0f, -15.0f);
 }
 
 void MainScene::Update(const GameTimer& gt)
 {
 	Scene::Update(gt);
 
-	MoveCamera(gt);
-
 	if (mInputManager->GetMouseDown(0)) {
 		Pick(mInputManager->GetMouseX(), mInputManager->GetMouseY());
-	}
-
-	if (mInputManager->GetMouseDown(1)) {
-		mLastMousePos.x = mInputManager->GetMouseX();
-		mLastMousePos.y = mInputManager->GetMouseY();
-	}
-
-	if (mInputManager->GetMousePress(1)) {
-		// 每像素对应0.25度
-		float dx = XMConvertToRadians(0.25f * static_cast<float>(mInputManager->GetMouseX() - mLastMousePos.x));
-		float dy = XMConvertToRadians(0.25f * static_cast<float>(mInputManager->GetMouseY() - mLastMousePos.y));
-
-		mMainCamera->Pitch(dy);
-		mMainCamera->RotateY(dx);
-
-		mLastMousePos.x = mInputManager->GetMouseX();
-		mLastMousePos.y = mInputManager->GetMouseY();
 	}
 }
 
@@ -140,17 +121,20 @@ void MainScene::BuildMaterials()
 void MainScene::BuildMeshes()
 {
 	GeometryGenerator geoGen;
-	mMeshManager->AddMesh("box", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 3));
-	mMeshManager->AddMesh("grid", geoGen.CreateGrid(20.0f, 30.0f, 60, 40));
-	mMeshManager->AddMesh("sphere", geoGen.CreateSphere(0.5f, 20, 20));
-	mMeshManager->AddMesh("cylinder", geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20));
-	mMeshManager->AddMesh("box2", geoGen.CreateBox(8.0f, 8.0f, 8.0f, 3));
 
 	mMeshManager->AddMesh("UnitBox", geoGen.CreateBox(1.0f, 1.0f, 1.0f, 0));
+	mMeshManager->AddMesh("UnitSphere", geoGen.CreateSphere(0.5f, 20, 20));
+	mMeshManager->AddMesh("UnitCylinder", geoGen.CreateCylinder(0.5f, 0.5f, 1.0f, 20, 20));
+
+	mMeshManager->AddMesh("Cylinder", geoGen.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20));
+	mMeshManager->AddMesh("Grid", geoGen.CreateGrid(20.0f, 30.0f, 60, 40));
 }
 
 void MainScene::BuildGameObjects()
 {
+	auto playerCamera = std::make_shared<PlayerCamera>(Transform(XMFLOAT3(0.0f, 2.0f, -15.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "PlayerCamera");
+	mGameObjectManager->AddGameObject(playerCamera);
+
 	auto sky = std::make_shared<Sky>(Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(5000.0f, 5000.0f, 5000.0f)), "Sky");
 	mGameObjectManager->AddGameObject(sky);
 
@@ -182,27 +166,4 @@ void MainScene::BuildGameObjects()
 
 	auto boxPx = std::make_shared<BoxPx>(Transform(XMFLOAT3(0.0f, 10.0f, -10.0f)), "BoxPx");
 	mGameObjectManager->AddGameObject(boxPx);
-}
-
-void MainScene::MoveCamera(const GameTimer& gt)
-{
-	const float dt = gt.DeltaTime();
-
-	if (GetAsyncKeyState('W') & 0x8000)
-		mMainCamera->Walk(10.0f * dt);
-
-	if (GetAsyncKeyState('S') & 0x8000)
-		mMainCamera->Walk(-10.0f * dt);
-
-	if (GetAsyncKeyState('A') & 0x8000)
-		mMainCamera->Strafe(-10.0f * dt);
-
-	if (GetAsyncKeyState('D') & 0x8000)
-		mMainCamera->Strafe(10.0f * dt);
-
-	if (GetAsyncKeyState('Q') & 0x8000)
-		mMainCamera->FlyUp(10.0f * dt);
-
-	if (GetAsyncKeyState('E') & 0x8000)
-		mMainCamera->FlyDown(10.0f * dt);
 }

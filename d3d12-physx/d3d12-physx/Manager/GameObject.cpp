@@ -29,16 +29,20 @@ void GameObject::Update(const GameTimer& gt)
 		}
 	}
 
+	if (mIsStatic) {
+		return;
+	}
+
 	if (mRigidDynamicCPT) {
-		mRigidDynamicCPT->Update();
-		mTransform.Translation = mRigidDynamicCPT->mParentTransform.Translation;
-		mTransform.Quaternion = mRigidDynamicCPT->mParentTransform.Quaternion;
+		mRigidDynamicCPT->Update(mTransform);
 	}
 
 	if (mMeshRenderCPT) {
-		mMeshRenderCPT->mTransform.Translation = mTransform.Translation;
-		mMeshRenderCPT->mTransform.Quaternion = mTransform.Quaternion;
-		mMeshRenderCPT->Update();
+		mMeshRenderCPT->Update(mTransform);
+	}
+
+	if (mCameraCPT) {
+		mCameraCPT->Update(mTransform);
 	}
 }
 
@@ -68,6 +72,11 @@ void GameObject::Release()
 bool GameObject::GetKeyDown(int key) { return GetCurrInputManager()->GetKeyDown(key); }
 bool GameObject::GetKeyPress(int key) { return GetCurrInputManager()->GetKeyPress(key); }
 bool GameObject::GetKeyUp(int key) { return GetCurrInputManager()->GetKeyUp(key); }
+bool GameObject::GetMouseDown(int key) { return GetCurrInputManager()->GetMouseDown(key); }
+bool GameObject::GetMousePress(int key) { return GetCurrInputManager()->GetMousePress(key); }
+bool GameObject::GetMouseUp(int key) { return GetCurrInputManager()->GetMouseUp(key); }
+int GameObject::GetMouseX() { return GetCurrInputManager()->GetMouseX(); }
+int GameObject::GetMouseY() { return GetCurrInputManager()->GetMouseY(); }
 
 bool GameObject::HasGameObject(std::string name) { return GetCurrGameObjectManager()->HasGameObject(name); }
 std::shared_ptr<GameObject> GameObject::GetGameObject(std::string name) { return GetCurrGameObjectManager()->GetGameObject(name); }
@@ -135,3 +144,17 @@ void GameObject::SetIsSsao(bool st) { GetCurrIsSsao() = st; }
 void GameObject::SetIsBlur(bool st) { GetCurrIsBlur() = st; }
 void GameObject::SetIsSobel(bool st) { GetCurrIsSobel() = st; }
 void GameObject::SetIsDrawRigidbody(bool st) { GetCurrIsDrawRigidbody() = st; }
+
+void GameObject::AddForce(DirectX::XMFLOAT3 force)
+{
+	if (mRigidDynamicCPT) {
+		mRigidDynamicCPT->AddForce(force);
+	}
+}
+
+void GameObject::SetRigidDynamicLockFlag(int axis, bool st)
+{
+	if (mRigidDynamicCPT) {
+		mRigidDynamicCPT->SetRigidDynamicLockFlag(axis, st);
+	}
+}

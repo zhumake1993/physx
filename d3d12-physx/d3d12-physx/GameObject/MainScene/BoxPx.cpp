@@ -5,6 +5,8 @@ using namespace DirectX;
 BoxPx::BoxPx(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
+	mIsStatic = false;
+
 	// Material
 	mMaterial = std::make_shared<Material>();
 	mMaterial->mDiffuseMapIndex = GetTextureIndex("bricks2");
@@ -18,7 +20,7 @@ BoxPx::BoxPx(const Transform& transform, const std::string& name)
 	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
 	mMeshRenderCPT->mMaterial = mMaterial;
 	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 0.5f, 1.0f));
-	mMeshRenderCPT->mMeshName = "box";
+	mMeshRenderCPT->mMeshName = "UnitBox";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
 	mMeshRenderCPT->mReceiveShadow = true;
 	mMeshRenderCPT->mParent = mName;
@@ -26,11 +28,12 @@ BoxPx::BoxPx(const Transform& transform, const std::string& name)
 
 	// ∏’ÃÂ
 	Transform rigidDynamicLocal = Transform(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f));
-	mRigidDynamicCPT = std::make_shared<RigidDynamicCPT>(transform, rigidDynamicLocal);
+	mRigidDynamicCPT = std::make_shared<RigidDynamicCPT>(mName, transform, rigidDynamicLocal);
 	mRigidDynamicCPT->mScale = XMFLOAT4(0.5f, 0.5f, 0.5f, 0.5f);
 	mRigidDynamicCPT->mPxMaterial = XMFLOAT3(0.5f, 0.5f, 0.5f);
 	mRigidDynamicCPT->mPxGeometry = PxBoxEnum;
 	mRigidDynamicCPT->mDensity = 10.0f;
+	mRigidDynamicCPT->isKinematic = false;
 	mRigidDynamicCPT->AddRigidDynamic();
 }
 

@@ -5,6 +5,8 @@ using namespace DirectX;
 Skull::Skull(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
+	mIsStatic = false;
+
 	// Material
 	mMaterial = std::make_shared<Material>();
 	mMaterial->mDiffuseMapIndex = GetTextureIndex("white1x1");
@@ -18,7 +20,7 @@ Skull::Skull(const Transform& transform, const std::string& name)
 	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
 	mMeshRenderCPT->mMaterial = mMaterial;
 	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	mMeshRenderCPT->mMeshName = "skull";
+	mMeshRenderCPT->mMeshName = "Skull";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
 	mMeshRenderCPT->mReceiveShadow = true;
 	mMeshRenderCPT->mParent = mName;

@@ -6,15 +6,17 @@ using namespace DirectX;
 
 extern XMVECTOR QuaterionLookAtLH(FXMVECTOR EyePosition, FXMVECTOR FocusPosition, FXMVECTOR UpDirection);
 
-std::unordered_map<int, XMFLOAT3> rainbowColors = {
-	{1,XMFLOAT3(1.00000000f,0.00000000f,0.00000000f)},// 赤
-	{2,XMFLOAT3(1.00000000f,0.64705882f,0.00000000f)},// 橙
-	{3,XMFLOAT3(1.00000000f,1.00000000f,0.00000000f)},// 黄
-	{4,XMFLOAT3(0.00000000f,1.00000000f,0.00000000f)},// 绿
-	{5,XMFLOAT3(0.00000000f,0.49803921f,1.00000000f)},// 青
-	{6,XMFLOAT3(0.00000000f,0.00000000f,1.00000000f)},// 蓝
-	{7,XMFLOAT3(0.54509804f,0.00000000f,1.00000000f)},// 紫
+std::vector<XMFLOAT3> rainbowColors = {
+	XMFLOAT3(1.00000000f,0.00000000f,0.00000000f),// 赤
+	XMFLOAT3(1.00000000f,0.64705882f,0.00000000f),// 橙
+	XMFLOAT3(1.00000000f,1.00000000f,0.00000000f),// 黄
+	XMFLOAT3(0.00000000f,1.00000000f,0.00000000f),// 绿
+	XMFLOAT3(0.00000000f,0.49803921f,1.00000000f),// 青
+	XMFLOAT3(0.00000000f,0.00000000f,1.00000000f),// 蓝
+	XMFLOAT3(0.54509804f,0.00000000f,1.00000000f),// 紫
 };
+
+//auto a = DirectX::Colors::LightSteelBlue;
 
 enum class Face : int
 {
@@ -33,6 +35,8 @@ XMFLOAT3 Int3ToXMFLOAT3(const Int3& int3) {
 Logic::Logic(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
+	mIsStatic = true;
+
 	// 至少有一个必须是偶数
 	mMapX = 8;
 	mMapY = 8;
@@ -193,7 +197,7 @@ std::vector<XMFLOAT3> Logic::CalRandColor()
 	int pair = mNumOfLeft / 2;
 
 	for (int i = 0; i < pair; i++) {
-		auto color = MathHelper::Rand(1, static_cast<int>(rainbowColors.size()));
+		auto color = MathHelper::Rand(0, static_cast<int>(rainbowColors.size()) - 1);
 		result.push_back(rainbowColors[color]);
 		result.push_back(rainbowColors[color]);
 	}
@@ -377,7 +381,7 @@ void Logic::CreateFragment(Int3 int3)
 				Transform t = Transform(XMFLOAT3(x, y, z), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(0.2f, 0.2f, 0.2f));
 				auto fragment = std::make_shared<Fragment>(t);
 
-				fragment->SetColor(rainbowColors[MathHelper::Rand(1, static_cast<int>(rainbowColors.size()))]);
+				fragment->SetColor(rainbowColors[MathHelper::Rand(0, static_cast<int>(rainbowColors.size()) - 1)]);
 
 				fragment->mRigidDynamicCPT->SetAngularDamping(0.5f);
 

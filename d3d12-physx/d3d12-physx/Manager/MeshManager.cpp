@@ -73,7 +73,7 @@ void MeshManager::Initialize()
 
 		fin.close();
 
-		AddMesh("skull", vertices, indices);
+		AddMesh("Skull", vertices, indices);
 	}
 }
 
@@ -85,7 +85,7 @@ bool MeshManager::HasMesh(std::string name)
 std::shared_ptr<Mesh> MeshManager::GetMesh(const std::string name)
 {
 	if (!HasMesh(name)) {
-		ThrowMyEx("Mesh does not exist!")
+		ThrowMyEx("Mesh " + name + " does not exist!")
 	}
 
 	return mMeshes[name];
@@ -94,7 +94,7 @@ std::shared_ptr<Mesh> MeshManager::GetMesh(const std::string name)
 void MeshManager::AddMesh(std::string Name, GeometryGenerator::MeshData mesh)
 {
 	if (HasMesh(Name)) {
-		ThrowMyEx("Mesh already exists!")
+		ThrowMyEx("Mesh " + Name + " already exists!")
 	}
 
 	// 注意：Vertex与GeometryGenerator::Vertex是不一样的
@@ -116,7 +116,7 @@ void MeshManager::AddMesh(std::string Name, GeometryGenerator::MeshData mesh)
 void MeshManager::AddMesh(std::string Name, std::vector<Vertex>& vertices, std::vector<std::uint16_t>& indices)
 {
 	if (HasMesh(Name)) {
-		ThrowMyEx("Mesh already exists!")
+		ThrowMyEx("Mesh " + Name + " already exists!");
 	}
 
 	auto meshGeo = std::make_shared<Mesh>();

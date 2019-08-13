@@ -12,6 +12,8 @@ extern ComPtr<ID3D12GraphicsCommandList> gCommandList;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12RootSignature>> gRootSignatures;
 extern std::unordered_map<std::string, Microsoft::WRL::ComPtr<ID3D12PipelineState>> gPSOs;
 
+extern XMVECTOR QuaterionLookAtLH(FXMVECTOR EyePosition, FXMVECTOR FocusPosition, FXMVECTOR UpDirection);
+
 CubeMap::CubeMap(DXGI_FORMAT format, DXGI_FORMAT depthStencilFormat)
 {
 	mFrameResource = std::make_unique<FrameResource<PassConstants>>(gD3D12Device.Get(), 6, true);
@@ -78,8 +80,14 @@ void CubeMap::BuildCubeFaceCamera(float x, float y, float z)
 	};
 
 	for (int i = 0; i < 6; ++i) {
-		mCubeMapCamera[i].LookAt(center, targets[i], ups[i]);
+		mCubeMapCamera[i].SetTranslation(center);
+
+		XMFLOAT4 quat;
+		XMStoreFloat4(&quat, QuaterionLookAtLH(XMLoadFloat3(&center), XMLoadFloat3(&targets[i]), XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)));
+		mCubeMapCamera[i].SetQuaternion(quat);
+
 		mCubeMapCamera[i].SetLens(0.5f * XM_PI, 1.0f, 0.1f, 1000.0f);
+
 		mCubeMapCamera[i].UpdateViewMatrix();
 	}
 }
@@ -103,7 +111,7 @@ void CubeMap::UpdatePassConstantsData(PassConstants& mainPassCB)
 		XMStoreFloat4x4(&cubeFacePassCB.InvProj, XMMatrixTranspose(invProj));
 		XMStoreFloat4x4(&cubeFacePassCB.ViewProj, XMMatrixTranspose(viewProj));
 		XMStoreFloat4x4(&cubeFacePassCB.InvViewProj, XMMatrixTranspose(invViewProj));
-		cubeFacePassCB.EyePosW = mCubeMapCamera[i].GetPosition3f();
+		cubeFacePassCB.EyePosW = mCubeMapCamera[i].GetTranslation3f();
 		cubeFacePassCB.RenderTargetSize = XMFLOAT2((float)mCubeMapSize, (float)mCubeMapSize);
 		cubeFacePassCB.InvRenderTargetSize = XMFLOAT2(1.0f / mCubeMapSize, 1.0f / mCubeMapSize);
 

@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Common\Camera.cpp" />
+    <ClCompile Include="Common\CameraOld.cpp" />
     <ClCompile Include="Common\D3DApp.cpp" />
     <ClCompile Include="Common\d3dUtil.cpp" />
     <ClCompile Include="Common\DDSTextureLoader.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="Common\GeometryGenerator.cpp" />
     <ClCompile Include="Common\Log.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
+    <ClCompile Include="Component\CameraCPT.cpp" />
     <ClCompile Include="Component\MeshRenderCPT.cpp" />
     <ClCompile Include="Component\RigidDynamicCPT.cpp" />
     <ClCompile Include="Component\RigidStaticCPT.cpp" />
@@ -161,13 +163,17 @@
     <ClCompile Include="GameObject\Linkup\Fragment.cpp" />
     <ClCompile Include="GameObject\Linkup\Inflection.cpp" />
     <ClCompile Include="GameObject\Linkup\Logic.cpp" />
+    <ClCompile Include="GameObject\Linkup\Player.cpp" />
+    <ClCompile Include="GameObject\Linkup\Obverser.cpp" />
     <ClCompile Include="GameObject\Linkup\RenderAndFilter.cpp" />
     <ClCompile Include="GameObject\Linkup\Segment.cpp" />
+    <ClCompile Include="GameObject\Linkup\Test.cpp" />
     <ClCompile Include="GameObject\MainScene\Box.cpp" />
     <ClCompile Include="GameObject\MainScene\BoxPx.cpp" />
     <ClCompile Include="GameObject\MainScene\Cylinder.cpp" />
     <ClCompile Include="GameObject\MainScene\Globe.cpp" />
     <ClCompile Include="GameObject\MainScene\Grid.cpp" />
+    <ClCompile Include="GameObject\MainScene\PlayerCamera.cpp" />
     <ClCompile Include="GameObject\MainScene\Skull.cpp" />
     <ClCompile Include="GameObject\MainScene\Sphere.cpp" />
     <ClCompile Include="GameObject\Sky.cpp" />
@@ -199,6 +205,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h" />
+    <ClInclude Include="Common\CameraOld.h" />
     <ClInclude Include="Common\D3DApp.h" />
     <ClInclude Include="Common\d3dUtil.h" />
     <ClInclude Include="Common\d3dx12.h" />
@@ -211,6 +218,7 @@
     <ClInclude Include="Common\MathHelper.h" />
     <ClInclude Include="Common\MyException.h" />
     <ClInclude Include="Common\UploadBuffer.h" />
+    <ClInclude Include="Component\CameraCPT.h" />
     <ClInclude Include="Component\MeshRenderCPT.h" />
     <ClInclude Include="Component\RigidDynamicCPT.h" />
     <ClInclude Include="Component\RigidStaticCPT.h" />
@@ -224,14 +232,18 @@
     <ClInclude Include="GameObject\Linkup\Inflection.h" />
     <ClInclude Include="GameObject\Linkup\LinkupGameObjects.h" />
     <ClInclude Include="GameObject\Linkup\Logic.h" />
+    <ClInclude Include="GameObject\Linkup\Player.h" />
+    <ClInclude Include="GameObject\Linkup\Obverser.h" />
     <ClInclude Include="GameObject\Linkup\RenderAndFilter.h" />
     <ClInclude Include="GameObject\Linkup\Segment.h" />
+    <ClInclude Include="GameObject\Linkup\Test.h" />
     <ClInclude Include="GameObject\MainScene\Box.h" />
     <ClInclude Include="GameObject\MainScene\BoxPx.h" />
     <ClInclude Include="GameObject\MainScene\Cylinder.h" />
     <ClInclude Include="GameObject\MainScene\Globe.h" />
     <ClInclude Include="GameObject\MainScene\Grid.h" />
     <ClInclude Include="GameObject\MainScene\MainSceneGameObjects.h" />
+    <ClInclude Include="GameObject\MainScene\PlayerCamera.h" />
     <ClInclude Include="GameObject\MainScene\Skull.h" />
     <ClInclude Include="GameObject\MainScene\Sphere.h" />
     <ClInclude Include="GameObject\Sky.h" />

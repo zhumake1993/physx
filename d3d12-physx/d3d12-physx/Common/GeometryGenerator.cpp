@@ -485,6 +485,96 @@ GeometryGenerator::MeshData GeometryGenerator::CreateQuad(float x, float y, floa
 	return meshData;
 }
 
+GeometryGenerator::MeshData GeometryGenerator::CreateCapsule(float radius, float height, uint32 sliceCount, uint32 sphereStackCount, uint32 cylinderStackCount)
+{
+	MeshData meshData;
+
+	//
+	// Build Stacks.
+	// 
+
+	float stackHeight = height / cylinderStackCount;
+
+	uint32 ringCount = cylinderStackCount + 1;
+
+	// Compute vertices for each stack ring starting at the bottom and moving up.
+	for (uint32 i = 0; i < ringCount; ++i)
+	{
+		float y = -0.5f * height + i * stackHeight;
+		float r = radius;
+
+		// vertices of ring
+		float dTheta = 2.0f * XM_PI / sliceCount;
+		for (uint32 j = 0; j <= sliceCount; ++j)
+		{
+			Vertex vertex;
+
+			float c = cosf(j * dTheta);
+			float s = sinf(j * dTheta);
+
+			vertex.Position = XMFLOAT3(r * c, y, r * s);
+
+			vertex.TexC.x = (float)j / sliceCount;
+			vertex.TexC.y = 1.0f - (float)i / cylinderStackCount;
+
+			// Cylinder can be parameterized as follows, where we introduce v
+			// parameter that goes in the same direction as the v tex-coord
+			// so that the bitangent goes in the same direction as the v tex-coord.
+			//   Let r0 be the bottom radius and let r1 be the top radius.
+			//   y(v) = h - hv for v in [0,1].
+			//   r(v) = r1 + (r0-r1)v
+			//
+			//   x(t, v) = r(v)*cos(t)
+			//   y(t, v) = h - hv
+			//   z(t, v) = r(v)*sin(t)
+			// 
+			//  dx/dt = -r(v)*sin(t)
+			//  dy/dt = 0
+			//  dz/dt = +r(v)*cos(t)
+			//
+			//  dx/dv = (r0-r1)*cos(t)
+			//  dy/dv = -h
+			//  dz/dv = (r0-r1)*sin(t)
+
+			// This is unit length.
+			vertex.TangentU = XMFLOAT3(-s, 0.0f, c);
+
+			XMFLOAT3 bitangent(0.0f, -height, 0.0f);
+
+			XMVECTOR T = XMLoadFloat3(&vertex.TangentU);
+			XMVECTOR B = XMLoadFloat3(&bitangent);
+			XMVECTOR N = XMVector3Normalize(XMVector3Cross(T, B));
+			XMStoreFloat3(&vertex.Normal, N);
+
+			meshData.Vertices.push_back(vertex);
+		}
+	}
+
+	// Add one because we duplicate the first and last vertex per ring
+	// since the texture coordinates are different.
+	uint32 ringVertexCount = sliceCount + 1;
+
+	// Compute indices for each stack.
+	for (uint32 i = 0; i < cylinderStackCount; ++i)
+	{
+		for (uint32 j = 0; j < sliceCount; ++j)
+		{
+			meshData.Indices32.push_back(i * ringVertexCount + j);
+			meshData.Indices32.push_back((i + 1) * ringVertexCount + j);
+			meshData.Indices32.push_back((i + 1) * ringVertexCount + j + 1);
+
+			meshData.Indices32.push_back(i * ringVertexCount + j);
+			meshData.Indices32.push_back((i + 1) * ringVertexCount + j + 1);
+			meshData.Indices32.push_back(i * ringVertexCount + j + 1);
+		}
+	}
+
+	BuildCapsuleTopHalfSphere(radius, height, sliceCount, sphereStackCount, meshData);
+	BuildCapsuleBottomHalfSphere(radius, height, sliceCount, sphereStackCount, meshData);
+
+	return meshData;
+}
+
 void GeometryGenerator::Subdivide(MeshData& meshData)
 {
 	// Save a copy of the input geometry.
@@ -650,5 +740,193 @@ void GeometryGenerator::BuildCylinderBottomCap(float bottomRadius, float topRadi
 		meshData.Indices32.push_back(centerIndex);
 		meshData.Indices32.push_back(baseIndex + i);
 		meshData.Indices32.push_back(baseIndex + i + 1);
+	}
+}
+
+void GeometryGenerator::BuildCapsuleTopHalfSphere(float radius, float height, uint32 sliceCount, uint32 sphereStackCount, MeshData& meshData)
+{
+	uint32 baseIndex = (uint32)meshData.Vertices.size();
+
+	//
+	// Compute the vertices stating at the top pole and moving down the stacks.
+	//
+
+	// Poles: note that there will be texture coordinate distortion as there is
+	// not a unique point on the texture map to assign to the pole when mapping
+	// a rectangular texture onto a sphere.
+	Vertex topVertex(0.0f, radius + height / 2.0f, 0.0f, 0.0f, +1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+
+	meshData.Vertices.push_back(topVertex);
+
+	float phiStep = XM_PIDIV2 / sphereStackCount;
+	float thetaStep = 2.0f * XM_PI / sliceCount;
+
+	// Compute vertices for each stack ring (do not count the poles as rings).
+	for (uint32 i = 1; i <= sphereStackCount; ++i)
+	{
+		float phi = i * phiStep;
+
+		// Vertices of ring.
+		for (uint32 j = 0; j <= sliceCount; ++j)
+		{
+			float theta = j * thetaStep;
+
+			Vertex v;
+
+			// spherical to cartesian
+			v.Position.x = radius * sinf(phi) * cosf(theta);
+			v.Position.y = radius * cosf(phi) + height / 2.0f;
+			v.Position.z = radius * sinf(phi) * sinf(theta);
+
+			// Partial derivative of P with respect to theta
+			v.TangentU.x = -radius * sinf(phi) * sinf(theta);
+			v.TangentU.y = 0.0f;
+			v.TangentU.z = +radius * sinf(phi) * cosf(theta);
+
+			XMVECTOR T = XMLoadFloat3(&v.TangentU);
+			XMStoreFloat3(&v.TangentU, XMVector3Normalize(T));
+
+			v.Normal.x = radius * sinf(phi) * cosf(theta);
+			v.Normal.y = radius * cosf(phi);
+			v.Normal.z = radius * sinf(phi) * sinf(theta);
+			XMVECTOR p = XMLoadFloat3(&v.Normal);
+			XMStoreFloat3(&v.Normal, XMVector3Normalize(p));
+
+			v.TexC.x = theta / XM_2PI;
+			v.TexC.y = phi / XM_PI;
+
+			meshData.Vertices.push_back(v);
+		}
+	}
+
+	//meshData.Vertices.push_back(bottomVertex);
+
+	//
+	// Compute indices for top stack.  The top stack was written first to the vertex buffer
+	// and connects the top pole to the first ring.
+	//
+
+	for (uint32 i = 1; i <= sliceCount; ++i)
+	{
+		meshData.Indices32.push_back(baseIndex);
+		meshData.Indices32.push_back(baseIndex + i + 1);
+		meshData.Indices32.push_back(baseIndex + i);
+	}
+
+	//
+	// Compute indices for inner stacks (not connected to poles).
+	//
+
+	// Offset the indices to the index of the first vertex in the first ring.
+	// This is just skipping the top pole vertex.
+	++baseIndex;
+	uint32 ringVertexCount = sliceCount + 1;
+	for (uint32 i = 0; i < sphereStackCount - 1; ++i)
+	{
+		for (uint32 j = 0; j < sliceCount; ++j)
+		{
+			meshData.Indices32.push_back(baseIndex + i * ringVertexCount + j);
+			meshData.Indices32.push_back(baseIndex + i * ringVertexCount + j + 1);
+			meshData.Indices32.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+
+			meshData.Indices32.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+			meshData.Indices32.push_back(baseIndex + i * ringVertexCount + j + 1);
+			meshData.Indices32.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+		}
+	}
+}
+
+void GeometryGenerator::BuildCapsuleBottomHalfSphere(float radius, float height, uint32 sliceCount, uint32 sphereStackCount, MeshData& meshData)
+{
+	uint32 baseIndex = (uint32)meshData.Vertices.size();
+
+	//
+	// Compute the vertices stating at the top pole and moving down the stacks.
+	//
+
+	// Poles: note that there will be texture coordinate distortion as there is
+	// not a unique point on the texture map to assign to the pole when mapping
+	// a rectangular texture onto a sphere.
+	Vertex topVertex(0.0f, -radius - height / 2.0f, 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+
+	meshData.Vertices.push_back(topVertex);
+
+	float phiStep = XM_PIDIV2 / sphereStackCount;
+	float thetaStep = 2.0f * XM_PI / sliceCount;
+
+	// Compute vertices for each stack ring (do not count the poles as rings).
+	for (uint32 i = 1; i <= sphereStackCount; ++i)
+	{
+		float phi = i * phiStep;
+
+		// Vertices of ring.
+		for (uint32 j = 0; j <= sliceCount; ++j)
+		{
+			float theta = j * thetaStep;
+
+			Vertex v;
+
+			// spherical to cartesian
+			v.Position.x = -radius * sinf(phi) * cosf(theta);
+			v.Position.y = -radius * cosf(phi) - height / 2.0f;
+			v.Position.z = -radius * sinf(phi) * sinf(theta);
+
+			// Partial derivative of P with respect to theta
+			v.TangentU.x = -radius * sinf(phi) * sinf(theta);
+			v.TangentU.y = 0.0f;
+			v.TangentU.z = +radius * sinf(phi) * cosf(theta);
+
+			XMVECTOR T = XMLoadFloat3(&v.TangentU);
+			XMStoreFloat3(&v.TangentU, XMVector3Normalize(T));
+
+			v.Normal.x = radius * sinf(phi) * cosf(theta);
+			v.Normal.y = radius * cosf(phi);
+			v.Normal.z = radius * sinf(phi) * sinf(theta);
+			XMVECTOR p = XMLoadFloat3(&v.Normal);
+			XMStoreFloat3(&v.Normal, XMVector3Normalize(-p));
+
+			v.TexC.x = theta / XM_2PI;
+			v.TexC.y = phi / XM_PI;
+
+			meshData.Vertices.push_back(v);
+		}
+	}
+
+	//meshData.Vertices.push_back(bottomVertex);
+
+	//
+	// Compute indices for top stack.  The top stack was written first to the vertex buffer
+	// and connects the top pole to the first ring.
+	//
+
+	for (uint32 i = 1; i <= sliceCount; ++i)
+	{
+		// 注意，这里改变了三角形的绕序
+		meshData.Indices32.push_back(baseIndex);
+		meshData.Indices32.push_back(baseIndex + i);
+		meshData.Indices32.push_back(baseIndex + i + 1);
+	}
+
+	//
+	// Compute indices for inner stacks (not connected to poles).
+	//
+
+	// Offset the indices to the index of the first vertex in the first ring.
+	// This is just skipping the top pole vertex.
+	++baseIndex;
+	uint32 ringVertexCount = sliceCount + 1;
+	for (uint32 i = 0; i < sphereStackCount - 1; ++i)
+	{
+		for (uint32 j = 0; j < sliceCount; ++j)
+		{
+			// 注意，这里改变了三角形的绕序
+			meshData.Indices32.push_back(baseIndex + i * ringVertexCount + j);
+			meshData.Indices32.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+			meshData.Indices32.push_back(baseIndex + i * ringVertexCount + j + 1);
+
+			meshData.Indices32.push_back(baseIndex + (i + 1) * ringVertexCount + j);
+			meshData.Indices32.push_back(baseIndex + (i + 1) * ringVertexCount + j + 1);
+			meshData.Indices32.push_back(baseIndex + i * ringVertexCount + j + 1);
+		}
 	}
 }

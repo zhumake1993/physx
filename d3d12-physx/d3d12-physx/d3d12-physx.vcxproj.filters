@@ -225,6 +225,12 @@
     <ClCompile Include="GameObject\Linkup\Obverser.cpp">
       <Filter>GameObject\Linkup</Filter>
     </ClCompile>
+    <ClCompile Include="GameObject\Linkup\Character.cpp">
+      <Filter>GameObject\Linkup</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\CharacterControllerCPT.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Camera.h">
@@ -427,6 +433,12 @@
     </ClInclude>
     <ClInclude Include="GameObject\Linkup\Obverser.h">
       <Filter>GameObject\Linkup</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject\Linkup\Character.h">
+      <Filter>GameObject\Linkup</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\CharacterControllerCPT.h">
+      <Filter>Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

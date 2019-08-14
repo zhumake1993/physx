@@ -96,8 +96,11 @@ void Linkup::BuildGameObjects()
 	auto obverser = std::make_shared<Obverser>(Transform(XMFLOAT3(0.0f, 2.0f, -10.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Obverser");
 	mGameObjectManager->AddGameObject(obverser);
 
-	auto test = std::make_shared<Test>(Transform(XMFLOAT3(0.0f, 2.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Test");
-	mGameObjectManager->AddGameObject(test);
+	//auto test = std::make_shared<Test>(Transform(XMFLOAT3(0.0f, 2.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Test");
+	//mGameObjectManager->AddGameObject(test);
+
+	auto character = std::make_shared<Character>(Transform(XMFLOAT3(0.0f, 2.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Character");
+	mGameObjectManager->AddGameObject(character);
 
 	auto logic = std::make_shared<Logic>(Transform(XMFLOAT3(0.0f, 2.0f, -15.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Logic");
 	mGameObjectManager->AddGameObject(logic);

@@ -8,6 +8,7 @@
 #include "Component/RigidDynamicCPT.h"
 #include "Component/RigidStaticCPT.h"
 #include "Component/CameraCPT.h"
+#include "Component/CharacterControllerCPT.h"
 
 class GameObject
 {
@@ -43,6 +44,7 @@ protected:
 	// ≤ƒ÷ 
 	void AddMaterial();
 	std::shared_ptr<Material> GetMaterial();
+	std::shared_ptr<Material> GetDefaultMaterial();
 	void SetMaterial(std::shared_ptr<Material> material);
 
 	// Œ∆¿Ì
@@ -91,6 +93,7 @@ public:
 	std::shared_ptr<RigidDynamicCPT> mRigidDynamicCPT = nullptr;
 	std::shared_ptr<RigidStaticCPT> mRigidStaticCPT = nullptr;
 	std::shared_ptr<CameraCPT> mCameraCPT = nullptr;
+	std::shared_ptr<CharacterControllerCPT> mCharacterControllerCPT = nullptr;
 
 	std::shared_ptr<GameTimer> mGameTimer = nullptr;
 	float mLifeTime = 0.0f;

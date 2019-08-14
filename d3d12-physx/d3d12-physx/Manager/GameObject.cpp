@@ -37,6 +37,10 @@ void GameObject::Update(const GameTimer& gt)
 		mRigidDynamicCPT->Update(mTransform);
 	}
 
+	if (mCharacterControllerCPT) {
+		mCharacterControllerCPT->Update(mTransform);
+	}
+
 	if (mMeshRenderCPT) {
 		mMeshRenderCPT->Update(mTransform);
 	}
@@ -67,6 +71,10 @@ void GameObject::Release()
 	if (mRigidStaticCPT) {
 		mRigidStaticCPT->Release();
 	}
+
+	if (mCharacterControllerCPT) {
+		mCharacterControllerCPT->Release();
+	}
 }
 
 bool GameObject::GetKeyDown(int key) { return GetCurrInputManager()->GetKeyDown(key); }
@@ -96,6 +104,11 @@ std::shared_ptr<Material> GameObject::GetMaterial()
 	else {
 		return mMeshRenderCPT->mMaterial;
 	}
+}
+
+std::shared_ptr<Material> GameObject::GetDefaultMaterial()
+{
+	return GetCurrMaterialManager()->GetDefaultMaterial();
 }
 
 void GameObject::SetMaterial(std::shared_ptr<Material> material)

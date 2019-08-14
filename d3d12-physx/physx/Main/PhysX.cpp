@@ -15,11 +15,14 @@ extern PxPhysics* gPhysics;
 extern PxDefaultCpuDispatcher* gDispatcher;
 extern PxScene* gScene;
 
+extern PxControllerManager* gControllerManager;
+
 extern PxPvd* gPvd;
 
 // 硬编码，测试用
 std::unordered_map<std::string, PxRigidDynamic*> gPxRigidDynamicMap;
 std::unordered_map<std::string, PxRigidStatic*> gPxRigidStaticMap;
+std::unordered_map<std::string, PxController*> gPxControllerMap;
 
 PhysX::PhysX()
 {
@@ -51,6 +54,9 @@ void PhysX::CreateScene()
 	sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(2);
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
+
+	// 创建角色控制器管理器
+	gControllerManager = PxCreateControllerManager(*gScene);
 
 	// 设置传输到Pvd的数据
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
@@ -246,6 +252,8 @@ void PhysX::DeletePxRigidDynamic(std::string name)
 	else {
 		ThrowPxEx("PxRigidDynamic does not exist!");
 	}
+
+	gPxRigidDynamicMap.erase(name);
 }
 
 void PhysX::DeletePxRigidStatic(std::string name)
@@ -256,6 +264,77 @@ void PhysX::DeletePxRigidStatic(std::string name)
 	else {
 		ThrowPxEx("PxRigidStatic does not exist!");
 	}
+
+	gPxRigidStaticMap.erase(name);
+}
+
+std::string PhysX::AddCharacterController(void* pdesc)
+{
+	auto name = MathHelper::RandStr();
+	while (HasPxController(name)) {
+		name = MathHelper::RandStr();
+	}
+
+	auto p = static_cast<CPT::PxCapsuleControllerDesc*>(pdesc);
+	
+	PxCapsuleControllerDesc desc;
+	desc.position = PxExtendedVec3(p->position.x, p->position.y, p->position.z);
+	desc.contactOffset = p->contactOffset;
+	desc.stepOffset = p->stepOffset;
+	desc.slopeLimit = p->slopeLimit;
+	desc.radius = p->radius;
+	desc.height = p->height;
+	desc.upDirection = PxVec3(p->upDirection.x, p->upDirection.y, p->upDirection.z);
+	desc.material = gPhysics->createMaterial(0.0f, 0.0f, 0.0f);
+
+	PxController* c = gControllerManager->createController(desc);
+	gPxControllerMap[name] = c;
+
+	return name;
+}
+
+void PhysX::DeleteCharacterController(const std::string& name)
+{
+	if (HasPxController(name)) {
+		gPxControllerMap[name]->release();
+	}
+	else {
+		ThrowPxEx("CharacterController does not exist!");
+	}
+
+	gPxControllerMap.erase(name);
+}
+
+int PhysX::MoveCharacterController(const std::string& name, const PxFloat3& disp, float minDist, float elapsedTime)
+{
+	if (!HasPxController(name)) {
+		ThrowPxEx("CharacterController does not exist!");
+	}
+	
+	auto flag = gPxControllerMap[name]->move(PxVec3(disp.x, disp.y, disp.z), minDist, elapsedTime, PxControllerFilters());
+	
+	if (flag == PxControllerCollisionFlag::eCOLLISION_SIDES) {
+		return 1;
+	}
+	else if (flag == PxControllerCollisionFlag::eCOLLISION_UP) {
+		return 2;
+	}
+	else if (flag == PxControllerCollisionFlag::eCOLLISION_DOWN) {
+		return 3;
+	}
+	else {
+		return 0;
+	}
+}
+
+PxFloat3 PhysX::GetCharacterControllerTranslation(const std::string& name)
+{
+	if (!HasPxController(name)) {
+		ThrowPxEx("CharacterController does not exist!");
+	}
+
+	auto translation = gPxControllerMap[name]->getPosition();
+	return PxFloat3(static_cast<float>(translation.x), static_cast<float>(translation.y), static_cast<float>(translation.z));
 }
 
 void PhysX::Update(float delta)
@@ -316,4 +395,9 @@ bool PhysX::HasPxRigidStatic(const std::string& name)
 bool PhysX::HasPxRigidDynamic(const std::string& name)
 {
 	return gPxRigidDynamicMap.find(name) != gPxRigidDynamicMap.end();
+}
+
+bool PhysX::HasPxController(const std::string& name)
+{
+	return gPxControllerMap.find(name) != gPxControllerMap.end();
 }

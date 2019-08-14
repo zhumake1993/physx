@@ -26,10 +26,6 @@ void Linkup::Initialize()
 void Linkup::Update(const GameTimer& gt)
 {
 	Scene::Update(gt);
-
-	if (mInputManager->GetMouseDown(0)) {
-		Pick(mInputManager->GetMouseX(), mInputManager->GetMouseY());
-	}
 }
 
 void Linkup::PostUpdate(const GameTimer& gt)
@@ -99,7 +95,7 @@ void Linkup::BuildGameObjects()
 	//auto test = std::make_shared<Test>(Transform(XMFLOAT3(0.0f, 2.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Test");
 	//mGameObjectManager->AddGameObject(test);
 
-	auto character = std::make_shared<Character>(Transform(XMFLOAT3(0.0f, 2.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Character");
+	auto character = std::make_shared<Character>(Transform(XMFLOAT3(4.0f, 10.0f, 5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Character");
 	mGameObjectManager->AddGameObject(character);
 
 	auto logic = std::make_shared<Logic>(Transform(XMFLOAT3(0.0f, 2.0f, -15.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Logic");

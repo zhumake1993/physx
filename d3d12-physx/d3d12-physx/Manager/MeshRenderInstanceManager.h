@@ -20,7 +20,7 @@ public:
 
 	void Draw(int randerLayer);
 
-	bool Pick(DirectX::FXMVECTOR rayOriginW, DirectX::FXMVECTOR rayDirW);
+	std::vector<RaycastHit> Raycast(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction);
 
 private:
 	//

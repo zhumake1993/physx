@@ -7,29 +7,19 @@ Character::Character(const Transform& transform, const std::string& name)
 {
 	mIsStatic = false;
 
-	// MeshRender
-	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
-	mMeshRenderCPT->mMaterial = GetDefaultMaterial();
-	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
-	mMeshRenderCPT->mMeshName = "Test";
-	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;
-	mMeshRenderCPT->mReceiveShadow = true;
-	mMeshRenderCPT->mParent = mName;
-	mMeshRenderCPT->AddMeshRender();
-
 	// 角色控制器
 	mCharacterControllerCPT = std::make_shared<CharacterControllerCPT>(mName, transform);
-	mCharacterControllerCPT->mContactOffset = 0.05f;
+	mCharacterControllerCPT->mContactOffset = 0.01f;
 	mCharacterControllerCPT->mStepOffset = 0.1f;
 	mCharacterControllerCPT->mSlopeLimit= cosf(XM_PIDIV4);
-	mCharacterControllerCPT->mRadius = 0.5f;
+	mCharacterControllerCPT->mRadius = 0.25f;
 	mCharacterControllerCPT->mHeight = 1.0f;
 	mCharacterControllerCPT->mUpDirection = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	mCharacterControllerCPT->AddCharacterController();
 
 	// Camera
 	mCameraCPT = std::make_shared<CameraCPT>(transform);
-	mCameraCPT->SetLens(0.25f * MathHelper::Pi, 1200.0f / 900.0f, 1.0f, 1000.0f);
+	mCameraCPT->SetLens(0.25f * MathHelper::Pi, 1200.0f / 900.0f, 0.1f, 1000.0f);
 	mCameraCPT->SetFrustumCulling(false);
 	mCameraCPT->SetMainCamera();
 }
@@ -42,16 +32,11 @@ void Character::Update(const GameTimer& gt)
 {
 	GameObject::Update(gt);
 
-	Move(gt);
-}
-
-void Character::Move(const GameTimer& gt)
-{
 	const auto delta = gt.DeltaTime();
-	
-	float verticalDist = mCurrVerticalSpeed * delta;
 
 	// 重力
+	float verticalDist = mCurrVerticalSpeed * delta;
+
 	if (mCharacterControllerCPT->Move(XMFLOAT3(0.0f, verticalDist, 0.0f), 0.01f, delta) == 3) {
 		mFallTime = 0.0f;
 		mStartVerticalSpeed = 0.0f;
@@ -60,6 +45,7 @@ void Character::Move(const GameTimer& gt)
 	mCurrVerticalSpeed = mStartVerticalSpeed + mGravity * mFallTime;
 	mFallTime += delta;
 
+	// 移动
 	if (GetKeyPress('W')) {
 		auto dir = mTransform.GetForward();
 		dir.y = 0.0f;
@@ -117,6 +103,11 @@ void Character::Move(const GameTimer& gt)
 		mLastMousePos.x = GetMouseX();
 		mLastMousePos.y = GetMouseY();
 	}
+
+	// 选取
+	if (GetMouseDown(0)) {
+		Pick(GetMouseX(), GetMouseY());
+	}
 }
 
 void Character::Pitch(float angle)
@@ -133,4 +124,40 @@ void Character::RotateY(float angle)
 	auto R = XMQuaternionRotationAxis(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), angle);
 	XMVECTOR quat = XMLoadFloat4(&mTransform.Quaternion);
 	XMStoreFloat4(&mTransform.Quaternion, XMQuaternionMultiply(quat, R));
+}
+
+void Character::Pick(int sx, int sy)
+{
+	XMFLOAT4X4 P = GetMainCamera()->GetProj4x4f();
+
+	// 计算视空间的选取射线
+	float vx = (+2.0f * sx / GetClientWidth() - 1.0f) / P(0, 0);
+	float vy = (-2.0f * sy / GetClientHeight() + 1.0f) / P(1, 1);
+
+	// 视空间的射线定义
+	XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	XMVECTOR rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
+
+	// 将射线转换至世界空间
+	XMMATRIX V = GetMainCamera()->GetView();
+	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(V), V);
+
+	XMVECTOR rayOriginW = XMVector3TransformCoord(rayOrigin, invView);
+	XMVECTOR rayDirW = XMVector3TransformNormal(rayDir, invView);
+
+	XMFLOAT3 origin;
+	XMFLOAT3 direction;
+	XMStoreFloat3(&origin, rayOriginW);
+	XMStoreFloat3(&direction, rayDirW);
+
+	auto hits = Raycast(origin, direction);
+
+	for (auto& h : hits) {
+		auto gameobject = GetGameObject(h.Name);
+		if (gameobject->GetLayer() == "Cube") {
+			std::shared_ptr<Cube> cube = std::dynamic_pointer_cast<Cube>(gameobject);
+			cube->GetPicked(h.Dist, h.Point);
+			break;
+		}
+	}
 }

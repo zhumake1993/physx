@@ -79,7 +79,7 @@ void D3D12App::Update(const GameTimer& gt)
 	}
 
 	// ÒÆ¶¯¹â
-	mLightRotationAngle += 0.1f * gt.DeltaTime();
+	mLightRotationAngle += 0.2f * gt.DeltaTime();
 	XMMATRIX R = XMMatrixRotationY(mLightRotationAngle);
 	for (int i = 0; i < 3; ++i) {
 		XMVECTOR lightDir = XMLoadFloat3(&mBaseLightDirections[i]);

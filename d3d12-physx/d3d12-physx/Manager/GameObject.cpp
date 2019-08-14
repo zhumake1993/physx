@@ -3,6 +3,8 @@
 
 using namespace DirectX;
 
+extern Setting gSetting;
+
 GameObject::GameObject(const Transform& transform, const std::string& name)
 {
 	if (name != "") {
@@ -50,10 +52,6 @@ void GameObject::Update(const GameTimer& gt)
 	}
 }
 
-void GameObject::GetPicked(float dst, DirectX::XMFLOAT3 hitPoint)
-{
-}
-
 void GameObject::Release()
 {
 	if (mMaterial) {
@@ -76,6 +74,11 @@ void GameObject::Release()
 		mCharacterControllerCPT->Release();
 	}
 }
+
+std::string GameObject::GetLayer() { return mLayer; }
+
+int GameObject::GetClientWidth() { return gSetting.ClientWidth; }
+int GameObject::GetClientHeight() { return gSetting.ClientHeight; }
 
 bool GameObject::GetKeyDown(int key) { return GetCurrInputManager()->GetKeyDown(key); }
 bool GameObject::GetKeyPress(int key) { return GetCurrInputManager()->GetKeyPress(key); }
@@ -170,4 +173,9 @@ void GameObject::SetRigidDynamicLockFlag(int axis, bool st)
 	if (mRigidDynamicCPT) {
 		mRigidDynamicCPT->SetRigidDynamicLockFlag(axis, st);
 	}
+}
+
+std::vector<RaycastHit> GameObject::Raycast(const XMFLOAT3& origin, const XMFLOAT3& direction)
+{
+	return GetCurrMeshRenderInstanceManager()->Raycast(origin, direction);
 }

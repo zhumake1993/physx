@@ -119,6 +119,13 @@ struct Int3_Cmp
 	}
 };
 
+struct RaycastHit
+{
+	std::string Name;
+	float Dist;
+	DirectX::XMFLOAT3 Point;
+};
+
 struct Vertex
 {
 	DirectX::XMFLOAT3 Pos;

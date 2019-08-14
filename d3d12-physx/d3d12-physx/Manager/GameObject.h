@@ -19,11 +19,16 @@ public:
 
 	virtual void Update(const GameTimer& gt);
 
-	virtual void GetPicked(float dst, DirectX::XMFLOAT3 hitPoint);
-
 	virtual void Release();
 
+	// 个人数据
+	std::string GetLayer();
+
 protected:
+
+	// 全局数据
+	int GetClientWidth();
+	int GetClientHeight();
 
 	// 键盘输入
 	bool GetKeyDown(int key);
@@ -84,6 +89,9 @@ protected:
 	void AddForce(DirectX::XMFLOAT3 force);
 	void SetRigidDynamicLockFlag(int axis, bool st);
 
+	// 空间查询
+	std::vector<RaycastHit> Raycast(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction);
+
 public:
 	std::string mName;
 	Transform mTransform;
@@ -100,5 +108,6 @@ public:
 
 protected:
 
+	std::string mLayer;
 	bool mIsStatic = false;
 };

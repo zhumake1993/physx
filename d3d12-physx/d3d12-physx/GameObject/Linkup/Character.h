@@ -12,11 +12,12 @@ public:
 private:
 	virtual void Update(const GameTimer& gt)override;
 
-	void Move(const GameTimer& gt);
-
 	// Ðý×ª
 	void Pitch(float angle);
 	void RotateY(float angle);
+
+	// Ñ¡È¡
+	void Pick(int sx, int sy);
 
 public:
 

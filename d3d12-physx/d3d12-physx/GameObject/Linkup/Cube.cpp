@@ -5,6 +5,7 @@ using namespace DirectX;
 Cube::Cube(const Transform& transform, const std::string& name)
 	:GameObject(transform, name)
 {
+	mLayer = "Cube";
 	mIsStatic = true;
 
 	// Material
@@ -41,7 +42,7 @@ Cube::~Cube()
 {
 }
 
-void Cube::GetPicked(float dst, DirectX::XMFLOAT3 hitPoint)
+void Cube::GetPicked(const float& dst, const DirectX::XMFLOAT3& hitPoint)
 {
 	std::shared_ptr<Logic> logic = std::dynamic_pointer_cast<Logic>(GetGameObject("Logic"));
 

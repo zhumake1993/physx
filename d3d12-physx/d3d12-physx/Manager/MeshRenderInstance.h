@@ -41,7 +41,7 @@ public:
 
 	void Draw();
 
-	bool Pick(DirectX::FXMVECTOR rayOriginW, DirectX::FXMVECTOR rayDirW, std::string& name, float& tmin, DirectX::XMVECTOR& point);
+	bool Raycast(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction, std::string& name, float& tmin, DirectX::XMFLOAT3& point);
 
 private:
 	//

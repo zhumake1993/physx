@@ -9,7 +9,7 @@ public:
 	Cube(const Transform& transform = Transform(), const std::string& name = "");
 	~Cube();
 
-	virtual void GetPicked(float dst, DirectX::XMFLOAT3 hitPoint)override;
+	void GetPicked(const float& dst, const DirectX::XMFLOAT3& hitPoint);
 
 	void TurnOnBlink();
 	void TurnOffBlink();

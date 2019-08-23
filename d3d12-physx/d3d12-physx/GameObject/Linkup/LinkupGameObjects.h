@@ -11,3 +11,4 @@
 #include "Player.h"
 #include "Test.h"
 #include "Obverser.h"
+#include "Character.h"

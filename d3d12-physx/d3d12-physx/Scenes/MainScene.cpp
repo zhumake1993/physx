@@ -24,10 +24,6 @@ void MainScene::Initialize()
 void MainScene::Update(const GameTimer& gt)
 {
 	Scene::Update(gt);
-
-	if (mInputManager->GetMouseDown(0)) {
-		Pick(mInputManager->GetMouseX(), mInputManager->GetMouseY());
-	}
 }
 
 void MainScene::PostUpdate(const GameTimer& gt)

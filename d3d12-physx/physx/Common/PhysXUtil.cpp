@@ -17,4 +17,6 @@ PxPhysics* gPhysics = NULL;						// Px实例
 PxDefaultCpuDispatcher* gDispatcher = NULL;		// cpu分配器
 PxScene* gScene = NULL;							// 场景
 
+PxControllerManager* gControllerManager = NULL;	// 角色控制器管理器
+
 PxPvd* gPvd = NULL;								// PVD

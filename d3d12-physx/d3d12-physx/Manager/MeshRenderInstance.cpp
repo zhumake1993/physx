@@ -125,9 +125,12 @@ void MeshRenderInstance::Draw()
 	gCommandList->DrawIndexedInstanced(mMesh->IndexCount, mVisibleCount, 0, 0, 0);
 }
 
-bool MeshRenderInstance::Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW, std::string& name, float& tmin, XMVECTOR& point)
+bool MeshRenderInstance::Raycast(const XMFLOAT3& origin, const XMFLOAT3& direction, std::string& name, float& tmin, XMFLOAT3& point)
 {
 	bool result = false;
+
+	XMVECTOR rayOriginW = XMLoadFloat3(&origin);
+	XMVECTOR rayDirW = XMLoadFloat3(&direction);
 
 	tmin = MathHelper::Infinity;
 
@@ -199,7 +202,7 @@ bool MeshRenderInstance::Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW, std::stri
 
 					tmin = tminW;
 					name = nameL;
-					point = pointW;
+					XMStoreFloat3(&point, pointW);
 				}
 			}
 		}

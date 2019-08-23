@@ -33,6 +33,12 @@ public:
 	void DeletePxRigidDynamic(std::string name);
 	void DeletePxRigidStatic(std::string name);
 
+	// ½ÇÉ«¿ØÖÆÆ÷
+	std::string AddCharacterController(void* pdesc);
+	void DeleteCharacterController(const std::string& name);
+	int MoveCharacterController(const std::string& name, const PxFloat3& disp, float minDist, float elapsedTime);
+	PxFloat3 GetCharacterControllerTranslation(const std::string& name);
+
 	void Update(float delta);
 
 	void GetPxRigidDynamicTransform(std::string name, PxFloat3& pos, PxFloat4& quat);
@@ -42,6 +48,7 @@ public:
 private:
 	bool HasPxRigidStatic(const std::string& name);
 	bool HasPxRigidDynamic(const std::string& name);
+	bool HasPxController(const std::string& name);
 
 public:
 	//

@@ -27,8 +27,6 @@ protected:
 	virtual void BuildMeshes() = 0;
 	virtual void BuildGameObjects() = 0;
 
-	void Pick(int sx, int sy);
-
 public:
 
 	// Camera

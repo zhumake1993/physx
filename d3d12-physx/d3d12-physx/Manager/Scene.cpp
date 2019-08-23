@@ -58,25 +58,3 @@ void Scene::PostUpdate(const GameTimer& gt)
 	// 注意，输入管理器的更新函数要放在最后，否则GetKeyDown之类的函数会失效
 	mInputManager->Update(gt);
 }
-
-void Scene::Pick(int sx, int sy)
-{
-	XMFLOAT4X4 P = mMainCamera->GetProj4x4f();
-
-	// 计算视空间的选取射线
-	float vx = (+2.0f * sx / gSetting.ClientWidth - 1.0f) / P(0, 0);
-	float vy = (-2.0f * sy / gSetting.ClientHeight + 1.0f) / P(1, 1);
-
-	// 视空间的射线定义
-	XMVECTOR rayOrigin = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-	XMVECTOR rayDir = XMVectorSet(vx, vy, 1.0f, 0.0f);
-
-	// 将射线转换至世界空间
-	XMMATRIX V = mMainCamera->GetView();
-	XMMATRIX invView = XMMatrixInverse(&XMMatrixDeterminant(V), V);
-
-	XMVECTOR rayOriginW = XMVector3TransformCoord(rayOrigin, invView);
-	XMVECTOR rayDirW = XMVector3TransformNormal(rayDir, invView);
-
-	mMeshRenderInstanceManager->Pick(rayOriginW, rayDirW);
-}

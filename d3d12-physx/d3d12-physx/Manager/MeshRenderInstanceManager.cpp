@@ -1,5 +1,6 @@
 #include "Manager/MeshRenderInstanceManager.h"
 #include "Manager/SceneManager.h"
+#include <algorithm>
 
 using namespace DirectX;
 
@@ -104,13 +105,9 @@ void MeshRenderInstanceManager::Draw(int randerLayer)
 	}
 }
 
-bool MeshRenderInstanceManager::Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW)
+std::vector<RaycastHit> MeshRenderInstanceManager::Raycast(const XMFLOAT3& origin, const XMFLOAT3& direction)
 {
-	bool result = false;
-
-	std::string nameResult;
-	float tminResult = MathHelper::Infinity;
-	XMVECTOR pointResult;
+	std::vector<RaycastHit> result;
 
 	for (int i = 0; i < (int)RenderLayer::Count;i++) {
 
@@ -125,27 +122,22 @@ bool MeshRenderInstanceManager::Pick(FXMVECTOR rayOriginW, FXMVECTOR rayDirW)
 		for (auto& p : mMeshRenderInstanceLayers[i]) {
 
 			std::string name;
-			float tmin;
-			XMVECTOR point;
+			float dist;
+			XMFLOAT3 point;
 
-			if (p.second->Pick(rayOriginW, rayDirW, name, tmin, point)) {
-				if (tmin < tminResult) {
-					result = true;
+			if (p.second->Raycast(origin, direction, name, dist, point)) {
+				
+				RaycastHit hit;
+				hit.Name = mMeshRenderToParent[name];
+				hit.Dist = dist;
+				hit.Point = point;
 
-					nameResult = name;
-					tminResult = tmin;
-					pointResult = point;
-				}
+				result.push_back(hit);
 			}
 		}
 	}
 
-	if (result) {
-		XMFLOAT3 hitPoint;
-		XMStoreFloat3(&hitPoint, pointResult);
-
-		GetCurrGameObjectManager()->GetGameObject(mMeshRenderToParent[nameResult])->GetPicked(tminResult, hitPoint);
-	}
+	std::sort(result.begin(), result.end(), [](const RaycastHit& a, const RaycastHit& b) {return a.Dist < b.Dist; });
 
 	return result;
 }

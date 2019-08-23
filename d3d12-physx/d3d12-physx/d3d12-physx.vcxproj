@@ -151,6 +151,7 @@
     <ClCompile Include="Common\Log.cpp" />
     <ClCompile Include="Common\MathHelper.cpp" />
     <ClCompile Include="Component\CameraCPT.cpp" />
+    <ClCompile Include="Component\CharacterControllerCPT.cpp" />
     <ClCompile Include="Component\MeshRenderCPT.cpp" />
     <ClCompile Include="Component\RigidDynamicCPT.cpp" />
     <ClCompile Include="Component\RigidStaticCPT.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="Filter\InverseFilter.cpp" />
     <ClCompile Include="Filter\MultiplyFilter.cpp" />
     <ClCompile Include="Filter\SobelFilter.cpp" />
+    <ClCompile Include="GameObject\Linkup\Character.cpp" />
     <ClCompile Include="GameObject\Linkup\Cube.cpp" />
     <ClCompile Include="GameObject\Linkup\Floor.cpp" />
     <ClCompile Include="GameObject\Linkup\Fragment.cpp" />
@@ -219,6 +221,7 @@
     <ClInclude Include="Common\MyException.h" />
     <ClInclude Include="Common\UploadBuffer.h" />
     <ClInclude Include="Component\CameraCPT.h" />
+    <ClInclude Include="Component\CharacterControllerCPT.h" />
     <ClInclude Include="Component\MeshRenderCPT.h" />
     <ClInclude Include="Component\RigidDynamicCPT.h" />
     <ClInclude Include="Component\RigidStaticCPT.h" />
@@ -226,6 +229,7 @@
     <ClInclude Include="Filter\InverseFilter.h" />
     <ClInclude Include="Filter\MultiplyFilter.h" />
     <ClInclude Include="Filter\SobelFilter.h" />
+    <ClInclude Include="GameObject\Linkup\Character.h" />
     <ClInclude Include="GameObject\Linkup\Cube.h" />
     <ClInclude Include="GameObject\Linkup\Floor.h" />
     <ClInclude Include="GameObject\Linkup\Fragment.h" />

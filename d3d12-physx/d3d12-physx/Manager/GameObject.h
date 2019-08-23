@@ -8,6 +8,7 @@
 #include "Component/RigidDynamicCPT.h"
 #include "Component/RigidStaticCPT.h"
 #include "Component/CameraCPT.h"
+#include "Component/CharacterControllerCPT.h"
 
 class GameObject
 {
@@ -18,11 +19,16 @@ public:
 
 	virtual void Update(const GameTimer& gt);
 
-	virtual void GetPicked(float dst, DirectX::XMFLOAT3 hitPoint);
-
 	virtual void Release();
 
+	// 个人数据
+	std::string GetLayer();
+
 protected:
+
+	// 全局数据
+	int GetClientWidth();
+	int GetClientHeight();
 
 	// 键盘输入
 	bool GetKeyDown(int key);
@@ -43,6 +49,7 @@ protected:
 	// 材质
 	void AddMaterial();
 	std::shared_ptr<Material> GetMaterial();
+	std::shared_ptr<Material> GetDefaultMaterial();
 	void SetMaterial(std::shared_ptr<Material> material);
 
 	// 纹理
@@ -82,6 +89,9 @@ protected:
 	void AddForce(DirectX::XMFLOAT3 force);
 	void SetRigidDynamicLockFlag(int axis, bool st);
 
+	// 空间查询
+	std::vector<RaycastHit> Raycast(const DirectX::XMFLOAT3& origin, const DirectX::XMFLOAT3& direction);
+
 public:
 	std::string mName;
 	Transform mTransform;
@@ -91,11 +101,13 @@ public:
 	std::shared_ptr<RigidDynamicCPT> mRigidDynamicCPT = nullptr;
 	std::shared_ptr<RigidStaticCPT> mRigidStaticCPT = nullptr;
 	std::shared_ptr<CameraCPT> mCameraCPT = nullptr;
+	std::shared_ptr<CharacterControllerCPT> mCharacterControllerCPT = nullptr;
 
 	std::shared_ptr<GameTimer> mGameTimer = nullptr;
 	float mLifeTime = 0.0f;
 
 protected:
 
+	std::string mLayer;
 	bool mIsStatic = false;
 };

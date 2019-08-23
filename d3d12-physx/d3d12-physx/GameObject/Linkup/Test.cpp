@@ -7,20 +7,9 @@ Test::Test(const Transform& transform, const std::string& name)
 {
 	mIsStatic = false;
 
-	// Material
-	mMaterial = std::make_shared<Material>();
-	mMaterial->mDiffuseMapIndex = -1;
-	mMaterial->mNormalMapIndex = -1;
-	mMaterial->mDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mMaterial->mFresnelR0 = XMFLOAT3(0.2f, 0.2f, 0.2f);
-	mMaterial->mRoughness = 0.1f;
-	mMaterial->mLerpDiffuseAlbedo = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	mMaterial->mLerpPara = 0.0f;
-	AddMaterial();
-
 	// MeshRender
 	mMeshRenderCPT = std::make_shared<MeshRenderCPT>(transform);
-	mMeshRenderCPT->mMaterial = mMaterial;
+	mMeshRenderCPT->mMaterial = GetDefaultMaterial();
 	XMStoreFloat4x4(&mMeshRenderCPT->mTexTransform, XMMatrixScaling(1.0f, 1.0f, 1.0f));
 	mMeshRenderCPT->mMeshName = "Test";
 	mMeshRenderCPT->mRenderLayer = (int)RenderLayer::Opaque;

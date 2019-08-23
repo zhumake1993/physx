@@ -26,10 +26,6 @@ void Linkup::Initialize()
 void Linkup::Update(const GameTimer& gt)
 {
 	Scene::Update(gt);
-
-	if (mInputManager->GetMouseDown(0)) {
-		Pick(mInputManager->GetMouseX(), mInputManager->GetMouseY());
-	}
 }
 
 void Linkup::PostUpdate(const GameTimer& gt)
@@ -57,10 +53,11 @@ void Linkup::BuildTextures()
 		L"Textures/bricks2_nmap.dds",
 		L"Textures/checkboard.dds",
 		L"Textures/tile.dds",
-		L"Textures/tile_nmap.dds"
+		L"Textures/tile_nmap.dds",
+		L"Textures/word.dds"
 	};
 
-	std::wstring cubeMapFileName = L"Textures/desertcube1024.dds";
+	std::wstring cubeMapFileName = L"Textures/snowcube1024.dds";
 
 	for (auto fileName : fileNames) {
 		mTextureManager->AddTextureTex(fileName);
@@ -96,8 +93,11 @@ void Linkup::BuildGameObjects()
 	auto obverser = std::make_shared<Obverser>(Transform(XMFLOAT3(0.0f, 2.0f, -10.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Obverser");
 	mGameObjectManager->AddGameObject(obverser);
 
-	auto test = std::make_shared<Test>(Transform(XMFLOAT3(0.0f, 2.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Test");
-	mGameObjectManager->AddGameObject(test);
+	//auto test = std::make_shared<Test>(Transform(XMFLOAT3(0.0f, 2.0f, -5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Test");
+	//mGameObjectManager->AddGameObject(test);
+
+	auto character = std::make_shared<Character>(Transform(XMFLOAT3(4.0f, 10.0f, 5.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Character");
+	mGameObjectManager->AddGameObject(character);
 
 	auto logic = std::make_shared<Logic>(Transform(XMFLOAT3(0.0f, 2.0f, -15.0f), XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(1.0f, 1.0f, 1.0f)), "Logic");
 	mGameObjectManager->AddGameObject(logic);

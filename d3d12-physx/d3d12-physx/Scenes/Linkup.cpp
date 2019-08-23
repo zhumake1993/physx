@@ -53,10 +53,11 @@ void Linkup::BuildTextures()
 		L"Textures/bricks2_nmap.dds",
 		L"Textures/checkboard.dds",
 		L"Textures/tile.dds",
-		L"Textures/tile_nmap.dds"
+		L"Textures/tile_nmap.dds",
+		L"Textures/word.dds"
 	};
 
-	std::wstring cubeMapFileName = L"Textures/desertcube1024.dds";
+	std::wstring cubeMapFileName = L"Textures/snowcube1024.dds";
 
 	for (auto fileName : fileNames) {
 		mTextureManager->AddTextureTex(fileName);
